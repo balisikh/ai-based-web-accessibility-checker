@@ -37,15 +37,18 @@ Confirm that a tester can:
 
 ## 3. Multi-site scan sequence (core test)
 
+**Target:** **10 websites** (enough coverage for this MVP test plan).
+
 Run these **in order**, using **New scan** between each:
 
 | # | Site | URL | Why include it |
 |---|------|-----|----------------|
 | 1 | Google UK | https://www.google.co.uk/ | Large public site; often few/no automated issues |
 | 2 | YouTube | https://www.youtube.com/ | Complex JS app; tests render + rules |
-| 3 | Example | https://example.com/ | Simple clean page; expect strong/clean score |
-| 4 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | Known-bad page; expect many issues / low score |
-| 5 | Tester choice | Any other public https site you need | Real-world coverage |
+| 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | Real local public-service page |
+| 4 | Example | https://example.com/ | Simple clean page; expect strong/clean score |
+| 5 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | Known-bad page; expect many issues / low score |
+| 6–10 | Tester choice | Any other public https sites | Fill remaining slots to reach **10 total** |
 
 ### Pass criteria for each site
 - [ ] Checklist progresses: Fetch → Render → Rules → AI → Score  

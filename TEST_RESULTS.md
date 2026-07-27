@@ -23,12 +23,15 @@ Notes:
 
 ## Summary count
 
+**Target sample size:** **10 websites**
+
 | Metric | Count |
 |--------|------:|
+| Target | 10 |
 | Websites tested | 3 |
 | Passed | 1 |
 | Failed | 2 |
-| Pending | example.com, W3C bad demo, other sites |
+| Remaining | 7 |
 
 ---
 
