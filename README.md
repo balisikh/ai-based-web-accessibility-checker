@@ -54,7 +54,7 @@ cp .env.example .env.local   # optional — edit as needed
 npm run dev
 ```
 
-Open **http://localhost:3000**
+Open **http://localhost:4376**
 
 #### Windows (PowerShell) note
 
