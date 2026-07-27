@@ -293,7 +293,7 @@ export function ScanExperience() {
         <section className="results" aria-labelledby="results-heading">
           <div className="panel-topbar">
             <button type="button" className="back-link" onClick={backToHome}>
-              ← Back to home
+              ← New scan
             </button>
           </div>
           <header className="results-header">
@@ -344,7 +344,7 @@ export function ScanExperience() {
                   Export JSON
                 </a>
                 <button type="button" className="button-secondary" onClick={backToHome}>
-                  Back to home
+                  New scan
                 </button>
               </div>
             </div>
@@ -379,7 +379,7 @@ export function ScanExperience() {
                     className="button-secondary"
                     onClick={backToHome}
                   >
-                    Back to home
+                    New scan
                   </button>
                 </div>
               </div>
