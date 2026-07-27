@@ -62,6 +62,34 @@ function httpErrorMessage(status: number): string {
   return `Website returned HTTP ${status}.`;
 }
 
+function isAxeFrameInjectionError(message: string): boolean {
+  return /axe\.utils|reading 'utils'|runPartial|frame\.evaluate/i.test(message);
+}
+
+async function runAxeAnalysis(page: Page) {
+  const tags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+  const build = (legacy: boolean) => {
+    let builder = new AxeBuilder({ page })
+      .withTags(tags)
+      .options({ iframes: false });
+    if (legacy) {
+      builder = builder.setLegacyMode(true);
+    }
+    return builder;
+  };
+
+  try {
+    return await build(false).analyze();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!isAxeFrameInjectionError(message)) {
+      throw error;
+    }
+    // Some pages (cross-origin / sandboxed iframes) break axe's default multi-frame path.
+    return await build(true).analyze();
+  }
+}
+
 async function pageHasScanableDom(page: Page): Promise<boolean> {
   return page
     .evaluate(() => {
@@ -130,9 +158,7 @@ export async function analyzeUrlWithAxe(
 
     await onProgress?.("rule_analysis");
 
-    const axeResults = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-      .analyze();
+    const axeResults = await runAxeAnalysis(page);
 
     const issues = mapAxeViolationsToIssues(scanId, axeResults.violations);
     const pageTitle = await page.title().catch(() => undefined);
@@ -148,6 +174,11 @@ export async function analyzeUrlWithAxe(
     if (/net::|NS_ERROR|ENOTFOUND|ECONNREFUSED|ERR_/i.test(message)) {
       throw new Error(
         "Could not reach that website. Check the URL or try again later.",
+      );
+    }
+    if (isAxeFrameInjectionError(message)) {
+      throw new Error(
+        "Accessibility rules could not run on this page (embedded frames blocked the scanner). Try a simpler URL or a single-page path without heavy iframe embeds.",
       );
     }
     throw error instanceof Error ? error : new Error(message);
