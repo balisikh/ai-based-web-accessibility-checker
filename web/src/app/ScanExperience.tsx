@@ -84,12 +84,14 @@ export function ScanExperience() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (phase !== "scanning" || !scan) return;
+    if (phase !== "scanning" || !scan?.id) return;
 
+    const scanId = scan.id;
     let cancelled = false;
+
     const timer = window.setInterval(async () => {
       try {
-        const res = await fetch(`/api/scans/${scan.id}`);
+        const res = await fetch(`/api/scans/${scanId}`);
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error ?? "Could not load scan status.");
@@ -97,9 +99,9 @@ export function ScanExperience() {
         if (cancelled) return;
 
         const next = data.scan as ScanSummary;
-        setScan(next);
 
         if (next.status === "completed") {
+          window.clearInterval(timer);
           const issuesRes = await fetch(`/api/scans/${next.id}/issues`);
           const issuesData = await issuesRes.json();
           if (!issuesRes.ok) {
@@ -108,20 +110,26 @@ export function ScanExperience() {
           if (cancelled) return;
           setIssues(issuesData.issues as Issue[]);
           setSelectedId(issuesData.issues[0]?.id ?? null);
+          setScan(next);
           setPhase("results");
-          window.clearInterval(timer);
+          return;
         }
 
         if (next.status === "failed") {
+          window.clearInterval(timer);
+          setScan(next);
           setError(next.errorMessage ?? "Scan failed.");
           setPhase("error");
-          window.clearInterval(timer);
+          return;
         }
+
+        // Progress update only — do not restart this effect.
+        setScan(next);
       } catch (err) {
         if (cancelled) return;
+        window.clearInterval(timer);
         setError(err instanceof Error ? err.message : "Scan polling failed.");
         setPhase("error");
-        window.clearInterval(timer);
       }
     }, 600);
 
@@ -129,7 +137,8 @@ export function ScanExperience() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [phase, scan]);
+    // Intentionally depend on scan.id only so status updates don't cancel in-flight completion.
+  }, [phase, scan?.id]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -163,6 +172,11 @@ export function ScanExperience() {
     setIssues([]);
     setSelectedId(null);
     setError(null);
+    setSeverityFilter("all");
+  }
+
+  function backToHome() {
+    reset();
   }
 
   const filteredIssues =
@@ -244,6 +258,11 @@ export function ScanExperience() {
 
       {phase === "scanning" && scan && (
         <section className="status-panel" aria-live="polite" aria-busy="true">
+          <div className="panel-topbar">
+            <button type="button" className="back-link" onClick={backToHome}>
+              ← Back to home
+            </button>
+          </div>
           <p className="brand compact">Lumen</p>
           <h2>Checking {scan.url}</h2>
           <p className="status-line">
@@ -272,6 +291,11 @@ export function ScanExperience() {
 
       {phase === "results" && scan && (
         <section className="results" aria-labelledby="results-heading">
+          <div className="panel-topbar">
+            <button type="button" className="back-link" onClick={backToHome}>
+              ← Back to home
+            </button>
+          </div>
           <header className="results-header">
             <div>
               <p className="brand compact">Lumen</p>
@@ -305,9 +329,12 @@ export function ScanExperience() {
             <div className="success-panel" role="status">
               <h3>Looking good</h3>
               <p>
-                No automated accessibility issues were found for this page with
-                the current WCAG A/AA rule set. That is encouraging — it is not
-                a formal certificate, so keep doing manual checks too.
+                Automated scan finished with score{" "}
+                <strong>{scan.score ?? 0}</strong> and{" "}
+                <strong>0 issues</strong> for this page under the current WCAG
+                A/AA rule set. That is the actual result — not a missing report.
+                It is still not a formal certificate, so keep doing manual checks
+                too.
               </p>
               <div className="toolbar-actions">
                 <a
@@ -316,8 +343,8 @@ export function ScanExperience() {
                 >
                   Export JSON
                 </a>
-                <button type="button" className="button-secondary" onClick={reset}>
-                  New scan
+                <button type="button" className="button-secondary" onClick={backToHome}>
+                  Back to home
                 </button>
               </div>
             </div>
@@ -350,9 +377,9 @@ export function ScanExperience() {
                   <button
                     type="button"
                     className="button-secondary"
-                    onClick={reset}
+                    onClick={backToHome}
                   >
-                    New scan
+                    Back to home
                   </button>
                 </div>
               </div>

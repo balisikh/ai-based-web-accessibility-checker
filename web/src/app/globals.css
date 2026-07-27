@@ -248,6 +248,27 @@ select:focus-visible {
   word-break: break-all;
 }
 
+.panel-topbar {
+  margin: 0 0 0.85rem;
+}
+
+.back-link {
+  border: 0;
+  background: transparent;
+  color: var(--brand-deep);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.back-link:hover {
+  color: var(--brand);
+}
+
 .status-line {
   margin: 0 0 1rem;
   color: var(--ink-soft);
