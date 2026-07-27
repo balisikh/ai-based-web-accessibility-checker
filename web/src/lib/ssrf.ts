@@ -26,24 +26,33 @@ function isPrivateIp(ip: string): boolean {
  * Resolve hostname and reject private/link-local targets (SSRF hardening).
  */
 export async function assertPublicHostname(hostname: string): Promise<void> {
-  let records: Array<{ address: string; family: number }>;
-  try {
-    records = await dns.lookup(hostname, { all: true, verbatim: true });
-  } catch {
-    throw new Error(
-      "Could not resolve that hostname. Check the URL and try again.",
-    );
-  }
-
-  if (!records.length) {
-    throw new Error("Could not resolve that hostname.");
-  }
-
-  for (const record of records) {
-    if (isPrivateIp(record.address)) {
-      throw new Error(
-        "Private or local network addresses cannot be scanned.",
-      );
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const records = await dns.lookup(hostname, { all: true, verbatim: true });
+      if (!records.length) {
+        throw new Error("Could not resolve that hostname.");
+      }
+      for (const record of records) {
+        if (isPrivateIp(record.address)) {
+          throw new Error(
+            "Private or local network addresses cannot be scanned.",
+          );
+        }
+      }
+      return;
+    } catch (error) {
+      lastError = error;
+      if (
+        error instanceof Error &&
+        /Private or local|Could not resolve/i.test(error.message)
+      ) {
+        throw error;
+      }
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 400));
+      }
     }
   }
+  throw new Error("Could not resolve that hostname. Check the URL and try again.");
 }

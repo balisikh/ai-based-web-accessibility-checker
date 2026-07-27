@@ -37,7 +37,7 @@ export type RateLimitResult =
  * Override with RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS.
  */
 export function checkRateLimit(key: string): RateLimitResult {
-  const defaultMax = process.env.NODE_ENV === "development" ? 60 : 5;
+  const defaultMax = process.env.NODE_ENV === "development" ? 120 : 5;
   const limit = envInt("RATE_LIMIT_MAX", defaultMax);
   const windowMs = envInt("RATE_LIMIT_WINDOW_MS", 60_000);
   const now = Date.now();
