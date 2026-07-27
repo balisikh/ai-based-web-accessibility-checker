@@ -26,6 +26,10 @@ npm run lint   # eslint
 | `PGLITE_DATA_DIR` | Optional custom PGlite data path |
 | `RATE_LIMIT_MAX` | Max `POST /api/scans` per IP per window (default `5`) |
 | `RATE_LIMIT_WINDOW_MS` | Window length in ms (default `60000`) |
+| `AI_API_KEY` / `OPENAI_API_KEY` | Enables AI tips for top issues (optional) |
+| `AI_BASE_URL` | OpenAI-compatible API base (default `https://api.openai.com/v1`) |
+| `AI_MODEL` | Model name (default `gpt-4o-mini`) |
+| `AI_MAX_ISSUES` | How many top issues to enrich (default `5`) |
 | `USE_DEMO_SCAN=1` | Sample findings instead of Playwright/axe |
 
 ```bash
@@ -53,6 +57,9 @@ Scans and issues are stored in Postgres tables (`scans`, `issues`):
 3. DNS resolve + reject private IPs  
 4. Playwright (Chrome) renders the page  
 5. axe-core runs WCAG A/AA tagged rules  
-6. Persist issues + score  
+6. Optional AI enrichment for top issues (if API key set; failures never block the report)  
+7. Persist issues + score  
 
-AI enrichment is still optional / not required for MVP.
+## AI tips
+
+Set `AI_API_KEY` (or `OPENAI_API_KEY`) in `.env.local`, restart the server, then scan a page. Top issues by severity get explanation + suggested fix in the results detail panel. Without a key, rule results still work as usual.

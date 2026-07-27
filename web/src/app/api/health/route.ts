@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb, getDbModeLabel } from "@/lib/db";
+import { isAiConfigured } from "@/lib/ai-enrichment";
 
 export async function GET() {
   try {
@@ -9,6 +10,7 @@ export async function GET() {
       ok: true,
       service: "lumen-accessibility-checker",
       db: getDbModeLabel(),
+      ai: isAiConfigured(),
       time: new Date().toISOString(),
     });
   } catch (error) {
@@ -17,6 +19,7 @@ export async function GET() {
         ok: false,
         service: "lumen-accessibility-checker",
         db: getDbModeLabel(),
+        ai: isAiConfigured(),
         error: error instanceof Error ? error.message : "Database unavailable",
         time: new Date().toISOString(),
       },

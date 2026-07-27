@@ -46,7 +46,7 @@ UI itself should aim for WCAG 2.2 AA (keyboard, labels, contrast, focus).
 | Scoring | Deterministic score from severities | ☑ |
 | WCAG mapping | Criteria IDs + severity on each issue | ☑ |
 | Job lifecycle | `queued → … → completed \| failed` | ☑ |
-| AI enrichment (optional) | If `AI_API_KEY` set, enrich top-N issues; never block rules | ☐ placeholder stage only |
+| AI enrichment (optional) | If `AI_API_KEY` set, enrich top-N issues; never block rules | ☑ |
 | Persistence | In-memory OK for spike; Postgres for real MVP | ☑ Postgres via `DATABASE_URL`, else PGlite files |
 
 ---

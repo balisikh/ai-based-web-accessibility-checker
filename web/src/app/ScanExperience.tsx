@@ -156,7 +156,8 @@ export function ScanExperience() {
             <p id="url-hint" className="hint">
               Public http/https pages only. We do not scan private or local
               network addresses. Scans run in a headless browser with axe-core
-              (WCAG A/AA tags).
+              (WCAG A/AA tags). Optional AI tips appear when an API key is
+              configured on the server.
             </p>
             {error && (
               <p id={errorId} className="form-error" role="alert">

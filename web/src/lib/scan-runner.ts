@@ -22,8 +22,7 @@ export async function createQueuedScan(url: string): Promise<Scan> {
 }
 
 /**
- * Live pipeline: resolve/SSRF check → Playwright render → axe-core → score.
- * AI enrichment stage is a no-op placeholder until an API key adapter is added.
+ * Live pipeline: resolve/SSRF check → Playwright render → axe-core → optional AI → score.
  */
 export async function runLiveScan(scanId: string): Promise<void> {
   const scan = await updateScan(scanId, { status: "fetching" });
@@ -38,10 +37,11 @@ export async function runLiveScan(scanId: string): Promise<void> {
     const current = await getScan(scanId);
     if (!current) return;
 
-    const { issues } = await analyzeUrlWithAxe(scanId, current.url);
+    let { issues } = await analyzeUrlWithAxe(scanId, current.url);
 
     await updateScan(scanId, { status: "ai_enrichment" });
-    // Optional AI tips: skipped until AI_API_KEY adapter exists.
+    const { enrichIssuesWithAi } = await import("./ai-enrichment");
+    issues = await enrichIssuesWithAi(current.url, issues);
 
     await updateScan(scanId, { status: "scoring" });
     const summaryCounts = countBySeverity(issues);

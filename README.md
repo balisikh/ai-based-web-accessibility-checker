@@ -31,6 +31,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Live scans** via Playwright (installed Chrome) + axe-core WCAG A/AA rules
 - **Rate limiting** on scan creation (per IP)
 - **Postgres persistence** (`DATABASE_URL`) or local **PGlite** files under `web/data/`
+- **Optional AI tips** for top issues when `AI_API_KEY` / `OPENAI_API_KEY` is set
 - Optional `USE_DEMO_SCAN=1` for sample findings without a browser
 
 ## Docs
