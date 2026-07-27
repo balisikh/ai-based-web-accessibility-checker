@@ -7,7 +7,7 @@ For the project overview and quick start, see the [root README](../README.md).
 ## Scripts
 
 ```bash
-npm run dev    # local development → http://localhost:3000
+npm run dev    # local development → http://localhost:4376
 npm run build  # production build
 npm run start  # run production server
 npm run lint   # eslint
