@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import type { Issue, ScanSummary, Severity } from "@/lib/types";
+import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
 
@@ -18,9 +18,63 @@ const STATUS_LABEL: Record<string, string> = {
 
 const SEVERITY_ORDER: Severity[] = ["critical", "serious", "moderate", "minor"];
 
+const EXAMPLE_URLS = [
+  { label: "example.com", url: "https://example.com" },
+  {
+    label: "W3C bad demo",
+    url: "https://www.w3.org/WAI/demos/bad/before/home.html",
+  },
+] as const;
+
+const SCAN_STEPS = [
+  { id: "fetching", label: "Fetch page" },
+  { id: "rendering", label: "Render page" },
+  { id: "rule_analysis", label: "Run accessibility rules" },
+  { id: "ai_enrichment", label: "Add AI guidance" },
+  { id: "scoring", label: "Calculate score" },
+] as const;
+
+const STEP_ORDER: ScanStatus[] = [
+  "queued",
+  "fetching",
+  "rendering",
+  "rule_analysis",
+  "ai_enrichment",
+  "scoring",
+  "completed",
+];
+
+function stepState(
+  current: ScanStatus,
+  stepId: (typeof SCAN_STEPS)[number]["id"],
+): "done" | "active" | "pending" {
+  const currentIndex = STEP_ORDER.indexOf(current);
+  const stepIndex = STEP_ORDER.indexOf(stepId);
+  if (current === "failed") {
+    return stepIndex <= Math.max(currentIndex, 1) ? "done" : "pending";
+  }
+  if (currentIndex < 0) return "pending";
+  if (currentIndex > stepIndex) return "done";
+  if (currentIndex === stepIndex) return "active";
+  // queued is before fetching
+  if (current === "queued" && stepId === "fetching") return "active";
+  return "pending";
+}
+
+function scoreRating(score: number | undefined): {
+  label: string;
+  tone: "strong" | "fair" | "needs-work";
+} {
+  const value = score ?? 0;
+  if (value >= 85) return { label: "Strong", tone: "strong" };
+  if (value >= 60) return { label: "Fair", tone: "fair" };
+  return { label: "Needs work", tone: "needs-work" };
+}
+
 export function ScanExperience() {
   const inputId = useId();
   const errorId = useId();
+  const examplesId = useId();
   const [url, setUrl] = useState("https://example.com");
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +170,8 @@ export function ScanExperience() {
       ? issues
       : issues.filter((issue) => issue.severity === severityFilter);
   const selected = issues.find((issue) => issue.id === selectedId) ?? null;
+  const rating = scoreRating(scan?.score);
+  const cleanScan = phase === "results" && issues.length === 0;
 
   return (
     <div className="scan-shell">
@@ -145,7 +201,9 @@ export function ScanExperience() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 aria-invalid={error ? true : undefined}
-                aria-describedby={error ? errorId : "url-hint"}
+                aria-describedby={
+                  error ? `${examplesId} ${errorId}` : `${examplesId} url-hint`
+                }
                 disabled={phase === "submitting"}
                 required
               />
@@ -153,6 +211,22 @@ export function ScanExperience() {
                 {phase === "submitting" ? "Starting…" : "Check accessibility"}
               </button>
             </div>
+
+            <div id={examplesId} className="example-row">
+              <span className="example-label">Try</span>
+              {EXAMPLE_URLS.map((example) => (
+                <button
+                  key={example.url}
+                  type="button"
+                  className="example-chip"
+                  disabled={phase === "submitting"}
+                  onClick={() => setUrl(example.url)}
+                >
+                  {example.label}
+                </button>
+              ))}
+            </div>
+
             <p id="url-hint" className="hint">
               Public http/https pages only. We do not scan private or local
               network addresses. Scans run in a headless browser with axe-core
@@ -178,6 +252,21 @@ export function ScanExperience() {
           <div className="progress-track" aria-hidden="true">
             <div className="progress-bar" />
           </div>
+          <ol className="scan-steps">
+            {SCAN_STEPS.map((step) => {
+              const state = stepState(scan.status, step.id);
+              return (
+                <li key={step.id} className={`scan-step scan-step-${state}`}>
+                  <span className="scan-step-marker" aria-hidden="true" />
+                  <span>
+                    {step.label}
+                    {state === "active" ? " (in progress)" : ""}
+                    {state === "done" ? " (done)" : ""}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </section>
       )}
 
@@ -193,9 +282,13 @@ export function ScanExperience() {
                 </a>
               </p>
             </div>
-            <div className="score-block" aria-label={`Accessibility score ${scan.score}`}>
+            <div
+              className={`score-block score-${rating.tone}`}
+              aria-label={`Accessibility score ${scan.score}, ${rating.label}`}
+            >
               <p className="score-value">{scan.score}</p>
               <p className="score-label">Score</p>
+              <p className="score-rating">{rating.label}</p>
             </div>
           </header>
 
@@ -208,113 +301,147 @@ export function ScanExperience() {
             ))}
           </ul>
 
-          <div className="toolbar">
-            <label>
-              Filter severity
-              <select
-                value={severityFilter}
-                onChange={(e) =>
-                  setSeverityFilter(e.target.value as Severity | "all")
-                }
-              >
-                <option value="all">All</option>
-                {SEVERITY_ORDER.map((severity) => (
-                  <option key={severity} value={severity}>
-                    {severity}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="toolbar-actions">
-              <a
-                className="button-secondary"
-                href={`/api/scans/${scan.id}/export?format=json`}
-              >
-                Export JSON
-              </a>
-              <button type="button" className="button-secondary" onClick={reset}>
-                New scan
-              </button>
-            </div>
-          </div>
-
-          <p className="disclaimer">
-            Assistive findings only — not a legal accessibility certificate.
-          </p>
-
-          <div className="results-grid">
-            <div className="issue-list" role="list">
-              {filteredIssues.length === 0 && (
-                <p className="empty">No issues for this filter.</p>
-              )}
-              {filteredIssues.map((issue) => (
-                <button
-                  key={issue.id}
-                  type="button"
-                  role="listitem"
-                  className={`issue-item${selectedId === issue.id ? " active" : ""}`}
-                  onClick={() => setSelectedId(issue.id)}
-                  aria-current={selectedId === issue.id ? "true" : undefined}
+          {cleanScan ? (
+            <div className="success-panel" role="status">
+              <h3>Looking good</h3>
+              <p>
+                No automated accessibility issues were found for this page with
+                the current WCAG A/AA rule set. That is encouraging — it is not
+                a formal certificate, so keep doing manual checks too.
+              </p>
+              <div className="toolbar-actions">
+                <a
+                  className="button-secondary"
+                  href={`/api/scans/${scan.id}/export?format=json`}
                 >
-                  <span className={`sev sev-${issue.severity}`}>{issue.severity}</span>
-                  <span className="issue-message">{issue.message}</span>
+                  Export JSON
+                </a>
+                <button type="button" className="button-secondary" onClick={reset}>
+                  New scan
                 </button>
-              ))}
+              </div>
             </div>
+          ) : (
+            <>
+              <div className="toolbar">
+                <label>
+                  Filter severity
+                  <select
+                    value={severityFilter}
+                    onChange={(e) =>
+                      setSeverityFilter(e.target.value as Severity | "all")
+                    }
+                  >
+                    <option value="all">All</option>
+                    {SEVERITY_ORDER.map((severity) => (
+                      <option key={severity} value={severity}>
+                        {severity}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="toolbar-actions">
+                  <a
+                    className="button-secondary"
+                    href={`/api/scans/${scan.id}/export?format=json`}
+                  >
+                    Export JSON
+                  </a>
+                  <button
+                    type="button"
+                    className="button-secondary"
+                    onClick={reset}
+                  >
+                    New scan
+                  </button>
+                </div>
+              </div>
 
-            <article className="issue-detail" aria-live="polite">
-              {!selected && <p className="empty">Select an issue to see details.</p>}
-              {selected && (
-                <>
-                  <p className={`sev sev-${selected.severity}`}>{selected.severity}</p>
-                  <h3>{selected.message}</h3>
-                  <dl className="meta">
-                    <div>
-                      <dt>WCAG</dt>
-                      <dd>{selected.wcagCriteria.join(", ") || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt>Rule</dt>
-                      <dd>{selected.ruleId ?? "—"}</dd>
-                    </div>
-                    <div>
-                      <dt>Selector</dt>
-                      <dd>
-                        <code>{selected.selector}</code>
-                      </dd>
-                    </div>
-                  </dl>
-                  <h4>Snippet</h4>
-                  <pre>
-                    <code>{selected.htmlSnippet}</code>
-                  </pre>
-                  {selected.helpUrl && (
-                    <p>
-                      <a
-                        href={selected.helpUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Rule help
-                      </a>
-                    </p>
+              <p className="disclaimer">
+                Assistive findings only — not a legal accessibility certificate.
+              </p>
+
+              <div className="results-grid">
+                <div className="issue-list" role="list">
+                  {filteredIssues.length === 0 && (
+                    <p className="empty">No issues for this filter.</p>
                   )}
-                  {selected.aiExplanation && (
-                    <div className="ai-panel">
-                      <h4>AI guidance</h4>
-                      <p>{selected.aiExplanation}</p>
-                      {selected.aiRemediation && (
-                        <>
-                          <h4>Suggested fix</h4>
-                          <p>{selected.aiRemediation}</p>
-                        </>
+                  {filteredIssues.map((issue) => (
+                    <button
+                      key={issue.id}
+                      type="button"
+                      role="listitem"
+                      className={`issue-item${selectedId === issue.id ? " active" : ""}`}
+                      onClick={() => setSelectedId(issue.id)}
+                      aria-current={selectedId === issue.id ? "true" : undefined}
+                    >
+                      <span className={`sev sev-${issue.severity}`}>
+                        {issue.severity}
+                      </span>
+                      <span className="issue-message">{issue.message}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <article className="issue-detail" aria-live="polite">
+                  {!selected && (
+                    <p className="empty">Select an issue to see details.</p>
+                  )}
+                  {selected && (
+                    <>
+                      <p className={`sev sev-${selected.severity}`}>
+                        {selected.severity}
+                      </p>
+                      <h3>{selected.message}</h3>
+                      <dl className="meta">
+                        <div>
+                          <dt>WCAG</dt>
+                          <dd>{selected.wcagCriteria.join(", ") || "—"}</dd>
+                        </div>
+                        <div>
+                          <dt>Rule</dt>
+                          <dd>{selected.ruleId ?? "—"}</dd>
+                        </div>
+                        <div>
+                          <dt>Selector</dt>
+                          <dd>
+                            <code>{selected.selector}</code>
+                          </dd>
+                        </div>
+                      </dl>
+                      <h4>Snippet</h4>
+                      <pre>
+                        <code>{selected.htmlSnippet}</code>
+                      </pre>
+                      {selected.helpUrl && (
+                        <p>
+                          <a
+                            href={selected.helpUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Rule help
+                          </a>
+                        </p>
                       )}
-                    </div>
+                      {selected.aiExplanation && (
+                        <div className="ai-panel">
+                          <h4>AI guidance</h4>
+                          <p>{selected.aiExplanation}</p>
+                          {selected.aiRemediation && (
+                            <>
+                              <h4>Suggested fix</h4>
+                              <p>{selected.aiRemediation}</p>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </article>
-          </div>
+                </article>
+              </div>
+            </>
+          )}
         </section>
       )}
     </div>
