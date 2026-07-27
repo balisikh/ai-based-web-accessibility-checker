@@ -61,6 +61,7 @@ Run these **in order**, using **New scan** between each:
 - A high score or `0` issues can still be a **valid** automated result  
 - These sites change often and may show consent walls, bots challenges, or sparse axe findings  
 - Record what you saw (score + issue count), not a fixed expected number  
+- **Website Pass/Fail** (based on score/critical issues) is logged in [`TEST_RESULTS.md`](./TEST_RESULTS.md)
 
 ---
 

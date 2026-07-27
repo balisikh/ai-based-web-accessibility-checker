@@ -128,6 +128,7 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 | [`MVP_CHECKLIST.md`](./MVP_CHECKLIST.md) | Build checklist |
 | [`WIREFRAMES.md`](./WIREFRAMES.md) | Screen wireframes |
 | [`TEST_PLAN.md`](./TEST_PLAN.md) | Manual test plan (multi-site scans) |
+| [`TEST_RESULTS.md`](./TEST_RESULTS.md) | Website Pass/Fail results log |
 | [`web/README.md`](./web/README.md) | App setup, env, pipeline |
 
 ---
