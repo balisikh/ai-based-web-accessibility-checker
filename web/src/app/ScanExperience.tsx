@@ -156,7 +156,11 @@ export function ScanExperience() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error ?? "Could not start scan.");
+        const retry =
+          typeof data.retryAfterSec === "number" && data.retryAfterSec > 0
+            ? ` Try again in about ${data.retryAfterSec} seconds.`
+            : "";
+        throw new Error((data.error ?? "Could not start scan.") + retry);
       }
       setScan(data.scan as ScanSummary);
       setPhase("scanning");

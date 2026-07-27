@@ -33,10 +33,12 @@ export type RateLimitResult =
 
 /**
  * Fixed-window rate limit by client key (usually IP).
- * Defaults: 5 requests / 60s. Override with RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS.
+ * Defaults: 5/min in production, 60/min in development.
+ * Override with RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS.
  */
 export function checkRateLimit(key: string): RateLimitResult {
-  const limit = envInt("RATE_LIMIT_MAX", 5);
+  const defaultMax = process.env.NODE_ENV === "development" ? 60 : 5;
+  const limit = envInt("RATE_LIMIT_MAX", defaultMax);
   const windowMs = envInt("RATE_LIMIT_WINDOW_MS", 60_000);
   const now = Date.now();
   const buckets = getBuckets();

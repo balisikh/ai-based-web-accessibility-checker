@@ -26,7 +26,7 @@ Copy `.env.example` to `.env.local` and adjust:
 |----------|---------|
 | `DATABASE_URL` | Real Postgres URL. If unset → **PGlite** in `./data/lumen-pg` |
 | `PGLITE_DATA_DIR` | Optional custom PGlite path |
-| `RATE_LIMIT_MAX` | Max `POST /api/scans` per IP per window (default `5`) |
+| `RATE_LIMIT_MAX` | Max `POST /api/scans` per IP per window (default **5** in production, **60** in `next dev`) |
 | `RATE_LIMIT_WINDOW_MS` | Window length in ms (default `60000`) |
 | `AI_API_KEY` / `OPENAI_API_KEY` | Enables AI tips for top issues |
 | `AI_BASE_URL` | OpenAI-compatible API base (default `https://api.openai.com/v1`) |

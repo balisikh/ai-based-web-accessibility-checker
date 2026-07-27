@@ -1,4 +1,4 @@
-import { chromium, type Browser } from "playwright";
+import { chromium, type Browser, type Page } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import { mapAxeViolationsToIssues } from "./axe-mapper";
 import { assertPublicHostname } from "./ssrf";
@@ -43,6 +43,36 @@ function friendlyLaunchError(error: unknown): string {
   return message;
 }
 
+/** Non-standard or anti-bot statuses where the server may still return HTML. */
+const BOT_BLOCK_STATUSES = new Set([401, 403, 429, 999]);
+
+function httpErrorMessage(status: number): string {
+  if (status === 404) {
+    return "Website returned HTTP 404 (page not found). Check the URL is correct and opens in your browser, then try again.";
+  }
+  if (status === 403) {
+    return "Website returned HTTP 403 (access forbidden). The site may be blocking automated scanners.";
+  }
+  if (status === 429) {
+    return "Website returned HTTP 429 (too many requests). Wait a minute and try again, or the site may be rate-limiting scanners.";
+  }
+  if (status === 999) {
+    return "Website returned HTTP 999. This usually means the site blocked automated access (common on LinkedIn). Lumen runs without your login cookies, so try a different public URL, or test that page manually in the browser.";
+  }
+  return `Website returned HTTP ${status}.`;
+}
+
+async function pageHasScanableDom(page: Page): Promise<boolean> {
+  return page
+    .evaluate(() => {
+      const body = document.body;
+      if (!body || body.children.length === 0) return false;
+      const text = (body.innerText ?? "").replace(/\s+/g, " ").trim();
+      return text.length >= 60;
+    })
+    .catch(() => false);
+}
+
 /**
  * Render a public URL with Playwright and run axe-core accessibility checks.
  * Calls onProgress as real work starts for each phase.
@@ -66,8 +96,7 @@ export async function analyzeUrlWithAxe(
 
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
-    userAgent:
-      "LumenAccessibilityChecker/0.1 (+https://localhost; educational scanner)",
+    // Default Chrome user agent — custom scanner UAs trigger bot blocks (e.g. HTTP 999).
   });
   context.setDefaultTimeout(ACTION_TIMEOUT_MS);
 
@@ -87,7 +116,11 @@ export async function analyzeUrlWithAxe(
 
     const status = response.status();
     if (status >= 400) {
-      throw new Error(`Website returned HTTP ${status}.`);
+      const canScanDespiteStatus =
+        BOT_BLOCK_STATUSES.has(status) && (await pageHasScanableDom(page));
+      if (!canScanDespiteStatus) {
+        throw new Error(httpErrorMessage(status));
+      }
     }
 
     // Short settle only — avoid long networkidle waits on quiet/simple pages.
