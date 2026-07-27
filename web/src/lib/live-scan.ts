@@ -2,15 +2,20 @@ import { chromium, type Browser } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import { mapAxeViolationsToIssues } from "./axe-mapper";
 import { assertPublicHostname } from "./ssrf";
-import type { Issue } from "./types";
+import type { Issue, ScanStatus } from "./types";
 
-const NAV_TIMEOUT_MS = 45_000;
-const ACTION_TIMEOUT_MS = 15_000;
+const NAV_TIMEOUT_MS = 30_000;
+const ACTION_TIMEOUT_MS = 12_000;
+const LOAD_SETTLE_MS = 2_500;
 
 export type LiveScanResult = {
   issues: Issue[];
   pageTitle?: string;
 };
+
+export type ScanProgress = (
+  status: Extract<ScanStatus, "fetching" | "rendering" | "rule_analysis">,
+) => Promise<void> | void;
 
 let browserPromise: Promise<Browser> | null = null;
 
@@ -40,11 +45,15 @@ function friendlyLaunchError(error: unknown): string {
 
 /**
  * Render a public URL with Playwright and run axe-core accessibility checks.
+ * Calls onProgress as real work starts for each phase.
  */
 export async function analyzeUrlWithAxe(
   scanId: string,
   url: string,
+  onProgress?: ScanProgress,
 ): Promise<LiveScanResult> {
+  await onProgress?.("fetching");
+
   const parsed = new URL(url);
   await assertPublicHostname(parsed.hostname);
 
@@ -65,6 +74,8 @@ export async function analyzeUrlWithAxe(
   const page = await context.newPage();
 
   try {
+    await onProgress?.("rendering");
+
     const response = await page.goto(url, {
       waitUntil: "domcontentloaded",
       timeout: NAV_TIMEOUT_MS,
@@ -79,8 +90,12 @@ export async function analyzeUrlWithAxe(
       throw new Error(`Website returned HTTP ${status}.`);
     }
 
-    // Allow late content to settle briefly without waiting forever.
-    await page.waitForLoadState("networkidle", { timeout: 8_000 }).catch(() => undefined);
+    // Short settle only — avoid long networkidle waits on quiet/simple pages.
+    await page
+      .waitForLoadState("load", { timeout: LOAD_SETTLE_MS })
+      .catch(() => undefined);
+
+    await onProgress?.("rule_analysis");
 
     const axeResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])

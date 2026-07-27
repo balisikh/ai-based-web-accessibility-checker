@@ -25,23 +25,23 @@ export async function createQueuedScan(url: string): Promise<Scan> {
  * Live pipeline: resolve/SSRF check → Playwright render → axe-core → optional AI → score.
  */
 export async function runLiveScan(scanId: string): Promise<void> {
-  const scan = await updateScan(scanId, { status: "fetching" });
-  if (!scan) return;
+  const existing = await getScan(scanId);
+  if (!existing) return;
 
   try {
-    await updateScan(scanId, { status: "rendering" });
-
     const { analyzeUrlWithAxe } = await import("./live-scan");
 
-    await updateScan(scanId, { status: "rule_analysis" });
-    const current = await getScan(scanId);
-    if (!current) return;
-
-    let { issues } = await analyzeUrlWithAxe(scanId, current.url);
+    let { issues } = await analyzeUrlWithAxe(
+      scanId,
+      existing.url,
+      async (status) => {
+        await updateScan(scanId, { status });
+      },
+    );
 
     await updateScan(scanId, { status: "ai_enrichment" });
     const { enrichIssuesWithAi } = await import("./ai-enrichment");
-    issues = await enrichIssuesWithAi(current.url, issues);
+    issues = await enrichIssuesWithAi(existing.url, issues);
 
     await updateScan(scanId, { status: "scoring" });
     const summaryCounts = countBySeverity(issues);
