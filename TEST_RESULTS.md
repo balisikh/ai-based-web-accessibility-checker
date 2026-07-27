@@ -3,7 +3,7 @@
 **Product:** Lumen Accessibility Checker  
 **Purpose:** Record whether each **website** passed or failed based on automated accessibility findings (not whether the Lumen tool itself worked).  
 **App:** http://localhost:4376  
-**Updated:** July 2026
+**Batch status:** **Finalized** — 15 websites (2026-07-27)
 
 ---
 
@@ -18,40 +18,55 @@ Notes:
 - This is an **automated axe** outcome only — not a legal WCAG certificate.
 - Large sites can change day to day; re-scan if needed.
 - Tool health (checklist/export working) is tracked separately in `TEST_PLAN.md`.
+- Scans are **unauthenticated** unless noted; Google Mail/Docs often hit sign-in or product shells, not logged-in apps.
 
 ---
 
 ## Summary count
 
-**Target sample size:** **10+ websites** (first 10 complete; continuing)
-
 | Metric | Count |
 |--------|------:|
-| Target (initial) | 10 |
-| Websites tested | 14 |
-| Passed | 7 |
-| Failed | 7 |
+| Websites tested | **15** |
+| **Passed** | **7** (47%) |
+| **Failed** | **8** (53%) |
+| Initial MVP target | 10 (met; extended with 5 additional sites) |
+
+### Severity totals (all 15 scans)
+
+| Critical | Serious | Moderate | Minor | Total issues |
+|---------:|--------:|---------:|------:|-------------:|
+| 23 | 32 | 1 | 0 | 56 |
+
+### Quick list
+
+| Result | Websites |
+|--------|----------|
+| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps |
+| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo |
 
 ---
 
 ## Results table
 
-| # | Website | URL | Score | Critical | Serious | Moderate | Minor | Total issues | Website result | Date | Tester |
-|---|---------|-----|------:|---------:|--------:|---------:|------:|-------------:|----------------|------|--------|
+| # | Website | URL | Score | Critical | Serious | Moderate | Minor | Total issues | Website result | Date | Notes |
+|--:|---------|-----|------:|---------:|--------:|---------:|------:|-------------:|----------------|------|-------|
 | 1 | Google UK | https://www.google.co.uk/ | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
 | 2 | YouTube | https://www.youtube.com/ | 0 | 4 | 0 | 0 | 0 | 4 | **Fail** | 2026-07-27 | |
 | 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | 15 | 1 | 4 | 0 | 0 | 5 | **Fail** | 2026-07-27 | |
 | 4 | BBC iPlayer | https://www.bbc.co.uk/iplayer | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
 | 5 | BBC News | https://www.bbc.co.uk/news | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
 | 6 | Disney+ UK | https://www.disneyplus.com/en-gb | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 7 | GitHub balisikh | https://github.com/balisikh | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
+| 7 | GitHub balisikh | https://github.com/balisikh | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | Profile page |
 | 8 | ChatGPT | https://chatgpt.com | 60 | 1 | 1 | 0 | 0 | 2 | **Fail** | 2026-07-27 | |
 | 9 | Spotify Web Player | https://open.spotify.com/ | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
 | 10 | Google Maps | https://www.google.com/maps | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 11 | Google Mail (Gmail) | https://mail.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | |
-| 12 | Google Docs | https://docs.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | Tester reported 0; verify scan 75 (see notes) |
+| 11 | Google Mail (Gmail) | https://mail.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | Sign-in surface |
+| 12 | Google Docs | https://docs.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | Tester 0 vs verify 75 — see notes |
 | 13 | Google Sheets | https://sheets.google.com | 0 | 6 | 13 | 0 | 0 | 19 | **Fail** | 2026-07-27 | |
-| 14 | Google Slides (Presentation) | https://slides.google.com | 0 | 9 | 13 | 0 | 0 | 22 | **Fail** | 2026-07-27 | |
+| 14 | Google Slides | https://slides.google.com | 0 | 9 | 13 | 0 | 0 | 22 | **Fail** | 2026-07-27 | |
+| 15 | Yahoo | https://www.yahoo.com | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | Fail on score &lt; 85 only |
+
+**Verification:** Rows 8–15 and selected earlier sites were cross-checked via local Lumen API scans; scores and severity counts match tester UI unless noted in row 12.
 
 ---
 
@@ -122,7 +137,7 @@ Notes:
 ### Google Docs — Fail
 - URL: https://docs.google.com  
 - **Tester:** score **0**. **Independent scan:** score **75**, **1 critical**, 1 issue (`select-name`).
-- Mismatch likely from different URL, login state, or landing vs editor (0 needs many more axe findings).
+- Table row uses the verified scan (75) for score and severities; tester 0 likely reflected editor/home with more issues while logged in.
 - Failed on both outcomes (score &lt; 85 and/or critical ≥ 1).
 
 ### Google Sheets — Fail
@@ -131,20 +146,34 @@ Notes:
 - Main findings: `aria-required-parent` (critical), `list` (serious).
 - Failed because score &lt; 85 and critical ≥ 1.
 
-### Google Slides (Presentation) — Fail
+### Google Slides — Fail
 - URL: https://slides.google.com  
 - Score **0**, **9 critical**, **13 serious**, 22 issues total (matches tester score 0; verified independently).
 - Main findings: `aria-required-parent` (9), `list` (13).
 - Failed because score &lt; 85 and critical ≥ 1.
 
+### Yahoo — Fail
+- URL: https://www.yahoo.com  
+- Score **78**, **0 critical**, **1 serious**, **1 moderate**, 2 issues total (matches tester score 78; verified independently).
+- Findings: `html-has-lang` (serious), `meta-viewport` (moderate).
+- Failed because score &lt; 85 (no critical issues).
+
 ---
 
-## How to add the next site
+## Out of scope for this batch
 
-1. Scan the site in Lumen.  
-2. Copy Score + severity counts.  
-3. Apply the Pass/Fail rule above.  
-4. Add a new row in the results table.  
-5. Update the **Summary count** (and raise **Target** if you go past 10).  
+These URLs appear in `TEST_PLAN.md` as examples but were **not** run in this 15-site batch:
 
-First 10 complete. Continuing as #11+.
+- https://example.com/
+- https://www.w3.org/WAI/demos/bad/before/home.html
+
+Use them for a future regression or “known good / known bad” comparison run.
+
+---
+
+## Adding more sites later
+
+1. Scan in Lumen (live mode, demo off).  
+2. Copy score + all four severity counts + total issues.  
+3. Apply the Pass/Fail rule.  
+4. Append row **#16+** and update **Summary count** and severity totals.

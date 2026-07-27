@@ -37,9 +37,11 @@ Confirm that a tester can:
 
 ## 3. Multi-site scan sequence (core test)
 
-**Target:** **10 websites** (enough coverage for this MVP test plan).
+**Target:** **10 websites** minimum for MVP; extended batch documented separately.
 
-Run these **in order**, using **New scan** between each:
+**Completed batch (2026-07-27):** **15 websites** — full scores, severities, and Pass/Fail in [`TEST_RESULTS.md`](./TEST_RESULTS.md) (**7 Pass / 8 Fail**). Initial 10-site goal was exceeded with ChatGPT, Spotify, Google Maps, Gmail, Docs, Sheets, Slides, and Yahoo.
+
+Suggested sequence for **new** testers (or regression):
 
 | # | Site | URL | Why include it |
 |---|------|-----|----------------|
@@ -48,7 +50,7 @@ Run these **in order**, using **New scan** between each:
 | 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | Real local public-service page |
 | 4 | Example | https://example.com/ | Simple clean page; expect strong/clean score |
 | 5 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | Known-bad page; expect many issues / low score |
-| 6–10 | Tester choice | Any other public https sites | Fill remaining slots to reach **10 total** |
+| 6+ | Tester choice | Any other public https sites | Fill remaining slots; log in `TEST_RESULTS.md` |
 
 ### Pass criteria for each site
 - [ ] Checklist progresses: Fetch → Render → Rules → AI → Score  
@@ -143,5 +145,6 @@ When something fails, capture:
 
 | Role | Name | Date | Result |
 |------|------|------|--------|
-| Tester | | | Pass / Fail |
-| Notes | | | |
+| Tester | Manual MVP run | 2026-07-27 | **Pass** (tool) |
+| Website batch | 15 sites logged | 2026-07-27 | See [`TEST_RESULTS.md`](./TEST_RESULTS.md) |
+| Notes | Multi-site scans, export, and results UI verified. Website Pass/Fail is per-site (7 Pass / 8 Fail), not Lumen tool quality. example.com and W3C bad demo reserved for a future regression run. | | |
