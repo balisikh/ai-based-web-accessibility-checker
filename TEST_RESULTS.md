@@ -3,7 +3,7 @@
 **Product:** Lumen Accessibility Checker  
 **Purpose:** Record whether each **website** passed or failed based on automated accessibility findings (not whether the Lumen tool itself worked).  
 **App:** http://localhost:4376  
-**Batch status:** **Finalized** — 15 websites (2026-07-27)
+**Batch status:** **16 websites** logged (initial batch finalized 2026-07-27; **#16+** extensions)
 
 ---
 
@@ -26,23 +26,23 @@ Notes:
 
 | Metric | Count |
 |--------|------:|
-| Websites tested | **15** |
-| **Passed** | **7** (47%) |
-| **Failed** | **8** (53%) |
-| Initial MVP target | 10 (met; extended with 5 additional sites) |
+| Websites tested | **16** |
+| **Passed** | **7** (44%) |
+| **Failed** | **9** (56%) |
+| Initial MVP target | 10 (met; extended with additional sites) |
 
-### Severity totals (all 15 scans)
+### Severity totals (all 16 scans)
 
 | Critical | Serious | Moderate | Minor | Total issues |
 |---------:|--------:|---------:|------:|-------------:|
-| 23 | 32 | 1 | 0 | 56 |
+| 23 | 33 | 3 | 0 | 59 |
 
 ### Quick list
 
 | Result | Websites |
 |--------|----------|
 | **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps |
-| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo |
+| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK |
 
 ---
 
@@ -65,8 +65,9 @@ Notes:
 | 13 | Google Sheets | https://sheets.google.com | 0 | 6 | 13 | 0 | 0 | 19 | **Fail** | 2026-07-27 | |
 | 14 | Google Slides | https://slides.google.com | 0 | 9 | 13 | 0 | 0 | 22 | **Fail** | 2026-07-27 | |
 | 15 | Yahoo | https://www.yahoo.com | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | Fail on score &lt; 85 only |
+| 16 | Amazon UK | https://www.amazon.co.uk | 71 | 0 | 1 | 2 | 0 | 3 | **Fail** | 2026-07-27 | Tester 0 vs verify 71 — see notes |
 
-**Verification:** Rows 8–15 and selected earlier sites were cross-checked via local Lumen API scans; scores and severity counts match tester UI unless noted in row 12.
+**Verification:** Rows 8–16 and selected earlier sites were cross-checked via local Lumen API scans; scores and severity counts match tester UI unless noted in rows 12 and 16.
 
 ---
 
@@ -158,6 +159,13 @@ Notes:
 - Findings: `html-has-lang` (serious), `meta-viewport` (moderate).
 - Failed because score &lt; 85 (no critical issues).
 
+### Amazon UK — Fail
+- URL: https://www.amazon.co.uk  
+- **Tester:** score **0**. **Independent scan:** score **71**, **0 critical**, **1 serious**, **2 moderate**, 3 issues total.
+- Findings: `page-has-heading-one` (serious), `landmark-one-main` (moderate), `document-title` (moderate).
+- Table row uses verified scan (71). Tester 0 may reflect a different TLD, bot/captcha page, or more axe hits on another surface.
+- Failed because score &lt; 85.
+
 ---
 
 ## Out of scope for this batch
@@ -176,4 +184,4 @@ Use them for a future regression or “known good / known bad” comparison run.
 1. Scan in Lumen (live mode, demo off).  
 2. Copy score + all four severity counts + total issues.  
 3. Apply the Pass/Fail rule.  
-4. Append row **#16+** and update **Summary count** and severity totals.
+4. Append row **#17+** and update **Summary count** and severity totals.
