@@ -3,7 +3,8 @@
 **Product:** Lumen Accessibility Checker  
 **Purpose:** Record whether each **website** passed or failed based on automated accessibility findings (not whether the Lumen tool itself worked).  
 **App:** http://localhost:4376  
-**Batch status:** **28** websites logged — extended target **27** complete; **#28** W3Schools (post-batch).
+**Batch status:** **28** websites logged — extended target **27** complete; **#28** W3Schools (post-batch).  
+**Snapshot resync:** Full live batch re-scan **2026-07-28** (`web/batch-rescan-report.json`) — table below matches `/batch`.
 
 ---
 
@@ -28,22 +29,22 @@ Notes:
 |--------|------:|
 | Websites tested | **28** |
 | **Target (extended)** | **27** (complete) |
-| **Passed** | **9** (32%) |
-| **Failed** | **19** (68%) |
+| **Passed** | **8** (29%) |
+| **Failed** | **20** (71%) |
 | Initial MVP target | 10 (met on 2026-07-27) |
 
 ### Severity totals (all 28 scans)
 
 | Critical | Serious | Moderate | Minor | Total issues |
 |---------:|--------:|---------:|------:|-------------:|
-| 57 | 62 | 159 | 5 | 283 |
+| 126 | 30 | 189 | 21 | 366 |
 
 ### Quick list
 
 | Result | Websites |
 |--------|----------|
-| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps, Wikipedia, example.com |
-| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland, W3C bad demo, W3Schools |
+| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Google Maps, Wikipedia, example.com |
+| **Fail** | YouTube, BBC Weather Southall, ChatGPT, **Spotify**, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland, W3C bad demo, W3Schools |
 
 ### Failed sites — notes and recommended actions
 
@@ -54,6 +55,7 @@ These are **tester recommendations** (not fixes applied by this project). Rule-l
 | 2 | YouTube | | Fix invalid ARIA on nav (`aria-allowed-attr`); re-scan until critical = 0 and score ≥ 85. |
 | 3 | BBC Weather | | Fix critical `aria-required-attr`, then `aria-hidden-focus` and `color-contrast`; re-scan after page updates. |
 | 8 | ChatGPT | | Fix `aria-allowed-attr` and `color-contrast`; export JSON before/after. |
+| 9 | Spotify | App/login shell on re-scan | Confirm URL/cookies; triage critical ARIA; re-scan vs prior Pass. |
 | 11 | Gmail | Sign-in surface | Fix `select-name` on sign-in; optional logged-in scan separately. |
 | 12 | Google Docs | | Align scan target (sign-in vs editor); fix `select-name`; re-scan one consistent URL. |
 | 13 | Google Sheets | | Fix `aria-required-parent` and `list` markup; prioritize criticals. |
@@ -77,36 +79,36 @@ These are **tester recommendations** (not fixes applied by this project). Rule-l
 
 | # | Website | URL | Score | Critical | Serious | Moderate | Minor | Total issues | Website result | Date | Notes |
 |--:|---------|-----|------:|---------:|--------:|---------:|------:|-------------:|----------------|------|-------|
-| 1 | Google UK | https://www.google.co.uk/ | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 2 | YouTube | https://www.youtube.com/ | 0 | 4 | 0 | 0 | 0 | 4 | **Fail** | 2026-07-27 | |
-| 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | 15 | 1 | 4 | 0 | 0 | 5 | **Fail** | 2026-07-27 | |
-| 4 | BBC iPlayer | https://www.bbc.co.uk/iplayer | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 5 | BBC News | https://www.bbc.co.uk/news | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 6 | Disney+ UK | https://www.disneyplus.com/en-gb | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 7 | GitHub balisikh | https://github.com/balisikh | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | Profile page |
-| 8 | ChatGPT | https://chatgpt.com | 60 | 1 | 1 | 0 | 0 | 2 | **Fail** | 2026-07-27 | |
-| 9 | Spotify Web Player | https://open.spotify.com/ | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 10 | Google Maps | https://www.google.com/maps | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-27 | |
-| 11 | Google Mail (Gmail) | https://mail.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | Sign-in surface |
-| 12 | Google Docs | https://docs.google.com | 75 | 1 | 0 | 0 | 0 | 1 | **Fail** | 2026-07-27 | Tester 0 vs verify 75 — see notes |
-| 13 | Google Sheets | https://sheets.google.com | 0 | 6 | 13 | 0 | 0 | 19 | **Fail** | 2026-07-27 | |
-| 14 | Google Slides | https://slides.google.com | 0 | 9 | 13 | 0 | 0 | 22 | **Fail** | 2026-07-27 | |
-| 15 | Yahoo | https://www.yahoo.com | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | Fail on score &lt; 85 only |
-| 16 | Amazon UK | https://www.amazon.co.uk | 0 | 0 | 1 | 2 | 0 | 3 | **Fail** | 2026-07-27 | Score per tester UI (0); severities from prior verify — refresh from Lumen if counts differ |
-| 17 | eBay UK | https://www.ebay.co.uk | 0 | 0 | 9 | 2 | 1 | 12 | **Fail** | 2026-07-27 | Matches tester score 0 |
-| 18 | Netflix UK | https://www.netflix.com/gb/ | 0 | 0 | 0 | 16 | 0 | 16 | **Fail** | 2026-07-27 | Matches tester score 0 |
-| 19 | ITVX | https://www.itv.com/watch | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-27 | |
-| 20 | Channel 4 | https://www.channel4.com/ | 46 | 0 | 2 | 3 | 1 | 6 | **Fail** | 2026-07-27 | |
-| 21 | Channel 5 | https://www.channel5.com/ | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-27 | |
-| 22 | Lidl UK | https://www.lidl.co.uk/ | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | |
-| 23 | Tesco | https://www.tesco.com/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
-| 24 | Iceland | https://www.iceland.co.uk/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
-| 25 | Wikipedia (en Main Page) | https://en.wikipedia.org/wiki/Main_Page | 91 | 0 | 0 | 0 | 3 | 3 | **Pass** | 2026-07-27 | |
-| 26 | example.com | https://example.com/ | 86 | 0 | 0 | 2 | 0 | 2 | **Pass** | 2026-07-28 | Matches tester score 86 |
-| 27 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | 0 | 34 | 10 | 23 | 0 | 67 | **Fail** | 2026-07-28 | Matches tester score 0; known-bad demo |
-| 28 | W3Schools | https://www.w3schools.com/ | 0 | 0 | 5 | 95 | 0 | 100 | **Fail** | 2026-07-28 | Verified on live server |
+| 1 | Google UK | https://www.google.co.uk/ | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-28 | |
+| 2 | YouTube | https://www.youtube.com/ | 0 | 4 | 0 | 0 | 0 | 4 | **Fail** | 2026-07-28 | |
+| 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | 54 | 1 | 0 | 3 | 0 | 4 | **Fail** | 2026-07-28 | |
+| 4 | BBC iPlayer | https://www.bbc.co.uk/iplayer | 86 | 0 | 0 | 2 | 0 | 2 | **Pass** | 2026-07-28 | |
+| 5 | BBC News | https://www.bbc.co.uk/news | 93 | 0 | 0 | 1 | 0 | 1 | **Pass** | 2026-07-28 | |
+| 6 | Disney+ UK | https://www.disneyplus.com/en-gb | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-28 | |
+| 7 | GitHub balisikh | https://github.com/balisikh | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-28 | Profile page |
+| 8 | ChatGPT | https://chatgpt.com | 50 | 1 | 1 | 1 | 1 | 4 | **Fail** | 2026-07-28 | |
+| 9 | Spotify Web Player | https://open.spotify.com/ | 0 | 82 | 0 | 2 | 16 | 100 | **Fail** | 2026-07-28 | Re-scan: confirm app shell in UI |
+| 10 | Google Maps | https://www.google.com/maps | 100 | 0 | 0 | 0 | 0 | 0 | **Pass** | 2026-07-28 | |
+| 11 | Google Mail (Gmail) | https://mail.google.com | 33 | 1 | 0 | 6 | 0 | 7 | **Fail** | 2026-07-28 | Sign-in surface |
+| 12 | Google Docs | https://docs.google.com | 33 | 1 | 0 | 6 | 0 | 7 | **Fail** | 2026-07-28 | Sign-in shell (resync) |
+| 13 | Google Sheets | https://sheets.google.com | 33 | 1 | 0 | 6 | 0 | 7 | **Fail** | 2026-07-28 | Sign-in shell (resync) |
+| 14 | Google Slides | https://slides.google.com | 33 | 1 | 0 | 6 | 0 | 7 | **Fail** | 2026-07-28 | Sign-in shell (resync) |
+| 15 | Yahoo | https://www.yahoo.com | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-28 | Fail on score &lt; 85 only |
+| 16 | Amazon UK | https://www.amazon.co.uk | 71 | 0 | 1 | 2 | 0 | 3 | **Fail** | 2026-07-28 | Re-scan score; avoid bot shell |
+| 17 | eBay UK | https://www.ebay.co.uk | 0 | 0 | 8 | 0 | 0 | 8 | **Fail** | 2026-07-28 | |
+| 18 | Netflix UK | https://www.netflix.com/gb/ | 0 | 0 | 0 | 16 | 0 | 16 | **Fail** | 2026-07-28 | |
+| 19 | ITVX | https://www.itv.com/watch | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-28 | |
+| 20 | Channel 4 | https://www.channel4.com/ | 68 | 0 | 1 | 2 | 1 | 4 | **Fail** | 2026-07-28 | |
+| 21 | Channel 5 | https://www.channel5.com/ | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-28 | |
+| 22 | Lidl UK | https://www.lidl.co.uk/ | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-28 | |
+| 23 | Tesco | https://www.tesco.com/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-28 | |
+| 24 | Iceland | https://www.iceland.co.uk/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-28 | |
+| 25 | Wikipedia (en Main Page) | https://en.wikipedia.org/wiki/Main_Page | 91 | 0 | 0 | 0 | 3 | 3 | **Pass** | 2026-07-28 | |
+| 26 | example.com | https://example.com/ | 86 | 0 | 0 | 2 | 0 | 2 | **Pass** | 2026-07-28 | |
+| 27 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | 0 | 34 | 10 | 23 | 0 | 67 | **Fail** | 2026-07-28 | Known-bad demo |
+| 28 | W3Schools | https://www.w3schools.com/ | 0 | 0 | 5 | 95 | 0 | 100 | **Fail** | 2026-07-28 | |
 
-**Verification:** Independent API scans where noted; compare your UI if scores differ (retail/TV pages change often).
+**Verification:** Full batch re-sync **2026-07-28** via `web/scripts/batch-rescan.ts`. Per-site narratives below may predate resync — trust the **Results table** and `/batch` for current numbers.
 
 ---
 

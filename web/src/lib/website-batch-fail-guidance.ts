@@ -29,6 +29,14 @@ export const FAIL_SITE_GUIDANCE: Record<number, FailSiteGuidance> = {
       "Re-scan; export JSON to track before/after.",
     ],
   },
+  9: {
+    note: "Re-scan hit app/login shell — confirm page in browser.",
+    furtherActions: [
+      "Confirm URL and cookies (open.spotify.com vs marketing landing).",
+      "Triage 82 critical findings — fix invalid ARIA/roles first.",
+      "Re-scan after stable page load; compare to prior Pass (100/0).",
+    ],
+  },
   11: {
     note: "Sign-in surface (not inbox).",
     furtherActions: [

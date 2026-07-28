@@ -2,12 +2,14 @@ import Link from "next/link";
 import {
   WEBSITE_BATCH_RESULTS,
   WEBSITE_BATCH_SUMMARY,
+  BATCH_SNAPSHOT_DATE,
 } from "@/lib/website-batch-results";
 import {
   websiteBatchFailReason,
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
 import { guidanceForSite } from "@/lib/website-batch-fail-guidance";
+import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
 
 export const metadata = {
   title: "Lumen | Website batch results",
@@ -39,8 +41,8 @@ export default function BatchResultsPage() {
         <p className="brand compact">Lumen</p>
         <h1 id="batch-heading">Website batch results</h1>
         <p className="lede batch-lede">
-          Static snapshot from manual testing — loads instantly and does not run
-          scans. Live checks still use the{" "}
+          Static snapshot (last full live resync <strong>{BATCH_SNAPSHOT_DATE}</strong>)
+          — loads instantly and does not run scans. Live checks use the{" "}
           <Link href="/">accessibility checker</Link>.
         </p>
 
@@ -129,6 +131,13 @@ export default function BatchResultsPage() {
                       >
                         {row.name}
                       </a>
+                      <ul className="batch-tag-row" aria-label="Site tags">
+                        {tagsForBatchSite(row).map((tag) => (
+                          <li key={tag}>
+                            <span className="batch-tag">{BATCH_TAG_LABELS[tag] ?? tag}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </td>
                     <td>{row.score}</td>
                     <td className="batch-sev-cell">
