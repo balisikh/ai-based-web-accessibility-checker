@@ -412,7 +412,7 @@ export function ScanExperience() {
             <div className="learn-more-group">
               <p className="batch-link-row">
                 <Link href="/batch" className="batch-dashboard-link">
-                  View 28-site batch results (instant)
+                  Website batch results
                 </Link>
               </p>
               <details className="learn-more">
