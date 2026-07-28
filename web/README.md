@@ -11,7 +11,10 @@ npm run dev    # local development → http://localhost:4376
 npm run build  # production build
 npm run start  # run production server
 npm run lint   # eslint
+npm run ci     # lint + validate:batch + build
 ```
+
+Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Requirements
 
@@ -26,7 +29,7 @@ Copy `.env.example` to `.env.local` and adjust:
 |----------|---------|
 | `DATABASE_URL` | Real Postgres URL. If unset → **PGlite** in `./data/lumen-pg` |
 | `PGLITE_DATA_DIR` | Optional custom PGlite path |
-| `RATE_LIMIT_MAX` | Max `POST /api/scans` per IP per window (default **5** in production, **60** in `next dev`) |
+| `RATE_LIMIT_MAX` | Max `POST /api/scans` per IP per window (default **5** in production, **120** in `next dev` if unset) |
 | `RATE_LIMIT_WINDOW_MS` | Window length in ms (default `60000`) |
 | `AI_API_KEY` / `OPENAI_API_KEY` | Enables AI tips for top issues |
 | `AI_BASE_URL` | OpenAI-compatible API base (default `https://api.openai.com/v1`) |
@@ -71,6 +74,6 @@ $env:USE_DEMO_SCAN="1"; npm run dev
 
 ## AI tips
 
-With `AI_API_KEY` (or `OPENAI_API_KEY`) set, top issues by severity get explanation + suggested fix in the results panel. Without a key, axe results still work.
+With `AI_API_KEY` (or `OPENAI_API_KEY`) set in **`.env.local`** (local) or host env (production), top issues by severity get explanation + suggested fix in the results panel. Without a key, axe results still work. Restart the dev server after changing env.
 
 `GET /api/config` returns `{ "aiTipsEnabled": true | false }` for the home UI (no secrets).

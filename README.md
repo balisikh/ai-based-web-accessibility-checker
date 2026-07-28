@@ -131,6 +131,16 @@ The full **28-site batch rescan** is intentionally **not** in CI (slow and flaky
 
 ---
 
+## Continuous deployment (CD)
+
+After **CI passes on `main`**, [`.github/workflows/cd.yml`](./.github/workflows/cd.yml) builds a Docker image and pushes to **GHCR** (`ghcr.io/<owner>/lumen-web`). Optionally set GitHub secret **`RENDER_DEPLOY_HOOK`** to auto-trigger Render.
+
+Details: [`web/DEPLOY.md`](./web/DEPLOY.md) · image: `ghcr.io/<owner>/<repo>:latest` · local: `docker build -f web/Dockerfile web`
+
+**AI tips locally:** copy [`web/.env.example`](./web/.env.example) to `web/.env.local`, set `OPENAI_API_KEY`, restart `npm run dev`. Never commit `.env.local`.
+
+---
+
 ## Stack
 
 - **Frontend / API:** Next.js (React) + TypeScript  
@@ -171,7 +181,7 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 
 ## Roadmap (next)
 
-1. Deploy to a worker-capable host (Chrome/Playwright)  
+1. Deploy to a worker-capable host (Chrome/Playwright) — **Docker + CD workflow in repo**; wire host secrets  
 2. PDF export  
 3. Accounts + scan history  
 4. Multi-page crawl · optional scheduled batch rescan in CI  

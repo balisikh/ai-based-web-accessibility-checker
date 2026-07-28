@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
+import { HOME_EXTRA_FAQS } from "@/lib/home-faqs";
 import { HOW_TO_USE_STEPS } from "@/lib/how-to-use";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 import { validateScanUrl } from "@/lib/validate-url";
@@ -417,7 +418,7 @@ export function ScanExperience() {
                       {item.id === "ai-tips"
                         ? aiTipsEnabled
                           ? "Short explanations and fix ideas for the most severe issues on this scan."
-                          : "Not enabled on this site — you still get rule findings, WCAG mapping, and a score."
+                          : "Not enabled on this Lumen server — you still get rule findings, WCAG mapping, and a score."
                         : item.body}
                     </p>
                     {item.id === "public-urls" && (
@@ -464,6 +465,16 @@ export function ScanExperience() {
                   </p>
                 </div>
               </details>
+              {HOME_EXTRA_FAQS.map((faq) => (
+                <details key={faq.id} className="learn-more">
+                  <summary>{faq.summary}</summary>
+                  <div className="learn-more-body">
+                    {faq.paragraphs.map((paragraph, index) => (
+                      <p key={`${faq.id}-${index}`}>{paragraph}</p>
+                    ))}
+                  </div>
+                </details>
+              ))}
             </div>
           </section>
         </section>
@@ -506,8 +517,8 @@ export function ScanExperience() {
           </ol>
           {!aiTipsEnabled && (
             <p className="scan-note hint">
-              AI guidance is not enabled on this site; automated rule checks and
-              scoring still run as usual.
+              AI guidance is not enabled on this Lumen server; automated rule
+              checks and scoring still run as usual.
             </p>
           )}
         </section>

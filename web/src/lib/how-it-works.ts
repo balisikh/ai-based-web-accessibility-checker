@@ -28,6 +28,6 @@ export const HOW_IT_WORKS_ITEMS: HowItWorksItem[] = [
     step: 4,
     id: "ai-tips",
     title: "Optional AI tips",
-    body: "Plain-language fix ideas for top issues when the site operator enables AI.",
+    body: "Plain-language fix ideas for top issues when the Lumen operator enables AI on this server.",
   },
 ];

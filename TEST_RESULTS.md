@@ -108,181 +108,103 @@ These are **tester recommendations** (not fixes applied by this project). Rule-l
 | 27 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | 0 | 34 | 10 | 23 | 0 | 67 | **Fail** | 2026-07-28 | Known-bad demo |
 | 28 | W3Schools | https://www.w3schools.com/ | 0 | 0 | 5 | 95 | 0 | 100 | **Fail** | 2026-07-28 | |
 
-**Verification:** Full batch re-sync **2026-07-28** via `web/scripts/batch-rescan.ts`. Per-site narratives below may predate resync — trust the **Results table** and `/batch` for current numbers.
+**Verification:** Full batch re-sync **2026-07-28** via `web/scripts/batch-rescan.ts`. Narratives below match the **Results table** and `/batch`.
 
 ---
 
 ## Why recorded sites passed or failed
 
+Synced to rescan **2026-07-28**. Pass = score ≥ 85 and critical = 0.
+
 ### Google UK — Pass
-- Score 100, 0 issues across all severities.
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 100, 0 issues. Met Pass rule.
 
 ### YouTube — Fail
-- Score 0, **4 critical** issues.
-- All were `aria-allowed-attr` (WCAG 4.1.2) on nav links (Home, Shorts, Subscriptions, You).
-- Failed because critical ≥ 1 (and score &lt; 85).
+- Score 0, 4 critical (`aria-allowed-attr` on nav). Fail: critical ≥ 1 and score &lt; 85.
 
 ### BBC Weather Southall — Fail
-- URL: https://www.bbc.co.uk/weather/2637490  
-- Score **15**, **1 critical**, **4 serious**, 5 issues total.
-- Findings included:
-  - `aria-required-attr` (critical) — required ARIA attributes missing
-  - `aria-hidden-focus` (serious) — hidden element still focusable
-  - `color-contrast` (serious) — low contrast text (3 instances)
-- Failed because critical ≥ 1 and score &lt; 85.
+- Score 54, 1 critical, 3 moderate, 4 issues. Fail: critical ≥ 1 and score &lt; 85.
 
 ### BBC iPlayer — Pass
-- URL: https://www.bbc.co.uk/iplayer  
-- Score **100**, critical **0** (verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 86, 0 critical, 2 moderate. Met Pass rule.
 
 ### BBC News — Pass
-- URL: https://www.bbc.co.uk/news  
-- Score **100**, 0 issues across all severities (verified independently; matches tester score 100).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 93, 0 critical, 1 moderate. Met Pass rule.
 
 ### Disney+ UK — Pass
-- URL: https://www.disneyplus.com/en-gb  
-- Score **100**, 0 issues (verified independently; matches tester score 100).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 100, 0 issues. Met Pass rule.
 
 ### GitHub balisikh — Pass
-- URL: https://github.com/balisikh  
-- Score **100**, 0 issues (matches tester score 100; verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 100, 0 issues (profile page). Met Pass rule.
 
 ### ChatGPT — Fail
-- URL: https://chatgpt.com  
-- Score **60**, **1 critical**, **1 serious**, 2 issues total (matches tester score 60; verified independently).
-- Findings:
-  - `aria-allowed-attr` (critical) — unsupported ARIA attribute
-  - `color-contrast` (serious) — low contrast text
-- Failed because score &lt; 85 and critical ≥ 1.
+- Score 50, 1 critical, 1 serious, 1 moderate, 1 minor. Fail: critical ≥ 1 and score &lt; 85.
 
-### Spotify Web Player — Pass
-- URL: https://open.spotify.com/  
-- Score **100**, 0 issues (matches tester score 100; verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0).
+### Spotify Web Player — Fail
+- Score 0, 82 critical, 2 moderate, 16 minor (100 issues). Re-scan hit app/login shell — confirm in UI before treating as final. Fail: critical ≥ 1.
 
 ### Google Maps — Pass
-- URL: https://www.google.com/maps  
-- Score **100**, 0 issues (matches tester score 100; verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 100, 0 issues. Met Pass rule.
 
 ### Google Mail (Gmail) — Fail
-- URL: https://mail.google.com  
-- Score **75**, **1 critical**, 1 issue total (matches tester score 75; verified independently).
-- Finding: `select-name` (critical) — select element missing an accessible name.
-- Failed because score &lt; 85 and critical ≥ 1. Note: unauthenticated scan typically hits the sign-in page, not the inbox.
+- Score 33, 1 critical, 6 moderate (sign-in surface). Fail: critical ≥ 1 and score &lt; 85.
 
 ### Google Docs — Fail
-- URL: https://docs.google.com  
-- **Tester:** score **0**. **Independent scan:** score **75**, **1 critical**, 1 issue (`select-name`).
-- Table row uses the verified scan (75) for score and severities; tester 0 likely reflected editor/home with more issues while logged in.
-- Failed on both outcomes (score &lt; 85 and/or critical ≥ 1).
+- Score 33, 1 critical, 6 moderate (sign-in shell). Fail: critical ≥ 1 and score &lt; 85.
 
 ### Google Sheets — Fail
-- URL: https://sheets.google.com  
-- Score **0**, **6 critical**, **13 serious**, 19 issues total (matches tester score 0; verified independently).
-- Main findings: `aria-required-parent` (critical), `list` (serious).
-- Failed because score &lt; 85 and critical ≥ 1.
+- Score 33, 1 critical, 6 moderate. Fail: critical ≥ 1 and score &lt; 85.
 
 ### Google Slides — Fail
-- URL: https://slides.google.com  
-- Score **0**, **9 critical**, **13 serious**, 22 issues total (matches tester score 0; verified independently).
-- Main findings: `aria-required-parent` (9), `list` (13).
-- Failed because score &lt; 85 and critical ≥ 1.
+- Score 33, 1 critical, 6 moderate. Fail: critical ≥ 1 and score &lt; 85.
 
 ### Yahoo — Fail
-- URL: https://www.yahoo.com  
-- Score **78**, **0 critical**, **1 serious**, **1 moderate**, 2 issues total (matches tester score 78; verified independently).
-- Findings: `html-has-lang` (serious), `meta-viewport` (moderate).
-- Failed because score &lt; 85 (no critical issues).
+- Score 78, 0 critical, 1 serious, 1 moderate. Fail: score &lt; 85 only.
 
 ### Amazon UK — Fail
-- URL: https://www.amazon.co.uk  
-- Score **0** (matches tester UI, 2026-07-27). Earlier independent scan was **71** (3 issues); retail/bot pages vary.
-- Table severities may not reflect the 0-score run — export from Lumen to update critical/serious/moderate/minor.
-- Failed because score &lt; 85.
+- Score 71, 0 critical, 1 serious, 2 moderate. Fail: score &lt; 85. Re-scan when page loads cleanly (avoid bot shell).
 
 ### eBay UK — Fail
-- URL: https://www.ebay.co.uk  
-- Score **0**, **0 critical**, **9 serious**, **2 moderate**, **1 minor**, 12 issues total (matches tester score 0).
-- Main findings: `aria-hidden-focus` (9), plus `page-has-heading-one`, `landmark-one-main`, `aria-allowed-role`.
-- Failed because score &lt; 85 (penalties from serious/moderate/minor only).
+- Score 0, 8 serious. Fail: score &lt; 85 (serious penalties).
 
 ### Netflix UK — Fail
-- URL: https://www.netflix.com/gb/  
-- Score **0**, **0 critical**, **0 serious**, **16 moderate**, 16 issues total (matches tester score 0).
-- Main findings: `region` (13), `heading-order`, `meta-viewport`, `landmark-unique`.
-- Failed because score &lt; 85 (moderate-only penalties).
+- Score 0, 16 moderate. Fail: score &lt; 85.
 
 ### ITVX — Fail
-- URL: https://www.itv.com/watch  
-- Score **79**, **0 critical**, **0 serious**, **3 moderate**, 3 issues total (matches tester score 79; verified independently).
-- Findings: `region`, `meta-viewport`, `landmark-one-main`.
-- Failed because score &lt; 85 (no critical issues).
+- Score 79, 3 moderate. Fail: score &lt; 85.
 
 ### Channel 4 — Fail
-- URL: https://www.channel4.com/  
-- Score **46**, **0 critical**, **2 serious**, **3 moderate**, **1 minor**, 6 issues total (verified independently).
-- Failed because score &lt; 85.
+- Score 68, 1 serious, 2 moderate, 1 minor. Fail: score &lt; 85.
 
 ### Channel 5 — Fail
-- URL: https://www.channel5.com/  
-- Score **79**, **0 critical**, **0 serious**, **3 moderate**, 3 issues total (verified independently).
-- Failed because score &lt; 85.
+- Score 79, 3 moderate. Fail: score &lt; 85.
 
 ### Lidl UK — Fail
-- URL: https://www.lidl.co.uk/  
-- Score **78**, **0 critical**, **1 serious**, **1 moderate**, 2 issues total (verified independently).
-- Failed because score &lt; 85.
+- Score 78, 1 serious, 1 moderate. Fail: score &lt; 85.
 
 ### Tesco — Fail
-- URL: https://www.tesco.com/  
-- Score **57**, **0 critical**, **1 serious**, **4 moderate**, 5 issues total (verified independently).
-- Failed because score &lt; 85.
+- Score 57, 1 serious, 4 moderate. Fail: score &lt; 85.
 
 ### Iceland — Fail
-- URL: https://www.iceland.co.uk/  
-- Score **57**, **0 critical**, **1 serious**, **4 moderate**, 5 issues total (verified independently).
-- Failed because score &lt; 85.
+- Score 57, 1 serious, 4 moderate. Fail: score &lt; 85.
 
 ### Wikipedia (en Main Page) — Pass
-- URL: https://en.wikipedia.org/wiki/Main_Page  
-- Score **91**, **0 critical**, **0 serious**, **0 moderate**, **3 minor**, 3 issues total (verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0).
+- Score 91, 0 critical, 3 minor. Met Pass rule.
 
 ### example.com — Pass
-- URL: https://example.com/  
-- Score **86**, **0 critical**, **0 serious**, **2 moderate**, 2 issues total (matches tester score 86; verified independently).
-- Met Pass rule (score ≥ 85 and critical = 0). Results log **#26**.
+- Score 86, 0 critical, 2 moderate. Met Pass rule (#26).
 
 ### W3C bad demo — Fail
-- URL: https://www.w3.org/WAI/demos/bad/before/home.html  
-- Score **0**, **34 critical**, **10 serious**, **23 moderate**, 67 issues total (matches tester score 0; verified independently).
-- Main findings: `image-alt` (33), `region` (22), `link-name` (7), plus contrast/lang/landmark issues.
-- Failed because score &lt; 85 and critical ≥ 1. Results log **#27** (final extended site).
+- Score 0, 34 critical, 10 serious, 23 moderate (67 issues). Known-bad demo (#27).
 
 ### W3Schools — Fail
-- URL: https://www.w3schools.com/  
-- Score **0**, **0 critical**, **5 serious**, **95 moderate**, 100 issues total (verified on live server, 2026-07-28).
-- Failed because score &lt; 85 (heavy moderate findings). Results log **#28** (post-batch).
+- Score 0, 5 serious, 95 moderate (100 issues). Fail: score &lt; 85 (#28).
 
 ---
 
-## Out of scope for this batch
+## Batch status
 
-These URLs appear in `TEST_PLAN.md` as examples but were **not** run in this 15-site batch:
+**28** sites logged (**8 Pass / 20 Fail**). Extended target **27** complete; **#28** W3Schools added post-batch. Optional extras: append rows in `website-batch-results.ts`, re-run `validate:batch`, and update this file.
 
-- https://example.com/
-- https://www.w3.org/WAI/demos/bad/before/home.html
+Regression URLs: **example.com** (#26 Pass) and **W3C bad demo** (#27 Fail) are included in the batch, not out of scope.
 
-Use them for a future regression or “known good / known bad” comparison run.
-
----
-
-## Extended batch complete (#27)
-
-All **27** target sites are logged. **#28+** are optional extras (e.g. W3Schools). To add more, append rows and update summary totals.
