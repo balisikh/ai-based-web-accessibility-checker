@@ -20,10 +20,10 @@
   --radius: 18px;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-body: var(--font-figtree), system-ui, sans-serif;
-  /* Responsive tokens — breakpoints: 480 phone, 640 batch-cards, 800 stack, 1024 tablet polish */
+  /* Responsive tokens — breakpoints: 480 phone, 768 batch-cards, 800 stack, 1024 tablet polish */
   --content-max-width: 1100px;
   --bp-phone: 480px;
-  --bp-batch-cards: 640px;
+  --bp-batch-cards: 768px;
   --bp-stack: 800px;
   --bp-tablet: 1024px;
 }
@@ -1367,7 +1367,7 @@ pre {
   color: var(--critical);
 }
 
-/* Mobile batch cards (table hidden below 640px) */
+/* Batch cards on phone + tablet portrait (table from 769px) */
 .batch-cards {
   display: none;
   list-style: none;
@@ -1470,7 +1470,7 @@ pre {
   max-width: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .batch-table-desktop {
     display: none;
   }
@@ -1493,7 +1493,7 @@ pre {
   }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 769px) {
   .batch-cards {
     display: none !important;
   }

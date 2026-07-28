@@ -19,16 +19,17 @@ Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Responsive layout
 
-**Defaults:** max content **1100px** (`--content-max-width`); breakpoints **480 / 640 / 800 / 1024**.
+**Defaults:** max content **1100px** (`--content-max-width`); breakpoints **480 / 768 / 800 / 1024**.
 
 | Width | Behavior |
 |------:|----------|
 | **480** | Full-width scan button, 44px touch targets |
-| **640** | `/batch` table → **card list** |
+| **768** | `/batch` table → **card list** (phones + tablet portrait) |
 | **800** | Stack results grid, URL row, how-it-works |
+| **769+** | Batch **table** view |
 | **801–1024** | Slightly compact batch table (tablet / small laptop) |
 
-**QA widths:** 320, 390, 768, 1024, 1280 px on `/` and `/batch`.
+**QA widths:** 320, 390, 768, 1024, 1280 px on `/`, `/batch`, and `/fixtures/results` (static results layout).
 
 ```bash
 npm run build && npm run start
