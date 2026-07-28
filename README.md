@@ -33,7 +33,8 @@ Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and
 | JSON export | Done |
 | Optional AI enrichment | Done |
 | Anonymous use (no login) | Done |
-| PDF export / accounts / crawl / deploy | Not yet |
+| PDF export / accounts / crawl | Not yet |
+| **Deploy (production host)** | **Docker + CD in repo** — wire host, Postgres, secrets ([`web/DEPLOY.md`](./web/DEPLOY.md)) |
 
 ---
 
@@ -116,7 +117,7 @@ On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.gi
 | Job | What it checks |
 |-----|----------------|
 | **web** | `npm ci` → ESLint → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
-| **responsive-viewport** | Viewport overflow checks + live **example.com** axe smoke (single Playwright install, cached) |
+| **responsive-viewport** | Viewport overflow on all PRs/pushes; **live example.com axe smoke** only on **`main`** push or **Actions → Run workflow** |
 
 Run the same checks locally:
 

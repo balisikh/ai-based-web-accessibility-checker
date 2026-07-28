@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   # One active run per PR (supersede old commits). Each push to main gets its own SHA group so runs are not canceled mid-flight.
@@ -46,7 +47,7 @@ jobs:
         run: npm run build
 
   responsive-viewport:
-    name: Viewport check + Playwright smoke scan
+    name: Viewport check (+ smoke on main)
     runs-on: ubuntu-latest
     needs: web
     defaults:
@@ -111,6 +112,7 @@ jobs:
           PLAYWRIGHT_CHROMIUM: "1"
 
       - name: Smoke scan example.com
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
         run: npm run smoke:scan
         env:
           CI: "true"
