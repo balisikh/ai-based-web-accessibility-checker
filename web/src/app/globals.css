@@ -20,12 +20,18 @@
   --radius: 18px;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-body: var(--font-figtree), system-ui, sans-serif;
-  /* Responsive tokens — breakpoints: 480 phone, 768 batch-cards, 800 stack, 1024 tablet polish */
+  /* Device tiers: mobile ≤480, tablet ≤768, stack ≤800, laptop ≤1024, desktop 1025+ */
   --content-max-width: 1100px;
-  --bp-phone: 480px;
-  --bp-batch-cards: 768px;
+  --bp-mobile: 480px;
+  --bp-tablet: 768px;
   --bp-stack: 800px;
-  --bp-tablet: 1024px;
+  --bp-laptop: 1024px;
+  --bp-desktop: 1440px;
+  --touch-min: 44px;
+  --gutter-mobile: 1rem;
+  --gutter-tablet: 1.25rem;
+  --gutter-laptop: 2rem;
+  --gutter-desktop: 2.5rem;
 }
 
 @theme inline {
@@ -81,12 +87,12 @@ select:focus-visible {
 }
 
 .scan-shell {
-  width: min(var(--content-max-width), calc(100% - 2rem));
+  width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-laptop)));
   margin: 0 auto;
   padding: calc(3.5rem + env(safe-area-inset-top, 0))
-    max(1rem, env(safe-area-inset-right, 0))
+    max(var(--gutter-mobile), env(safe-area-inset-right, 0))
     calc(4rem + env(safe-area-inset-bottom, 0))
-    max(1rem, env(safe-area-inset-left, 0));
+    max(var(--gutter-mobile), env(safe-area-inset-left, 0));
   position: relative;
   z-index: 1;
 }
@@ -930,13 +936,19 @@ pre {
   .url-row,
   .results-grid,
   .count-row,
-  .how-grid {
+  .how-grid,
+  .how-to-use-grid {
     grid-template-columns: 1fr;
   }
 
   .scan-shell {
-    width: min(1100px, calc(100% - 1.25rem));
+    width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-tablet)));
     padding-top: 2rem;
+  }
+
+  .batch-summary,
+  .batch-summary-severity {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .results-header h2 {
@@ -964,7 +976,7 @@ pre {
   .toolbar-actions .button-secondary,
   .toolbar-actions button {
     width: 100%;
-    min-height: 44px;
+    min-height: var(--touch-min);
   }
 
   .how-it-works-head {
@@ -973,10 +985,31 @@ pre {
   }
 }
 
-/* Tablet / small laptop: keep readable spacing without widening shell */
+/* Tablet portrait + large phone: touch-friendly scan form */
+@media (max-width: 768px) {
+  .url-row {
+    grid-template-columns: 1fr;
+  }
+
+  .url-row button {
+    width: 100%;
+    min-height: var(--touch-min);
+  }
+
+  .scan-shell {
+    width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-mobile)));
+  }
+}
+
+/* Tablet landscape / small laptop */
 @media (min-width: 801px) and (max-width: 1024px) {
   .scan-shell {
-    width: min(var(--content-max-width), calc(100% - 1.5rem));
+    width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-tablet)));
+  }
+
+  .batch-summary,
+  .batch-summary-severity {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .batch-table {
@@ -987,24 +1020,57 @@ pre {
   .batch-table td {
     padding: 0.55rem 0.6rem;
   }
+
+  .results-grid {
+    grid-template-columns: minmax(0, 0.45fr) minmax(0, 0.55fr);
+  }
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .scan-shell {
+    width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-laptop)));
+  }
+
+  .batch-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .batch-summary-severity {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .results-grid {
+    grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+  }
+
+  .issue-list {
+    max-height: min(32rem, 65vh);
+  }
+}
+
+/* Desktop / ultrawide — cap line length, generous gutters */
+@media (min-width: 1440px) {
+  .scan-shell {
+    width: min(var(--content-max-width), calc(100% - 2 * var(--gutter-desktop)));
+    padding-top: calc(4rem + env(safe-area-inset-top, 0));
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .lede,
+  .score-explainer,
+  .batch-live-reason {
+    max-width: 40rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .url-row {
-    grid-template-columns: 1fr;
-  }
-
-  .url-row button {
-    width: 100%;
-    min-height: 44px;
-  }
-
   .example-row {
     flex-wrap: wrap;
   }
 
   .example-chip {
-    min-height: 44px;
+    min-height: var(--touch-min);
   }
 
   .score-value {
@@ -1015,6 +1081,9 @@ pre {
     font-size: clamp(1.75rem, 8vw, 2.5rem);
   }
 
+  .hero,
+  .status-panel,
+  .results,
   .batch-panel {
     padding: clamp(1rem, 4vw, 1.5rem);
   }

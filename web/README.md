@@ -19,17 +19,19 @@ Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Responsive layout
 
-**Defaults:** max content **1100px** (`--content-max-width`); breakpoints **480 / 768 / 800 / 1024**.
+Content is capped at **1100px** with **device-tier** gutters and breakpoints.
 
-| Width | Behavior |
-|------:|----------|
-| **480** | Full-width scan button, 44px touch targets |
-| **768** | `/batch` table → **card list** (phones + tablet portrait) |
-| **800** | Stack results grid, URL row, how-it-works |
-| **769+** | Batch **table** view |
-| **801–1024** | Slightly compact batch table (tablet / small laptop) |
+| Device | Viewport (typical) | Layout |
+|--------|-------------------|--------|
+| **Mobile** | ≤480px | Single column, 44px touch targets, tight gutters |
+| **Tablet** | 481–768px | Batch **cards**, full-width scan button, 2×2 summary tiles |
+| **Tablet landscape** | 769–1024px | Batch **table** (compact), 2×2 summaries, balanced results columns |
+| **Laptop** | 1025–1439px | Full 4-column batch summaries, results list + detail |
+| **Desktop** | ≥1440px | Same max width, wider side margins, extra vertical rhythm |
 
-**QA widths:** 320, 390, 768, 1024, 1280 px on `/`, `/batch`, and `/fixtures/results` (static results layout).
+**Breakpoint tokens:** `--bp-mobile` 480 · `--bp-tablet` 768 · `--bp-stack` 800 · `--bp-laptop` 1024 · `--bp-desktop` 1440.
+
+**QA widths (CI):** 320, 390, 768, 1024, 1280, 1440 on `/`, `/batch`, `/fixtures/results`.
 
 ```bash
 npm run build && npm run start

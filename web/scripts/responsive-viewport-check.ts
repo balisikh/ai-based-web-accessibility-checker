@@ -6,7 +6,7 @@
 import { chromium } from "playwright";
 
 const BASE = (process.env.BASE_URL ?? "http://127.0.0.1:4376").replace(/\/$/, "");
-const WIDTHS = [320, 390, 768, 1024, 1280] as const;
+const WIDTHS = [320, 390, 768, 1024, 1280, 1440] as const;
 const PATHS = ["/", "/batch", "/fixtures/results"] as const;
 
 async function waitForServer(maxMs = 90_000): Promise<void> {
