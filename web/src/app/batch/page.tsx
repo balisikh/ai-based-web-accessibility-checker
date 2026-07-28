@@ -7,6 +7,7 @@ import {
   websiteBatchFailReason,
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
+import { guidanceForSite } from "@/lib/website-batch-fail-guidance";
 
 export const metadata = {
   title: "Lumen | Website batch results",
@@ -106,12 +107,13 @@ export default function BatchResultsPage() {
                 <th scope="col">Minor</th>
                 <th scope="col">Total</th>
                 <th scope="col">Result</th>
-                <th scope="col">Notes</th>
+                <th scope="col">Notes &amp; recommended actions</th>
               </tr>
             </thead>
             <tbody>
               {WEBSITE_BATCH_RESULTS.map((row) => {
                 const pass = websiteBatchPass(row.score, row.critical);
+                const guidance = guidanceForSite(row.id);
                 const failReason = websiteBatchFailReason(
                   row.score,
                   row.critical,
@@ -158,7 +160,36 @@ export default function BatchResultsPage() {
                         <p className="batch-row-callout">{failReason}</p>
                       )}
                     </td>
-                    <td className="batch-notes">{row.note ?? "—"}</td>
+                    <td className="batch-notes">
+                      {pass ? (
+                        row.note ? (
+                          <p className="batch-note-line">{row.note}</p>
+                        ) : (
+                          "—"
+                        )
+                      ) : (
+                        <>
+                          {(row.note ?? guidance?.note) && (
+                            <p className="batch-note-line">
+                              <strong>Note:</strong>{" "}
+                              {row.note ?? guidance?.note}
+                            </p>
+                          )}
+                          {guidance?.furtherActions.length ? (
+                            <ul className="batch-actions">
+                              {guidance.furtherActions.map((action) => (
+                                <li key={action}>{action}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="batch-note-line hint">
+                              Re-scan in{" "}
+                              <Link href="/">Lumen</Link> for rule-level fixes.
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </td>
                   </tr>
                 );
               })}

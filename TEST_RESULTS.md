@@ -45,6 +45,32 @@ Notes:
 | **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps, Wikipedia, example.com |
 | **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland, W3C bad demo, W3Schools |
 
+### Failed sites — notes and recommended actions
+
+These are **tester recommendations** (not fixes applied by this project). Rule-level detail comes from re-scanning the URL in Lumen. The same text appears on the [batch results page](http://localhost:4376/batch) (**Notes & recommended actions** column) and in `web/src/lib/website-batch-fail-guidance.ts`.
+
+| # | Site | Note | Recommended actions (summary) |
+|--:|------|------|--------------------------------|
+| 2 | YouTube | | Fix invalid ARIA on nav (`aria-allowed-attr`); re-scan until critical = 0 and score ≥ 85. |
+| 3 | BBC Weather | | Fix critical `aria-required-attr`, then `aria-hidden-focus` and `color-contrast`; re-scan after page updates. |
+| 8 | ChatGPT | | Fix `aria-allowed-attr` and `color-contrast`; export JSON before/after. |
+| 11 | Gmail | Sign-in surface | Fix `select-name` on sign-in; optional logged-in scan separately. |
+| 12 | Google Docs | | Align scan target (sign-in vs editor); fix `select-name`; re-scan one consistent URL. |
+| 13 | Google Sheets | | Fix `aria-required-parent` and `list` markup; prioritize criticals. |
+| 14 | Google Slides | | Fix `aria-required-parent` and `list`; re-scan and export for devs. |
+| 15 | Yahoo | | Add `html` lang; fix `meta-viewport`; re-scan (score 78 → need ≥ 85). |
+| 16 | Amazon UK | Score/bot variance | Re-scan when page loads cleanly; fix serious/moderate; log one consistent row. |
+| 17 | eBay UK | | Fix `aria-hidden-focus` and landmark/heading/role issues; re-scan. |
+| 18 | Netflix UK | | Fix regions, landmarks, heading order, viewport; re-scan (moderate-heavy). |
+| 19 | ITVX | | Fix `region`, `meta-viewport`, `landmark-one-main`; re-scan (79 → ≥ 85). |
+| 20 | Channel 4 | | Re-scan; fix serious then moderate issues via Rule help. |
+| 21 | Channel 5 | | Fix moderate landmark/region/viewport issues; re-scan. |
+| 22 | Lidl UK | | Fix 1 serious + 1 moderate; re-scan (78 → ≥ 85). |
+| 23 | Tesco | | Fix 1 serious + 4 moderate; re-scan. |
+| 24 | Iceland | | Same pattern as Tesco; re-scan from score 57. |
+| 27 | W3C bad demo | Known-bad demo | Regression/learning only — not production remediation. |
+| 28 | W3Schools | | Triage serious then moderates; re-scan; use AI tips if enabled. |
+
 ---
 
 ## Results table

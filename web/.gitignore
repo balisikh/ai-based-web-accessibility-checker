@@ -37,6 +37,10 @@ yarn-error.log*
 # local postgres / pglite data
 /data
 
+# local batch rescan output
+/batch-rescan-report.json
+/batch-rescan.log
+
 # vercel
 .vercel
 
