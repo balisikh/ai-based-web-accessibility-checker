@@ -16,6 +16,13 @@ npm run ci     # lint + validate:batch + build
 
 Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
+## Responsive layout
+
+- **Breakpoints:** 640px (batch table → cards), 800px (stacked results / how-it-works grid), 480px (full-width scan button, touch targets ≥ 44px).
+- **Batch:** On narrow viewports, `/batch` shows **card list** instead of horizontal table scroll.
+- **Viewport:** `layout.tsx` exports `width: device-width`, `initialScale: 1` (zoom not disabled).
+- **Test:** Chrome DevTools → 375×667 and 320px width on `/` and `/batch`; confirm no clipped primary actions.
+
 ## Requirements
 
 - Node.js 22+ (GitHub Actions CI uses 22)

@@ -11,6 +11,7 @@ import {
 import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
+import { BatchMobileCards } from "./BatchMobileCards";
 
 export const metadata = {
   title: "Lumen | Website batch results",
@@ -94,7 +95,9 @@ export default function BatchResultsPage() {
           <code>TEST_RESULTS.md</code> in the repo.
         </p>
 
-        <div className="batch-table-wrap">
+        <BatchMobileCards rows={WEBSITE_BATCH_RESULTS} />
+
+        <div className="batch-table-wrap batch-table-desktop">
           <table className="batch-table">
             <caption className="sr-only">
               All batch websites with score, severity counts, and pass or fail
