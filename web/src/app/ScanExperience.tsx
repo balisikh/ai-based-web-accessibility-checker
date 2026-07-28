@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
+import { validateScanUrl } from "@/lib/validate-url";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
 
@@ -18,6 +19,13 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const SEVERITY_ORDER: Severity[] = ["critical", "serious", "moderate", "minor"];
+
+const SEVERITY_HINT: Record<Severity, string> = {
+  critical: "Blocks many users — fix first.",
+  serious: "Major barriers for some users.",
+  moderate: "Noticeable friction — plan fixes.",
+  minor: "Small improvements when you can.",
+};
 
 const EXAMPLE_URLS = [
   { label: "example.com", url: "https://example.com" },
@@ -100,6 +108,8 @@ export function ScanExperience() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [severityFilter, setSeverityFilter] = useState<Severity | "all">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
+  const errorAlertRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,19 +190,36 @@ export function ScanExperience() {
     // Intentionally depend on scan.id only so status updates don't cancel in-flight completion.
   }, [phase, scan?.id]);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  useEffect(() => {
+    if (phase === "results") {
+      resultsHeadingRef.current?.focus();
+    } else if (phase === "error" && error) {
+      errorAlertRef.current?.focus();
+    }
+  }, [phase, error]);
+
+  async function startScan(rawUrl: string) {
     setError(null);
     setIssues([]);
     setSelectedId(null);
     setSeverityFilter("all");
+
+    const validation = validateScanUrl(rawUrl);
+    if (!validation.ok) {
+      setError(validation.error);
+      setPhase("error");
+      return;
+    }
+
+    setUrl(validation.url);
+    setScan(null);
     setPhase("submitting");
 
     try {
       const res = await fetch("/api/scans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: validation.url }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -208,6 +235,11 @@ export function ScanExperience() {
       setError(err instanceof Error ? err.message : "Could not start scan.");
       setPhase("error");
     }
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await startScan(url);
   }
 
   function reset() {
@@ -230,6 +262,9 @@ export function ScanExperience() {
   const selected = issues.find((issue) => issue.id === selectedId) ?? null;
   const rating = scoreRating(scan?.score);
   const cleanScan = phase === "results" && issues.length === 0;
+  const criticalCount = scan?.summaryCounts?.critical ?? 0;
+  const failedScanUrl =
+    phase === "error" && scan?.url ? scan.url : null;
 
   return (
     <div className="scan-shell">
@@ -245,6 +280,12 @@ export function ScanExperience() {
           </p>
 
           <form className="scan-form" onSubmit={onSubmit} noValidate>
+            {phase === "error" && failedScanUrl && (
+              <div className="error-summary" role="group" aria-label="Scan failure">
+                <p className="error-summary-title">Scan did not finish</p>
+                <p className="error-summary-url">{failedScanUrl}</p>
+              </div>
+            )}
             <label htmlFor={inputId} className="url-label">
               Website URL
             </label>
@@ -290,9 +331,25 @@ export function ScanExperience() {
               blocked.
             </p>
             {error && (
-              <p id={errorId} className="form-error" role="alert">
-                {error}
-              </p>
+              <>
+                <p
+                  id={errorId}
+                  ref={errorAlertRef}
+                  tabIndex={-1}
+                  className="form-error"
+                  role="alert"
+                >
+                  {error}
+                </p>
+                <button
+                  type="button"
+                  className="button-secondary retry-button"
+                  disabled={phase === "submitting"}
+                  onClick={() => startScan(url)}
+                >
+                  Try again
+                </button>
+              </>
             )}
           </form>
 
@@ -426,7 +483,9 @@ export function ScanExperience() {
           <header className="results-header">
             <div>
               <p className="brand compact">Lumen</p>
-              <h2 id="results-heading">Results</h2>
+              <h2 id="results-heading" ref={resultsHeadingRef} tabIndex={-1}>
+                Results
+              </h2>
               <p className="results-url">
                 <a href={scan.url} target="_blank" rel="noopener noreferrer">
                   {scan.url}
@@ -443,7 +502,22 @@ export function ScanExperience() {
             </div>
           </header>
 
-          <ul className="count-row">
+          {criticalCount > 0 && (
+            <p className="critical-banner" role="alert">
+              <strong>{criticalCount} critical</strong>{" "}
+              {criticalCount === 1 ? "issue" : "issues"} — address these before
+              lower-severity items, even if the score looks acceptable.
+            </p>
+          )}
+
+          <p className="score-explainer">
+            Score <strong>0–100</strong> from automated issue counts.{" "}
+            <strong>{rating.label}</strong> means {scan.score ?? 0} (85+ is
+            Strong). In our website test batches, <strong>Pass</strong> also
+            requires zero critical issues.
+          </p>
+
+          <ul className="count-row" aria-label="Issue counts by severity">
             {SEVERITY_ORDER.map((severity) => (
               <li key={severity}>
                 <span className={`sev sev-${severity}`}>{severity}</span>
@@ -451,6 +525,15 @@ export function ScanExperience() {
               </li>
             ))}
           </ul>
+
+          <dl className="severity-legend">
+            {SEVERITY_ORDER.map((severity) => (
+              <div key={severity}>
+                <dt className={`sev sev-${severity}`}>{severity}</dt>
+                <dd>{SEVERITY_HINT[severity]}</dd>
+              </div>
+            ))}
+          </dl>
 
           {cleanScan ? (
             <div className="success-panel" role="status">
@@ -539,7 +622,10 @@ export function ScanExperience() {
 
                 <article className="issue-detail" aria-live="polite">
                   {!selected && (
-                    <p className="empty">Select an issue to see details.</p>
+                    <p className="empty">
+                      Select an issue to see WCAG criteria, the HTML snippet,
+                      and rule help.
+                    </p>
                   )}
                   {selected && (
                     <>
