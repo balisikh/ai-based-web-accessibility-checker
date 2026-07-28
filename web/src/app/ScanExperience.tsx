@@ -240,8 +240,8 @@ export function ScanExperience() {
             Accessibility Checker
           </h1>
           <p className="lede">
-            Paste a public URL. Get WCAG-oriented findings, a clear score, and
-            practical fix guidance.
+            Paste a public URL. Get automated accessibility findings, a clear
+            score, and links to rule help.
           </p>
 
           <form className="scan-form" onSubmit={onSubmit} noValidate>
@@ -306,6 +306,11 @@ export function ScanExperience() {
                 className={`ai-status-pill${aiTipsEnabled ? " ai-status-on" : ""}`}
               >
                 {aiTipsEnabled ? "AI tips on" : "AI tips off"}
+                <span className="sr-only">
+                  {aiTipsEnabled
+                    ? ". AI guidance is enabled on this server."
+                    : ". Automated axe scan and scoring are unchanged."}
+                </span>
               </span>
             </div>
             <ol className="how-grid">
@@ -319,37 +324,50 @@ export function ScanExperience() {
                     <p>
                       {item.id === "ai-tips"
                         ? aiTipsEnabled
-                          ? "Plain-language explanations and fix ideas for the most severe issues on this server."
-                          : "Not configured here — you still get axe findings, WCAG mapping, and a score."
+                          ? "Short explanations and fix ideas for the most severe issues on this scan."
+                          : "Not enabled on this site — you still get rule findings, WCAG mapping, and a score."
                         : item.body}
                     </p>
                     {item.id === "public-urls" && (
                       <p className="how-examples">
                         <span className="how-ok">✓ https://example.com</span>
-                        <span className="how-no">✗ localhost or 192.168.x.x</span>
+                        <span className="how-no">✗ localhost or 127.0.0.1</span>
+                        <span className="how-no">✗ 192.168.x.x</span>
                       </p>
                     )}
                   </div>
                 </li>
               ))}
             </ol>
-            <details className="learn-more">
-              <summary>What URLs can I use?</summary>
-              <div className="learn-more-body">
-                <p>
-                  Lumen is for pages on the public web. We accept{" "}
-                  <strong>http</strong> and <strong>https</strong> URLs and
-                  block localhost, private IP ranges, and hostnames that resolve
-                  to them — so the checker cannot be used to probe your home or
-                  office network.
-                </p>
-                <p>
-                  Scans use automated rules only. Results help you improve
-                  accessibility but are <strong>not</strong> a legal certificate
-                  or a substitute for manual testing with assistive technology.
-                </p>
-              </div>
-            </details>
+            <div className="learn-more-group">
+              <details className="learn-more">
+                <summary>What URLs can I use?</summary>
+                <div className="learn-more-body">
+                  <p>
+                    Lumen is for pages on the public web. We accept{" "}
+                    <strong>http</strong> and <strong>https</strong> URLs and
+                    block localhost, private IP ranges, and hostnames that resolve
+                    to them — so the checker cannot be used to probe your home or
+                    office network.
+                  </p>
+                </div>
+              </details>
+              <details className="learn-more">
+                <summary>What are the limits of a scan?</summary>
+                <div className="learn-more-body">
+                  <p>
+                    Each run checks <strong>one URL</strong>, not a whole website.
+                    Most public pages finish in a few seconds to about a minute.
+                    Login-only or paywalled content may not fully appear.
+                  </p>
+                  <p>
+                    Results come from automated rules only. They help you improve
+                    accessibility but are <strong>not</strong> a legal certificate
+                    or a substitute for manual testing with assistive technology.
+                  </p>
+                </div>
+              </details>
+            </div>
           </section>
         </section>
       )}
@@ -391,8 +409,8 @@ export function ScanExperience() {
           </ol>
           {!aiTipsEnabled && (
             <p className="scan-note hint">
-              AI guidance is off on this server; axe results and scoring still
-              run as usual.
+              AI guidance is not enabled on this site; automated rule checks and
+              scoring still run as usual.
             </p>
           )}
         </section>

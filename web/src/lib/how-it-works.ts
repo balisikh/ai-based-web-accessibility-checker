@@ -16,18 +16,18 @@ export const HOW_IT_WORKS_ITEMS: HowItWorksItem[] = [
     step: 2,
     id: "browser-scan",
     title: "Real browser scan",
-    body: "A headless Chromium session loads the page like a visitor would.",
+    body: "Automated Chrome loads the page in the background, like a real visitor.",
   },
   {
     step: 3,
     id: "wcag-rules",
-    title: "WCAG A/AA rules",
-    body: "axe-core runs automated checks tagged for WCAG 2.x Levels A and AA.",
+    title: "Accessibility rules",
+    body: "Industry-standard checks (axe-core) for common WCAG Level A and AA requirements.",
   },
   {
     step: 4,
     id: "ai-tips",
-    title: "AI tips",
-    body: "Optional plain-language fixes for top issues when this server has an API key.",
+    title: "Optional AI tips",
+    body: "Plain-language fix ideas for top issues when the site operator enables AI.",
   },
 ];
