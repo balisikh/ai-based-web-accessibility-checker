@@ -3,7 +3,7 @@
 **Product:** Lumen Accessibility Checker  
 **Purpose:** Record whether each **website** passed or failed based on automated accessibility findings (not whether the Lumen tool itself worked).  
 **App:** http://localhost:4376  
-**Batch status:** **16 websites** logged (initial batch finalized 2026-07-27; **#16+** extensions)
+**Batch status:** **25 websites** logged — **session paused** (continue **#26+** tomorrow). Initial MVP batch (10) completed earlier; extensions **#11–25** on 2026-07-27.
 
 ---
 
@@ -26,23 +26,24 @@ Notes:
 
 | Metric | Count |
 |--------|------:|
-| Websites tested | **16** |
-| **Passed** | **7** (44%) |
-| **Failed** | **9** (56%) |
-| Initial MVP target | 10 (met; extended with additional sites) |
+| Websites tested | **25** |
+| **Passed** | **8** (32%) |
+| **Failed** | **17** (68%) |
+| Initial MVP target | 10 (met on 2026-07-27) |
+| Extended run (today) | **#11–25** (15 sites); **#26+** next session |
 
-### Severity totals (all 16 scans)
+### Severity totals (all 25 scans)
 
 | Critical | Serious | Moderate | Minor | Total issues |
 |---------:|--------:|---------:|------:|-------------:|
-| 23 | 33 | 3 | 0 | 59 |
+| 23 | 47 | 39 | 5 | 114 |
 
 ### Quick list
 
 | Result | Websites |
 |--------|----------|
-| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps |
-| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK |
+| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps, Wikipedia |
+| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland |
 
 ---
 
@@ -65,9 +66,18 @@ Notes:
 | 13 | Google Sheets | https://sheets.google.com | 0 | 6 | 13 | 0 | 0 | 19 | **Fail** | 2026-07-27 | |
 | 14 | Google Slides | https://slides.google.com | 0 | 9 | 13 | 0 | 0 | 22 | **Fail** | 2026-07-27 | |
 | 15 | Yahoo | https://www.yahoo.com | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | Fail on score &lt; 85 only |
-| 16 | Amazon UK | https://www.amazon.co.uk | 71 | 0 | 1 | 2 | 0 | 3 | **Fail** | 2026-07-27 | Tester 0 vs verify 71 — see notes |
+| 16 | Amazon UK | https://www.amazon.co.uk | 0 | 0 | 1 | 2 | 0 | 3 | **Fail** | 2026-07-27 | Score per tester UI (0); severities from prior verify — refresh from Lumen if counts differ |
+| 17 | eBay UK | https://www.ebay.co.uk | 0 | 0 | 9 | 2 | 1 | 12 | **Fail** | 2026-07-27 | Matches tester score 0 |
+| 18 | Netflix UK | https://www.netflix.com/gb/ | 0 | 0 | 0 | 16 | 0 | 16 | **Fail** | 2026-07-27 | Matches tester score 0 |
+| 19 | ITVX | https://www.itv.com/watch | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-27 | |
+| 20 | Channel 4 | https://www.channel4.com/ | 46 | 0 | 2 | 3 | 1 | 6 | **Fail** | 2026-07-27 | |
+| 21 | Channel 5 | https://www.channel5.com/ | 79 | 0 | 0 | 3 | 0 | 3 | **Fail** | 2026-07-27 | |
+| 22 | Lidl UK | https://www.lidl.co.uk/ | 78 | 0 | 1 | 1 | 0 | 2 | **Fail** | 2026-07-27 | |
+| 23 | Tesco | https://www.tesco.com/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
+| 24 | Iceland | https://www.iceland.co.uk/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
+| 25 | Wikipedia (en Main Page) | https://en.wikipedia.org/wiki/Main_Page | 91 | 0 | 0 | 0 | 3 | 3 | **Pass** | 2026-07-27 | |
 
-**Verification:** Rows 8–16 and selected earlier sites were cross-checked via local Lumen API scans; scores and severity counts match tester UI unless noted in rows 12 and 16.
+**Verification:** Independent API scans where noted; compare your UI if scores differ (retail/TV pages change often).
 
 ---
 
@@ -161,10 +171,57 @@ Notes:
 
 ### Amazon UK — Fail
 - URL: https://www.amazon.co.uk  
-- **Tester:** score **0**. **Independent scan:** score **71**, **0 critical**, **1 serious**, **2 moderate**, 3 issues total.
-- Findings: `page-has-heading-one` (serious), `landmark-one-main` (moderate), `document-title` (moderate).
-- Table row uses verified scan (71). Tester 0 may reflect a different TLD, bot/captcha page, or more axe hits on another surface.
+- Score **0** (matches tester UI, 2026-07-27). Earlier independent scan was **71** (3 issues); retail/bot pages vary.
+- Table severities may not reflect the 0-score run — export from Lumen to update critical/serious/moderate/minor.
 - Failed because score &lt; 85.
+
+### eBay UK — Fail
+- URL: https://www.ebay.co.uk  
+- Score **0**, **0 critical**, **9 serious**, **2 moderate**, **1 minor**, 12 issues total (matches tester score 0).
+- Main findings: `aria-hidden-focus` (9), plus `page-has-heading-one`, `landmark-one-main`, `aria-allowed-role`.
+- Failed because score &lt; 85 (penalties from serious/moderate/minor only).
+
+### Netflix UK — Fail
+- URL: https://www.netflix.com/gb/  
+- Score **0**, **0 critical**, **0 serious**, **16 moderate**, 16 issues total (matches tester score 0).
+- Main findings: `region` (13), `heading-order`, `meta-viewport`, `landmark-unique`.
+- Failed because score &lt; 85 (moderate-only penalties).
+
+### ITVX — Fail
+- URL: https://www.itv.com/watch  
+- Score **79**, **0 critical**, **0 serious**, **3 moderate**, 3 issues total (matches tester score 79; verified independently).
+- Findings: `region`, `meta-viewport`, `landmark-one-main`.
+- Failed because score &lt; 85 (no critical issues).
+
+### Channel 4 — Fail
+- URL: https://www.channel4.com/  
+- Score **46**, **0 critical**, **2 serious**, **3 moderate**, **1 minor**, 6 issues total (verified independently).
+- Failed because score &lt; 85.
+
+### Channel 5 — Fail
+- URL: https://www.channel5.com/  
+- Score **79**, **0 critical**, **0 serious**, **3 moderate**, 3 issues total (verified independently).
+- Failed because score &lt; 85.
+
+### Lidl UK — Fail
+- URL: https://www.lidl.co.uk/  
+- Score **78**, **0 critical**, **1 serious**, **1 moderate**, 2 issues total (verified independently).
+- Failed because score &lt; 85.
+
+### Tesco — Fail
+- URL: https://www.tesco.com/  
+- Score **57**, **0 critical**, **1 serious**, **4 moderate**, 5 issues total (verified independently).
+- Failed because score &lt; 85.
+
+### Iceland — Fail
+- URL: https://www.iceland.co.uk/  
+- Score **57**, **0 critical**, **1 serious**, **4 moderate**, 5 issues total (verified independently).
+- Failed because score &lt; 85.
+
+### Wikipedia (en Main Page) — Pass
+- URL: https://en.wikipedia.org/wiki/Main_Page  
+- Score **91**, **0 critical**, **0 serious**, **0 moderate**, **3 minor**, 3 issues total (verified independently).
+- Met Pass rule (score ≥ 85 and critical = 0).
 
 ---
 
@@ -184,4 +241,4 @@ Use them for a future regression or “known good / known bad” comparison run.
 1. Scan in Lumen (live mode, demo off).  
 2. Copy score + all four severity counts + total issues.  
 3. Apply the Pass/Fail rule.  
-4. Append row **#17+** and update **Summary count** and severity totals.
+4. Append row **#26+** and update **Summary count** and severity totals.
