@@ -6,7 +6,10 @@
     "dev": "next dev -p 4376",
     "build": "next build",
     "start": "next start -p 4376",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate:batch": "tsx scripts/validate-batch-snapshot.ts",
+    "smoke:scan": "tsx scripts/smoke-scan.ts https://example.com",
+    "ci": "npm run lint && npm run validate:batch && npm run build"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.12.1",
@@ -27,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }

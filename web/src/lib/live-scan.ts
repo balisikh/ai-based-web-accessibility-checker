@@ -36,16 +36,17 @@ async function getBrowser(): Promise<Browser> {
   }
 
   if (!browserPromise) {
-    browserPromise = chromium
-      .launch({
-        channel: "chrome",
-        headless: true,
-        args: ["--disable-dev-shm-usage", "--disable-gpu"],
-      })
-      .catch((error) => {
-        resetBrowserInstance();
-        throw error;
-      });
+    const launchOptions: Parameters<typeof chromium.launch>[0] = {
+      headless: true,
+      args: ["--disable-dev-shm-usage", "--disable-gpu"],
+    };
+    if (process.env.PLAYWRIGHT_CHROMIUM !== "1" && process.env.CI !== "true") {
+      launchOptions.channel = "chrome";
+    }
+    browserPromise = chromium.launch(launchOptions).catch((error) => {
+      resetBrowserInstance();
+      throw error;
+    });
   }
   return browserPromise;
 }

@@ -107,6 +107,28 @@ Full details: [`web/README.md`](./web/README.md)
 
 ---
 
+## Continuous integration (GitHub Actions)
+
+On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) runs:
+
+| Job | What it checks |
+|-----|----------------|
+| **web** | `npm ci` → ESLint → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
+| **smoke-scan** | Playwright **Chromium** live scan of `https://example.com` (bundled browser on CI, not system Chrome) |
+
+Run the same checks locally:
+
+```bash
+cd web
+npm run ci              # lint + validate:batch + build
+npm run validate:batch  # snapshot only
+npm run smoke:scan      # optional live scan (needs Chrome locally, or PLAYWRIGHT_CHROMIUM=1 + playwright install chromium)
+```
+
+The full **28-site batch rescan** is intentionally **not** in CI (slow and flaky). Update [`web/src/lib/website-batch-results.ts`](./web/src/lib/website-batch-results.ts) after manual rescans; CI keeps that file internally consistent.
+
+---
+
 ## Stack
 
 - **Frontend / API:** Next.js (React) + TypeScript  
@@ -150,7 +172,7 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 1. Deploy to a worker-capable host (Chrome/Playwright)  
 2. PDF export  
 3. Accounts + scan history  
-4. Multi-page crawl / CI integration  
+4. Multi-page crawl · optional scheduled batch rescan in CI  
 
 ---
 
