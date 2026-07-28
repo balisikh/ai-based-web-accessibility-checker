@@ -14,6 +14,23 @@ export const metadata = {
     "Pass and fail counts for the 28-site accessibility batch (static snapshot).",
 };
 
+type BatchSeverity = "critical" | "serious" | "moderate" | "minor";
+
+function BatchSeverityCount({
+  severity,
+  count,
+}: {
+  severity: BatchSeverity;
+  count: number;
+}) {
+  if (count === 0) {
+    return <span className="batch-sev-zero">0</span>;
+  }
+  return (
+    <span className={`batch-sev-num sev sev-${severity}`}>{count}</span>
+  );
+}
+
 export default function BatchResultsPage() {
   return (
     <main className="scan-shell">
@@ -40,8 +57,30 @@ export default function BatchResultsPage() {
             <strong>{WEBSITE_BATCH_SUMMARY.failed}</strong>
           </li>
           <li>
-            <span className="batch-summary-label">Critical (all sites)</span>
+            <span className="batch-summary-label">Total issues</span>
+            <strong>{WEBSITE_BATCH_SUMMARY.totalIssues}</strong>
+          </li>
+        </ul>
+
+        <ul
+          className="batch-summary batch-summary-severity"
+          aria-label="Severity totals across all 28 sites"
+        >
+          <li>
+            <span className="sev sev-critical">Critical</span>
             <strong>{WEBSITE_BATCH_SUMMARY.totalCritical}</strong>
+          </li>
+          <li>
+            <span className="sev sev-serious">Serious</span>
+            <strong>{WEBSITE_BATCH_SUMMARY.totalSerious}</strong>
+          </li>
+          <li>
+            <span className="sev sev-moderate">Moderate</span>
+            <strong>{WEBSITE_BATCH_SUMMARY.totalModerate}</strong>
+          </li>
+          <li>
+            <span className="sev sev-minor">Minor</span>
+            <strong>{WEBSITE_BATCH_SUMMARY.totalMinor}</strong>
           </li>
         </ul>
 
@@ -54,7 +93,7 @@ export default function BatchResultsPage() {
         <div className="batch-table-wrap">
           <table className="batch-table">
             <caption className="sr-only">
-              All batch websites with score, critical count, and pass or fail
+              All batch websites with score, severity counts, and pass or fail
             </caption>
             <thead>
               <tr>
@@ -62,6 +101,10 @@ export default function BatchResultsPage() {
                 <th scope="col">Website</th>
                 <th scope="col">Score</th>
                 <th scope="col">Critical</th>
+                <th scope="col">Serious</th>
+                <th scope="col">Moderate</th>
+                <th scope="col">Minor</th>
+                <th scope="col">Total</th>
                 <th scope="col">Result</th>
                 <th scope="col">Notes</th>
               </tr>
@@ -86,13 +129,19 @@ export default function BatchResultsPage() {
                       </a>
                     </td>
                     <td>{row.score}</td>
-                    <td>
-                      {row.critical > 0 ? (
-                        <span className="batch-critical-num">{row.critical}</span>
-                      ) : (
-                        row.critical
-                      )}
+                    <td className="batch-sev-cell">
+                      <BatchSeverityCount severity="critical" count={row.critical} />
                     </td>
+                    <td className="batch-sev-cell">
+                      <BatchSeverityCount severity="serious" count={row.serious} />
+                    </td>
+                    <td className="batch-sev-cell">
+                      <BatchSeverityCount severity="moderate" count={row.moderate} />
+                    </td>
+                    <td className="batch-sev-cell">
+                      <BatchSeverityCount severity="minor" count={row.minor} />
+                    </td>
+                    <td>{row.totalIssues}</td>
                     <td>
                       <span
                         className={`batch-badge batch-badge-${pass ? "pass" : "fail"}`}

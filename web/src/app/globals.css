@@ -982,6 +982,27 @@ pre {
   color: var(--critical);
 }
 
+.batch-summary-severity {
+  margin-top: 0.65rem;
+}
+
+.batch-summary-severity li {
+  gap: 0.45rem;
+}
+
+.batch-sev-cell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-sev-zero {
+  color: var(--ink-soft);
+}
+
+.batch-sev-num {
+  font-weight: 800;
+}
+
 .batch-rule {
   margin-bottom: 1rem;
 }

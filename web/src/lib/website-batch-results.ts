@@ -52,4 +52,8 @@ export const WEBSITE_BATCH_SUMMARY = {
   passed: WEBSITE_BATCH_RESULTS.filter((r) => r.score >= 85 && r.critical === 0).length,
   failed: WEBSITE_BATCH_RESULTS.filter((r) => r.score < 85 || r.critical >= 1).length,
   totalCritical: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.critical, 0),
+  totalSerious: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.serious, 0),
+  totalModerate: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.moderate, 0),
+  totalMinor: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.minor, 0),
+  totalIssues: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.totalIssues, 0),
 };
