@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
+import { HOW_TO_USE_STEPS } from "@/lib/how-to-use";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 import { validateScanUrl } from "@/lib/validate-url";
 import {
@@ -105,6 +106,7 @@ export function ScanExperience() {
   const errorId = useId();
   const examplesId = useId();
   const howItWorksId = useId();
+  const howToUseId = useId();
   const [url, setUrl] = useState("https://example.com");
   const [aiTipsEnabled, setAiTipsEnabled] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -365,6 +367,26 @@ export function ScanExperience() {
               </>
             )}
           </form>
+
+          <section className="how-to-use" aria-labelledby={howToUseId}>
+            <h2 id={howToUseId}>How to use Lumen</h2>
+            <p className="how-to-use-lede">
+              Step-by-step from URL to report.
+            </p>
+            <ol className="how-grid how-to-use-grid">
+              {HOW_TO_USE_STEPS.map((item) => (
+                <li key={item.id} className="how-card">
+                  <span className="how-card-step" aria-hidden="true">
+                    {item.step}
+                  </span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
 
           <section
             className="how-it-works"

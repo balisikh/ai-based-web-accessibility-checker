@@ -79,6 +79,8 @@ USE_DEMO_SCAN=1 npm run dev
 
 ## How to use
 
+The home screen includes a **How to use Lumen** section (backed by [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts)). Keep it aligned with this list:
+
 1. Open the app and enter a public `https://` URL (for example `https://example.com`)  
 2. Click **Check accessibility**  
 3. Wait for status steps (fetch → render → rules → optional AI → score)  
