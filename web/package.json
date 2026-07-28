@@ -9,6 +9,7 @@
     "lint": "eslint",
     "validate:batch": "tsx scripts/validate-batch-snapshot.ts",
     "smoke:scan": "tsx scripts/smoke-scan.ts https://example.com",
+    "test:responsive": "tsx scripts/responsive-viewport-check.ts",
     "ci": "npm run lint && npm run validate:batch && npm run build"
   },
   "dependencies": {

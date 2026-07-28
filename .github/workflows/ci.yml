@@ -45,6 +45,57 @@ jobs:
       - name: Production build
         run: npm run build
 
+  responsive-viewport:
+    name: Viewport overflow check (320–1280px)
+    runs-on: ubuntu-latest
+    needs: web
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Start production server
+        run: npm run start &
+        env:
+          HOSTNAME: 127.0.0.1
+
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:4376/api/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Server did not become ready"
+          exit 1
+
+      - name: Responsive viewport check
+        run: npm run test:responsive
+        env:
+          BASE_URL: http://127.0.0.1:4376
+          CI: "true"
+          PLAYWRIGHT_CHROMIUM: "1"
+
   smoke-scan:
     name: Playwright smoke scan (example.com)
     runs-on: ubuntu-latest

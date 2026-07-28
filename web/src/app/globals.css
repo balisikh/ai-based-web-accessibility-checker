@@ -20,6 +20,12 @@
   --radius: 18px;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-body: var(--font-figtree), system-ui, sans-serif;
+  /* Responsive tokens — breakpoints: 480 phone, 640 batch-cards, 800 stack, 1024 tablet polish */
+  --content-max-width: 1100px;
+  --bp-phone: 480px;
+  --bp-batch-cards: 640px;
+  --bp-stack: 800px;
+  --bp-tablet: 1024px;
 }
 
 @theme inline {
@@ -75,7 +81,7 @@ select:focus-visible {
 }
 
 .scan-shell {
-  width: min(1100px, calc(100% - 2rem));
+  width: min(var(--content-max-width), calc(100% - 2rem));
   margin: 0 auto;
   padding: calc(3.5rem + env(safe-area-inset-top, 0))
     max(1rem, env(safe-area-inset-right, 0))
@@ -967,6 +973,22 @@ pre {
   }
 }
 
+/* Tablet / small laptop: keep readable spacing without widening shell */
+@media (min-width: 801px) and (max-width: 1024px) {
+  .scan-shell {
+    width: min(var(--content-max-width), calc(100% - 1.5rem));
+  }
+
+  .batch-table {
+    font-size: 0.88rem;
+  }
+
+  .batch-table th,
+  .batch-table td {
+    padding: 0.55rem 0.6rem;
+  }
+}
+
 @media (max-width: 480px) {
   .url-row {
     grid-template-columns: 1fr;
@@ -1474,11 +1496,5 @@ pre {
 @media (min-width: 641px) {
   .batch-cards {
     display: none !important;
-  }
-}
-
-@media (max-width: 800px) {
-  .batch-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

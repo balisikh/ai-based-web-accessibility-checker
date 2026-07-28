@@ -12,16 +12,31 @@ npm run build  # production build
 npm run start  # run production server
 npm run lint   # eslint
 npm run ci     # lint + validate:batch + build
+npm run test:responsive   # needs npm run start in another terminal
 ```
 
 Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Responsive layout
 
-- **Breakpoints:** 640px (batch table → cards), 800px (stacked results / how-it-works grid), 480px (full-width scan button, touch targets ≥ 44px).
-- **Batch:** On narrow viewports, `/batch` shows **card list** instead of horizontal table scroll.
-- **Viewport:** `layout.tsx` exports `width: device-width`, `initialScale: 1` (zoom not disabled).
-- **Test:** Chrome DevTools → 375×667 and 320px width on `/` and `/batch`; confirm no clipped primary actions.
+**Defaults:** max content **1100px** (`--content-max-width`); breakpoints **480 / 640 / 800 / 1024**.
+
+| Width | Behavior |
+|------:|----------|
+| **480** | Full-width scan button, 44px touch targets |
+| **640** | `/batch` table → **card list** |
+| **800** | Stack results grid, URL row, how-it-works |
+| **801–1024** | Slightly compact batch table (tablet / small laptop) |
+
+**QA widths:** 320, 390, 768, 1024, 1280 px on `/` and `/batch`.
+
+```bash
+npm run build && npm run start
+# other terminal:
+npm run test:responsive
+```
+
+CI runs the same check after build. Viewport: `layout.tsx` — zoom allowed.
 
 ## Requirements
 

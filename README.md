@@ -116,6 +116,7 @@ On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.gi
 | Job | What it checks |
 |-----|----------------|
 | **web** | `npm ci` → ESLint → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
+| **responsive-viewport** | Production server + **no horizontal overflow** on `/` and `/batch` at 320–1280px |
 | **smoke-scan** | Playwright **Chromium** live scan of `https://example.com` (bundled browser on CI, not system Chrome) |
 
 Run the same checks locally:
