@@ -45,6 +45,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: clip;
+}
+
 html,
 body {
   min-height: 100%;
@@ -107,6 +111,8 @@ select:focus-visible {
   box-shadow: var(--shadow);
   padding: clamp(1.5rem, 4vw, 2.75rem);
   animation: rise 520ms ease both;
+  max-width: 100%;
+  min-width: 0;
 }
 
 @keyframes rise {
@@ -833,6 +839,9 @@ select:focus-visible {
   background: rgba(255, 255, 255, 0.82);
   padding: 1rem 1.1rem;
   min-height: 16rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .issue-detail h3 {
@@ -874,7 +883,8 @@ select:focus-visible {
 pre {
   margin: 0;
   padding: 0.75rem;
-  overflow: auto;
+  overflow-x: auto;
+  max-width: 100%;
   border-radius: 12px;
   background: #173532;
   color: #e7fffb;
@@ -939,6 +949,23 @@ pre {
   .how-grid,
   .how-to-use-grid {
     grid-template-columns: 1fr;
+  }
+
+  .count-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .severity-legend div {
+    grid-template-columns: 1fr;
+  }
+
+  .results-header > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .results-grid {
+    min-width: 0;
   }
 
   .scan-shell {
@@ -1120,6 +1147,9 @@ pre {
   border-radius: calc(var(--radius) + 6px);
   box-shadow: var(--shadow);
   padding: clamp(1.5rem, 4vw, 2.75rem);
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .batch-panel h1 {
@@ -1373,9 +1403,15 @@ pre {
 .batch-notes {
   font-size: 0.85rem;
   color: var(--ink-soft);
-  min-width: 16rem;
+  min-width: 0;
   max-width: 26rem;
   vertical-align: top;
+}
+
+@media (min-width: 1025px) {
+  .batch-table .batch-notes {
+    min-width: 12rem;
+  }
 }
 
 .batch-note-line {
@@ -1443,6 +1479,8 @@ pre {
   margin: 0;
   padding: 0;
   gap: 1rem;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .batch-card {
@@ -1451,6 +1489,10 @@ pre {
   padding: 1rem;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 6px 20px rgba(13, 92, 99, 0.06);
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
 }
 
 .batch-card-pass {
