@@ -11,6 +11,10 @@ import {
   websiteBatchFailReason,
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
+import {
+  BATCH_SNAPSHOT_DATE,
+  WEBSITE_BATCH_SUMMARY,
+} from "@/lib/website-batch-results";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
 
@@ -289,8 +293,9 @@ export function ScanExperience() {
           <div className="hero-grid">
             <div className="hero-primary">
           <p className="brand">Lumen</p>
-          <h1 id="hero-heading" className="headline">
-            Accessibility Checker
+          <p className="hero-eyebrow">WCAG-oriented · live Playwright + axe</p>
+          <h1 id="hero-heading" className="headline headline-hero">
+            <span className="headline-accent">Accessibility</span> checker
           </h1>
           <p className="lede">
             Paste a public URL. Get automated accessibility findings, a clear
@@ -373,15 +378,42 @@ export function ScanExperience() {
             </div>
 
             <aside className="hero-aside" aria-label="Quick links">
-              <div className="hero-spotlight hero-spotlight-pass">
-                <strong>28-site batch snapshot</strong>
-                <p>
-                  See Pass vs Fail, severity totals, and recommended actions for
-                  each public URL in the portfolio test set.
+              <div
+                className="hero-stat-card"
+                aria-label={`Batch snapshot: ${WEBSITE_BATCH_SUMMARY.tested} sites, ${WEBSITE_BATCH_SUMMARY.passed} pass, ${WEBSITE_BATCH_SUMMARY.failed} fail`}
+              >
+                <p className="hero-stat-kicker">Portfolio snapshot</p>
+                <p className="hero-stat-value">
+                  <span className="hero-stat-num">
+                    {WEBSITE_BATCH_SUMMARY.tested}
+                  </span>
+                  <span className="hero-stat-unit">sites tested</span>
                 </p>
-                <Link href="/batch" className="hero-spotlight-link">
-                  Open batch results →
+                <p className="hero-stat-split">
+                  <span className="hero-stat-pass">
+                    {WEBSITE_BATCH_SUMMARY.passed} Pass
+                  </span>
+                  <span className="hero-stat-sep" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="hero-stat-fail">
+                    {WEBSITE_BATCH_SUMMARY.failed} Fail
+                  </span>
+                </p>
+                <p className="hero-stat-meta">
+                  {WEBSITE_BATCH_SUMMARY.totalIssues} issues · resync{" "}
+                  {BATCH_SNAPSHOT_DATE}
+                </p>
+                <Link href="/batch" className="hero-stat-link">
+                  Open batch dashboard →
                 </Link>
+              </div>
+              <div className="hero-spotlight hero-spotlight-pass">
+                <strong>Pass vs Fail guidance</strong>
+                <p>
+                  See severity totals and recommended actions for each public
+                  URL in the portfolio test set.
+                </p>
               </div>
               <div className="hero-spotlight">
                 <strong>Pass rule (websites)</strong>
@@ -525,7 +557,7 @@ export function ScanExperience() {
               effectiveScanStatus(scan.status, aiTipsEnabled)
             ] ?? scan.status}
           </p>
-          <div className="progress-track" aria-hidden="true">
+          <div className="progress-track progress-track-active" aria-hidden="true">
             <div className="progress-bar" />
           </div>
           <ol className="scan-steps">
@@ -575,7 +607,7 @@ export function ScanExperience() {
               </p>
             </div>
             <div
-              className={`score-block score-${rating.tone}`}
+              className={`score-block score-${rating.tone} score-animate-in`}
               aria-label={`Accessibility score ${scan.score}, ${rating.label}`}
             >
               <p className="score-value">{scan.score}</p>
