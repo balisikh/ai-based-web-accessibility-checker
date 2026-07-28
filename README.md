@@ -117,7 +117,7 @@ On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.gi
 | Job | What it checks |
 |-----|----------------|
 | **web** | `npm ci` → ESLint → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
-| **responsive-viewport** | Viewport overflow on all PRs/pushes; **live example.com axe smoke** only on **`main`** push or **Actions → Run workflow** |
+| **responsive-viewport** | Viewport overflow on `/`, `/batch`, `/fixtures/results` (Playwright; no live URL scan in CI) |
 
 Run the same checks locally:
 
@@ -125,7 +125,7 @@ Run the same checks locally:
 cd web
 npm run ci              # lint + validate:batch + build
 npm run validate:batch  # snapshot only
-npm run smoke:scan      # optional live scan (needs Chrome locally, or PLAYWRIGHT_CHROMIUM=1 + playwright install chromium)
+npm run smoke:scan      # local/manual live axe scan (not run in CI)
 ```
 
 The full **28-site batch rescan** is intentionally **not** in CI (slow and flaky). Update [`web/src/lib/website-batch-results.ts`](./web/src/lib/website-batch-results.ts) after manual rescans; CI keeps that file internally consistent.
