@@ -1192,6 +1192,17 @@ pre {
   color: #0a9396;
 }
 
+.batch-summary-sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+
 .batch-summary-fail strong {
   color: var(--critical);
 }
@@ -1376,6 +1387,11 @@ pre {
   font-size: 0.82rem;
   color: var(--ink-soft);
   line-height: 1.35;
+}
+
+.batch-row-callout-pass {
+  color: #0a9396;
+  font-weight: 600;
 }
 
 .batch-tag-row {

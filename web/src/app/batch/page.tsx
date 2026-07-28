@@ -5,13 +5,13 @@ import {
   BATCH_SNAPSHOT_DATE,
 } from "@/lib/website-batch-results";
 import {
-  websiteBatchFailReason,
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
 import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
 import { BatchMobileCards } from "./BatchMobileCards";
+import { BatchResultCallouts } from "./BatchResultCallouts";
 
 export const metadata = {
   title: "Lumen | Website batch results",
@@ -56,6 +56,10 @@ export default function BatchResultsPage() {
           <li className="batch-summary-pass">
             <span className="batch-summary-label">Passed</span>
             <strong>{WEBSITE_BATCH_SUMMARY.passed}</strong>
+            <span className="batch-summary-sub">
+              {WEBSITE_BATCH_SUMMARY.passedClean} clean ·{" "}
+              {WEBSITE_BATCH_SUMMARY.passedWithIssues} with issues
+            </span>
           </li>
           <li className="batch-summary-fail">
             <span className="batch-summary-label">Failed</span>
@@ -91,8 +95,9 @@ export default function BatchResultsPage() {
 
         <p className="hint batch-rule">
           <strong>Pass:</strong> score ≥ 85 and critical = 0.{" "}
-          <strong>Fail:</strong> otherwise. Source:{" "}
-          <code>TEST_RESULTS.md</code> in the repo.
+          <strong>Fail:</strong> otherwise. Pass and Fail rows both use{" "}
+          <strong>Notes &amp; recommendations</strong> when there are issues to
+          triage. Source: <code>TEST_RESULTS.md</code> in the repo.
         </p>
 
         <BatchMobileCards rows={WEBSITE_BATCH_RESULTS} />
@@ -120,10 +125,6 @@ export default function BatchResultsPage() {
               {WEBSITE_BATCH_RESULTS.map((row) => {
                 const pass = websiteBatchPass(row.score, row.critical);
                 const guidanceView = batchGuidanceForRow(row);
-                const failReason = websiteBatchFailReason(
-                  row.score,
-                  row.critical,
-                );
                 return (
                   <tr
                     key={row.id}
@@ -166,15 +167,7 @@ export default function BatchResultsPage() {
                       >
                         {pass ? "Pass" : "Fail"}
                       </span>
-                      {!pass && row.critical > 0 && (
-                        <p className="batch-critical-callout" role="alert">
-                          {row.critical} critical{" "}
-                          {row.critical === 1 ? "issue" : "issues"}
-                        </p>
-                      )}
-                      {!pass && failReason && (
-                        <p className="batch-row-callout">{failReason}</p>
-                      )}
+                      <BatchResultCallouts row={row} />
                     </td>
                     <td className="batch-notes">
                       <BatchGuidanceCell guidance={guidanceView} />

@@ -118,6 +118,24 @@ Suggested sequence for **new** testers (or regression):
 - Record what you saw (score + issue count), not a fixed expected number  
 - **Website Pass/Fail** (based on score/critical issues) is logged in [`TEST_RESULTS.md`](./TEST_RESULTS.md)
 
+### Pass/Fail vs follow-up work (test plan)
+
+When you run the multi-site sequence, record **two things** for each URL:
+
+1. **Batch result** — **Pass** if score ≥ 85 and critical = 0; otherwise **Fail** (WEB-02).
+2. **Follow-up** — If **total issues &gt; 0**, use the same workflow whether the site Passes or Fails:
+   - Re-scan in Lumen → open issues → Rule help / export JSON.
+   - **Fail:** fix **critical** first, then serious/moderate until Pass.
+   - **Pass with issues:** no criticals today, but still triage moderates/minors so score stays ≥ 85.
+
+| Bucket | What it means | Where to log / view |
+|--------|----------------|---------------------|
+| Pass, clean (0 issues) | Strong automated scan | [`TEST_RESULTS.md`](./TEST_RESULTS.md) + `/batch` — **Maintain Pass** |
+| Pass, with issues | Meets Pass rule; optional fixes | Same — **Recommended actions** (pass guidance) |
+| Fail | Score and/or critical gap | Same — **Recommended actions** (fail guidance) |
+
+Live dashboard: [http://localhost:4376/batch](http://localhost:4376/batch) (snapshot; re-sync after full rescan).
+
 ---
 
 ## 4. UI flow tests

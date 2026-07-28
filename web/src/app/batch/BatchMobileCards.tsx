@@ -1,11 +1,9 @@
 import type { WebsiteBatchResult } from "@/lib/website-batch-results";
-import {
-  websiteBatchFailReason,
-  websiteBatchPass,
-} from "@/lib/website-pass-fail";
 import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
+import { websiteBatchPass } from "@/lib/website-pass-fail";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
+import { BatchResultCallouts } from "./BatchResultCallouts";
 
 type BatchSeverity = "critical" | "serious" | "moderate" | "minor";
 
@@ -32,7 +30,6 @@ export function BatchMobileCards({ rows }: { rows: WebsiteBatchResult[] }) {
       {rows.map((row) => {
         const pass = websiteBatchPass(row.score, row.critical);
         const guidanceView = batchGuidanceForRow(row);
-        const failReason = websiteBatchFailReason(row.score, row.critical);
 
         return (
           <li
@@ -75,14 +72,7 @@ export function BatchMobileCards({ rows }: { rows: WebsiteBatchResult[] }) {
               <SeverityChip label="Moderate" severity="moderate" count={row.moderate} />
               <SeverityChip label="Minor" severity="minor" count={row.minor} />
             </ul>
-            {!pass && row.critical > 0 && (
-              <p className="batch-critical-callout" role="alert">
-                {row.critical} critical {row.critical === 1 ? "issue" : "issues"}
-              </p>
-            )}
-            {!pass && failReason && (
-              <p className="batch-row-callout">{failReason}</p>
-            )}
+            <BatchResultCallouts row={row} />
             <BatchGuidanceCell guidance={guidanceView} />
           </li>
         );

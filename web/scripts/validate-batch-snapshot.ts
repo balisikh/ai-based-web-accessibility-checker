@@ -106,6 +106,11 @@ check(ts === WEBSITE_BATCH_SUMMARY.totalSerious, "total serious mismatch");
 check(tm === WEBSITE_BATCH_SUMMARY.totalModerate, "total moderate mismatch");
 check(tn === WEBSITE_BATCH_SUMMARY.totalMinor, "total minor mismatch");
 check(tt === WEBSITE_BATCH_SUMMARY.totalIssues, "total issues mismatch");
+check(
+  WEBSITE_BATCH_SUMMARY.passedClean + WEBSITE_BATCH_SUMMARY.passedWithIssues ===
+    pass,
+  "passedClean + passedWithIssues must equal pass count",
+);
 
 if (errors > 0) {
   fail(`${errors} check(s) failed`);

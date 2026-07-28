@@ -23,6 +23,12 @@ export function BatchGuidanceCell({ guidance }: { guidance: BatchSiteGuidanceVie
           Re-scan in <Link href="/">Lumen</Link> for live rule detail.
         </p>
       )}
+      {guidance.pass && guidance.hasFollowUpWork && (
+        <p className="batch-guidance-footer">
+          Still a batch <strong>Pass</strong> — re-scan in{" "}
+          <Link href="/">Lumen</Link> after fixes so critical stays 0.
+        </p>
+      )}
     </div>
   );
 }

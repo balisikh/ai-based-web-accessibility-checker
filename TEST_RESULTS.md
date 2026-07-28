@@ -30,6 +30,8 @@ Notes:
 | Websites tested | **28** |
 | **Target (extended)** | **27** (complete) |
 | **Passed** | **8** (29%) |
+| **Passed (0 issues)** | **4** |
+| **Passed (with issues)** | **4** — still Pass; triage in table below |
 | **Failed** | **20** (71%) |
 | Initial MVP target | 10 (met on 2026-07-27) |
 
@@ -75,7 +77,7 @@ These are **tester recommendations** (not fixes applied by this project). Rule-l
 
 ### Passed sites — notes and recommended actions
 
-Shown on `/batch` with **Maintain Pass** cards (`web/src/lib/website-batch-pass-guidance.ts`).
+Shown on `/batch` — **Maintain Pass** when 0 issues; **Recommended actions** when Pass but issues remain (`web/src/lib/website-batch-pass-guidance.ts`).
 
 | # | Site | Note (summary) | Recommendations (summary) |
 |--:|------|----------------|---------------------------|

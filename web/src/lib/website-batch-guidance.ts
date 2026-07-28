@@ -14,6 +14,8 @@ export type BatchSiteGuidanceView = {
   kicker: string;
   note?: string;
   recommendations: string[];
+  /** True when the site still has axe findings to triage (Pass with issues or Fail). */
+  hasFollowUpWork: boolean;
 };
 
 function fromFail(g: FailSiteGuidance, rowNote?: string): BatchSiteGuidanceView {
@@ -22,15 +24,21 @@ function fromFail(g: FailSiteGuidance, rowNote?: string): BatchSiteGuidanceView 
     kicker: "Recommended actions",
     note: rowNote ?? g.note,
     recommendations: g.furtherActions,
+    hasFollowUpWork: true,
   };
 }
 
-function fromPass(g: PassSiteGuidance, rowNote?: string): BatchSiteGuidanceView {
+function fromPass(
+  g: PassSiteGuidance,
+  rowNote: string | undefined,
+  hasIssues: boolean,
+): BatchSiteGuidanceView {
   return {
     pass: true,
-    kicker: "Maintain Pass",
+    kicker: hasIssues ? "Recommended actions" : "Maintain Pass",
     note: rowNote ?? g.note,
     recommendations: g.recommendations,
+    hasFollowUpWork: hasIssues,
   };
 }
 
@@ -39,18 +47,26 @@ export function batchGuidanceForRow(
   row: WebsiteBatchResult,
 ): BatchSiteGuidanceView {
   const pass = websiteBatchPass(row.score, row.critical);
+  const hasIssues = row.totalIssues > 0;
 
   if (pass) {
     const guided = passGuidanceForSite(row.id);
-    if (guided) return fromPass(guided, row.note);
+    if (guided) return fromPass(guided, row.note, hasIssues);
     return {
       pass: true,
-      kicker: "Maintain Pass",
+      kicker: hasIssues ? "Recommended actions" : "Maintain Pass",
       note: row.note,
-      recommendations: [
-        "Re-scan in Lumen to confirm score ≥ 85 and critical = 0.",
-        "Export JSON when sharing results with your team.",
-      ],
+      recommendations: hasIssues
+        ? [
+            "Triage non-critical issues in Lumen (Rule help + export JSON).",
+            "Re-scan to confirm score ≥ 85 and critical stays 0.",
+            "Fix new critical findings before release.",
+          ]
+        : [
+            "Re-scan in Lumen to confirm score ≥ 85 and critical = 0.",
+            "Export JSON when sharing results with your team.",
+          ],
+      hasFollowUpWork: hasIssues,
     };
   }
 
@@ -65,5 +81,6 @@ export function batchGuidanceForRow(
       "Re-scan in Lumen and work critical issues first, then serious/moderate.",
       "Use Rule help and Export JSON for developer handoff.",
     ],
+    hasFollowUpWork: true,
   };
 }

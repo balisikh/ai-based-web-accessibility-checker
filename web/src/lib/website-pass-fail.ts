@@ -29,3 +29,22 @@ export function websiteBatchFailReason(
   }
   return parts.join("; ");
 }
+
+/** Pass sites can still have serious/moderate/minor — same follow-up column as Fail. */
+export function websiteBatchPassIssueCallout(
+  totalIssues: number,
+): string | null {
+  if (totalIssues <= 0) return null;
+  const noun = totalIssues === 1 ? "issue" : "issues";
+  return `${totalIssues} ${noun} — batch Pass; triage below (keep critical at 0)`;
+}
+
+/** Issue count line for Fail rows (complements {@link websiteBatchFailReason}). */
+export function websiteBatchFailIssueCallout(
+  pass: boolean,
+  totalIssues: number,
+): string | null {
+  if (pass || totalIssues <= 0) return null;
+  const noun = totalIssues === 1 ? "issue" : "issues";
+  return `${totalIssues} ${noun} — work through recommendations below`;
+}

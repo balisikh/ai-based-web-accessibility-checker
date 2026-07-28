@@ -49,10 +49,21 @@ export const WEBSITE_BATCH_RESULTS: WebsiteBatchResult[] = [
   { id: 28, name: "W3Schools", url: "https://www.w3schools.com/", score: 0, critical: 0, serious: 5, moderate: 95, minor: 0, totalIssues: 100, date: "2026-07-28" },
 ];
 
+import { websiteBatchPass } from "./website-pass-fail";
+
 export const WEBSITE_BATCH_SUMMARY = {
   tested: WEBSITE_BATCH_RESULTS.length,
-  passed: WEBSITE_BATCH_RESULTS.filter((r) => r.score >= 85 && r.critical === 0).length,
-  failed: WEBSITE_BATCH_RESULTS.filter((r) => r.score < 85 || r.critical >= 1).length,
+  passed: WEBSITE_BATCH_RESULTS.filter((r) => websiteBatchPass(r.score, r.critical))
+    .length,
+  failed: WEBSITE_BATCH_RESULTS.filter(
+    (r) => !websiteBatchPass(r.score, r.critical),
+  ).length,
+  passedClean: WEBSITE_BATCH_RESULTS.filter(
+    (r) => websiteBatchPass(r.score, r.critical) && r.totalIssues === 0,
+  ).length,
+  passedWithIssues: WEBSITE_BATCH_RESULTS.filter(
+    (r) => websiteBatchPass(r.score, r.critical) && r.totalIssues > 0,
+  ).length,
   totalCritical: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.critical, 0),
   totalSerious: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.serious, 0),
   totalModerate: WEBSITE_BATCH_RESULTS.reduce((n, r) => n + r.moderate, 0),
