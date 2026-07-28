@@ -3,7 +3,7 @@
 **Product:** Lumen Accessibility Checker  
 **Purpose:** Record whether each **website** passed or failed based on automated accessibility findings (not whether the Lumen tool itself worked).  
 **App:** http://localhost:4376  
-**Batch status:** **25 websites** logged — **session paused** (continue **#26+** tomorrow). Initial MVP batch (10) completed earlier; extensions **#11–25** on 2026-07-27.
+**Batch status:** **28** websites logged — extended target **27** complete; **#28** W3Schools (post-batch).
 
 ---
 
@@ -26,24 +26,24 @@ Notes:
 
 | Metric | Count |
 |--------|------:|
-| Websites tested | **25** |
-| **Passed** | **8** (32%) |
-| **Failed** | **17** (68%) |
+| Websites tested | **28** |
+| **Target (extended)** | **27** (complete) |
+| **Passed** | **9** (32%) |
+| **Failed** | **19** (68%) |
 | Initial MVP target | 10 (met on 2026-07-27) |
-| Extended run (today) | **#11–25** (15 sites); **#26+** next session |
 
-### Severity totals (all 25 scans)
+### Severity totals (all 28 scans)
 
 | Critical | Serious | Moderate | Minor | Total issues |
 |---------:|--------:|---------:|------:|-------------:|
-| 23 | 47 | 39 | 5 | 114 |
+| 57 | 62 | 159 | 5 | 283 |
 
 ### Quick list
 
 | Result | Websites |
 |--------|----------|
-| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps, Wikipedia |
-| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland |
+| **Pass** | Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Spotify, Google Maps, Wikipedia, example.com |
+| **Fail** | YouTube, BBC Weather Southall, ChatGPT, Gmail, Google Docs, Google Sheets, Google Slides, Yahoo, Amazon UK, eBay UK, Netflix UK, ITVX, Channel 4, Channel 5, Lidl UK, Tesco, Iceland, W3C bad demo, W3Schools |
 
 ---
 
@@ -76,6 +76,9 @@ Notes:
 | 23 | Tesco | https://www.tesco.com/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
 | 24 | Iceland | https://www.iceland.co.uk/ | 57 | 0 | 1 | 4 | 0 | 5 | **Fail** | 2026-07-27 | |
 | 25 | Wikipedia (en Main Page) | https://en.wikipedia.org/wiki/Main_Page | 91 | 0 | 0 | 0 | 3 | 3 | **Pass** | 2026-07-27 | |
+| 26 | example.com | https://example.com/ | 86 | 0 | 0 | 2 | 0 | 2 | **Pass** | 2026-07-28 | Matches tester score 86 |
+| 27 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | 0 | 34 | 10 | 23 | 0 | 67 | **Fail** | 2026-07-28 | Matches tester score 0; known-bad demo |
+| 28 | W3Schools | https://www.w3schools.com/ | 0 | 0 | 5 | 95 | 0 | 100 | **Fail** | 2026-07-28 | Verified on live server |
 
 **Verification:** Independent API scans where noted; compare your UI if scores differ (retail/TV pages change often).
 
@@ -223,6 +226,22 @@ Notes:
 - Score **91**, **0 critical**, **0 serious**, **0 moderate**, **3 minor**, 3 issues total (verified independently).
 - Met Pass rule (score ≥ 85 and critical = 0).
 
+### example.com — Pass
+- URL: https://example.com/  
+- Score **86**, **0 critical**, **0 serious**, **2 moderate**, 2 issues total (matches tester score 86; verified independently).
+- Met Pass rule (score ≥ 85 and critical = 0). Results log **#26**.
+
+### W3C bad demo — Fail
+- URL: https://www.w3.org/WAI/demos/bad/before/home.html  
+- Score **0**, **34 critical**, **10 serious**, **23 moderate**, 67 issues total (matches tester score 0; verified independently).
+- Main findings: `image-alt` (33), `region` (22), `link-name` (7), plus contrast/lang/landmark issues.
+- Failed because score &lt; 85 and critical ≥ 1. Results log **#27** (final extended site).
+
+### W3Schools — Fail
+- URL: https://www.w3schools.com/  
+- Score **0**, **0 critical**, **5 serious**, **95 moderate**, 100 issues total (verified on live server, 2026-07-28).
+- Failed because score &lt; 85 (heavy moderate findings). Results log **#28** (post-batch).
+
 ---
 
 ## Out of scope for this batch
@@ -236,9 +255,6 @@ Use them for a future regression or “known good / known bad” comparison run.
 
 ---
 
-## Adding more sites later
+## Extended batch complete (#27)
 
-1. Scan in Lumen (live mode, demo off).  
-2. Copy score + all four severity counts + total issues.  
-3. Apply the Pass/Fail rule.  
-4. Append row **#26+** and update **Summary count** and severity totals.
+All **27** target sites are logged. **#28+** are optional extras (e.g. W3Schools). To add more, append rows and update summary totals.
