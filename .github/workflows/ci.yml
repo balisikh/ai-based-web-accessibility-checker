@@ -7,8 +7,12 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # One active run per PR (supersede old commits). Each push to main gets its own SHA group so runs are not canceled mid-flight.
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('ci-pr-{0}', github.event.pull_request.number)
+        || format('ci-{0}', github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   web:
@@ -20,12 +24,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -51,12 +55,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: web/package-lock.json
 

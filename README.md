@@ -41,7 +41,7 @@ Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and
 
 ### Requirements
 
-- **Node.js 20+**
+- **Node.js 22+** (CI uses 22; 20+ may still work locally)
 - **Google Chrome** installed (used for live page scans)
 - npm
 

@@ -18,7 +18,7 @@ Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 22+ (GitHub Actions CI uses 22)
 - Google Chrome (live scans use Playwright `channel: "chrome"`)
 
 ## Environment
