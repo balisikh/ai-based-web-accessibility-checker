@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Fraunces } from "next/font/google";
+import { SiteHeader } from "./SiteHeader";
+import { ThemeInitScript } from "./ThemeInitScript";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -29,8 +31,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${figtree.variable} ${fraunces.variable} h-full`}>
-      <body className="min-h-full antialiased">{children}</body>
+    <html
+      lang="en"
+      className={`${figtree.variable} ${fraunces.variable} h-full`}
+      data-theme="system"
+      suppressHydrationWarning
+    >
+      <body className="min-h-full antialiased">
+        <ThemeInitScript />
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }

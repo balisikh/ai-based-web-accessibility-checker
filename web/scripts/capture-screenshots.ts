@@ -5,6 +5,7 @@
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
+import { THEME_STORAGE_KEY } from "../src/lib/theme";
 
 const BASE = (process.env.BASE_URL ?? "http://127.0.0.1:4376").replace(/\/$/, "");
 const OUT_DIR = path.resolve(process.cwd(), "..", "docs", "screenshots");
@@ -40,7 +41,15 @@ async function main(): Promise<void> {
       viewport: { width: shot.width, height: 900 },
     });
     const page = await context.newPage();
+    await page.addInitScript(
+      ({ key }) => {
+        localStorage.setItem(key, "light");
+        document.documentElement.setAttribute("data-theme", "light");
+      },
+      { key: THEME_STORAGE_KEY },
+    );
     await page.goto(`${BASE}${shot.path}`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.waitForTimeout(400);
     await page.screenshot({
       path: path.join(OUT_DIR, shot.file),
       fullPage: shot.fullPage ?? false,

@@ -40,13 +40,21 @@ export default function BatchResultsPage() {
   return (
     <main className="scan-shell">
       <section className="batch-panel" aria-labelledby="batch-heading">
-        <p className="brand compact">Lumen</p>
-        <h1 id="batch-heading">Website batch results</h1>
-        <p className="lede batch-lede">
-          Static snapshot (last full live resync <strong>{BATCH_SNAPSHOT_DATE}</strong>)
-          — loads instantly and does not run scans. Live checks use the{" "}
-          <Link href="/">accessibility checker</Link>.
-        </p>
+        <div className="batch-page-head">
+          <div>
+            <p className="batch-page-eyebrow">Portfolio test set</p>
+            <h1 id="batch-heading">Website batch results</h1>
+            <p className="lede batch-lede">
+              Static snapshot (last full live resync{" "}
+              <strong>{BATCH_SNAPSHOT_DATE}</strong>) — loads instantly and does
+              not run scans. Live checks use the{" "}
+              <Link href="/">accessibility checker</Link>.
+            </p>
+          </div>
+          <Link href="/" className="button-secondary batch-head-cta">
+            Run a live scan
+          </Link>
+        </div>
 
         <ul className="batch-summary" aria-label="Batch totals">
           <li>

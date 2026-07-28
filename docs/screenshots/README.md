@@ -11,6 +11,8 @@ Used in the root [README](../README.md).
 
 ## Automated
 
+Captures force **light** theme for consistent README images.
+
 ```bash
 cd web
 npm run dev

@@ -286,6 +286,8 @@ export function ScanExperience() {
     <div className="scan-shell">
       {(phase === "idle" || phase === "submitting" || phase === "error") && (
         <section className="hero" aria-labelledby="hero-heading">
+          <div className="hero-grid">
+            <div className="hero-primary">
           <p className="brand">Lumen</p>
           <h1 id="hero-heading" className="headline">
             Accessibility Checker
@@ -368,6 +370,35 @@ export function ScanExperience() {
               </>
             )}
           </form>
+            </div>
+
+            <aside className="hero-aside" aria-label="Quick links">
+              <div className="hero-spotlight hero-spotlight-pass">
+                <strong>28-site batch snapshot</strong>
+                <p>
+                  See Pass vs Fail, severity totals, and recommended actions for
+                  each public URL in the portfolio test set.
+                </p>
+                <Link href="/batch" className="hero-spotlight-link">
+                  Open batch results →
+                </Link>
+              </div>
+              <div className="hero-spotlight">
+                <strong>Pass rule (websites)</strong>
+                <p>
+                  Score ≥ 85 with zero critical issues. Sites can still have
+                  moderate or minor findings — triage those like Fail follow-ups.
+                </p>
+              </div>
+              <div className="hero-spotlight">
+                <strong>Assistive only</strong>
+                <p>
+                  Automated axe findings help you improve pages; they are not a
+                  legal WCAG certificate or full manual audit.
+                </p>
+              </div>
+            </aside>
+          </div>
 
           <section className="how-to-use" aria-labelledby={howToUseId}>
             <h2 id={howToUseId}>How to use Lumen</h2>
