@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   WEBSITE_BATCH_RESULTS,
   WEBSITE_BATCH_SUMMARY,
-} from "@/data/website-batch-results";
+} from "@/lib/website-batch-results";
 import {
   websiteBatchFailReason,
   websiteBatchPass,
