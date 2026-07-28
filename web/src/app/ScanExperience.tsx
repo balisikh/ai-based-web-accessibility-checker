@@ -1,9 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 import { validateScanUrl } from "@/lib/validate-url";
+import {
+  websiteBatchFailReason,
+  websiteBatchPass,
+} from "@/lib/website-pass-fail";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
 
@@ -265,6 +270,14 @@ export function ScanExperience() {
   const criticalCount = scan?.summaryCounts?.critical ?? 0;
   const failedScanUrl =
     phase === "error" && scan?.url ? scan.url : null;
+  const batchPass =
+    phase === "results" && scan
+      ? websiteBatchPass(scan.score ?? 0, criticalCount)
+      : null;
+  const batchFailReason =
+    phase === "results" && scan && batchPass === false
+      ? websiteBatchFailReason(scan.score ?? 0, criticalCount)
+      : null;
 
   return (
     <div className="scan-shell">
@@ -397,6 +410,11 @@ export function ScanExperience() {
               ))}
             </ol>
             <div className="learn-more-group">
+              <p className="batch-link-row">
+                <Link href="/batch" className="batch-dashboard-link">
+                  View 28-site batch results (instant)
+                </Link>
+              </p>
               <details className="learn-more">
                 <summary>What URLs can I use?</summary>
                 <div className="learn-more-body">
@@ -499,8 +517,26 @@ export function ScanExperience() {
               <p className="score-value">{scan.score}</p>
               <p className="score-label">Score</p>
               <p className="score-rating">{rating.label}</p>
+              {batchPass !== null && (
+                <p
+                  className={`batch-live-badge batch-live-badge-${batchPass ? "pass" : "fail"}`}
+                >
+                  Batch: {batchPass ? "Pass" : "Fail"}
+                </p>
+              )}
             </div>
           </header>
+
+          {batchPass === false && batchFailReason && (
+            <p className="batch-live-reason hint" role="note">
+              {criticalCount > 0 && (
+                <span className="batch-critical-callout-inline">
+                  Critical: {criticalCount}.{" "}
+                </span>
+              )}
+              {batchFailReason}
+            </p>
+          )}
 
           {criticalCount > 0 && (
             <p className="critical-banner" role="alert">

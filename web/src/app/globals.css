@@ -928,3 +928,185 @@ pre {
     transform: none;
   }
 }
+
+.batch-panel {
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: var(--shadow);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+}
+
+.batch-panel h1 {
+  margin: 0.35rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.batch-lede {
+  margin-bottom: 1.25rem;
+}
+
+.batch-summary {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.batch-summary li {
+  padding: 0.85rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.batch-summary-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.batch-summary-pass strong {
+  color: #0a9396;
+}
+
+.batch-summary-fail strong {
+  color: var(--critical);
+}
+
+.batch-rule {
+  margin-bottom: 1rem;
+}
+
+.batch-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.batch-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.batch-table th,
+.batch-table td {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.batch-table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  background: rgba(13, 92, 99, 0.06);
+}
+
+.batch-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.batch-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+}
+
+.batch-badge-pass {
+  background: rgba(10, 147, 150, 0.15);
+  color: #0a9396;
+}
+
+.batch-badge-fail {
+  background: rgba(155, 34, 38, 0.12);
+  color: var(--critical);
+}
+
+.batch-critical-num {
+  font-weight: 800;
+  color: var(--critical);
+}
+
+.batch-critical-callout {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--critical);
+}
+
+.batch-row-callout {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+
+.batch-notes {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  max-width: 12rem;
+}
+
+.batch-footer {
+  margin: 1.25rem 0 0;
+  font-weight: 650;
+}
+
+.batch-link-row {
+  margin: 0 0 0.55rem;
+}
+
+.batch-dashboard-link {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.batch-live-badge {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.batch-live-badge-pass {
+  color: #0a9396;
+}
+
+.batch-live-badge-fail {
+  color: var(--critical);
+}
+
+.batch-live-reason {
+  margin: 0 0 0.75rem;
+  max-width: 42rem;
+}
+
+.batch-critical-callout-inline {
+  font-weight: 700;
+  color: var(--critical);
+}
+
+@media (max-width: 800px) {
+  .batch-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
