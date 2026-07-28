@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
@@ -71,17 +72,56 @@ function scoreRating(score: number | undefined): {
   return { label: "Needs work", tone: "needs-work" };
 }
 
+function effectiveScanStatus(
+  status: ScanStatus,
+  aiTipsEnabled: boolean,
+): ScanStatus {
+  if (!aiTipsEnabled && status === "ai_enrichment") {
+    return "scoring";
+  }
+  return status;
+}
+
+function visibleScanSteps(aiTipsEnabled: boolean) {
+  if (aiTipsEnabled) return SCAN_STEPS;
+  return SCAN_STEPS.filter((step) => step.id !== "ai_enrichment");
+}
+
 export function ScanExperience() {
   const inputId = useId();
   const errorId = useId();
   const examplesId = useId();
+  const howItWorksId = useId();
   const [url, setUrl] = useState("https://example.com");
+  const [aiTipsEnabled, setAiTipsEnabled] = useState(false);
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanSummary | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [severityFilter, setSeverityFilter] = useState<Severity | "all">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/config")
+      .then(async (res) => {
+        const data = (await res.json()) as { aiTipsEnabled?: boolean };
+        if (!cancelled) {
+          setAiTipsEnabled(Boolean(data.aiTipsEnabled));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAiTipsEnabled(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const scanSteps = useMemo(
+    () => visibleScanSteps(aiTipsEnabled),
+    [aiTipsEnabled],
+  );
 
   useEffect(() => {
     if (phase !== "scanning" || !scan?.id) return;
@@ -246,10 +286,8 @@ export function ScanExperience() {
             </div>
 
             <p id="url-hint" className="hint">
-              Public http/https pages only. We do not scan private or local
-              network addresses. Scans run in a headless browser with axe-core
-              (WCAG A/AA tags). Optional AI tips appear when an API key is
-              configured on the server.
+              Public http or https URLs only — private and local addresses are
+              blocked.
             </p>
             {error && (
               <p id={errorId} className="form-error" role="alert">
@@ -257,6 +295,62 @@ export function ScanExperience() {
               </p>
             )}
           </form>
+
+          <section
+            className="how-it-works"
+            aria-labelledby={howItWorksId}
+          >
+            <div className="how-it-works-head">
+              <h2 id={howItWorksId}>How Lumen checks a page</h2>
+              <span
+                className={`ai-status-pill${aiTipsEnabled ? " ai-status-on" : ""}`}
+              >
+                {aiTipsEnabled ? "AI tips on" : "AI tips off"}
+              </span>
+            </div>
+            <ol className="how-grid">
+              {HOW_IT_WORKS_ITEMS.map((item) => (
+                <li key={item.id} className="how-card">
+                  <span className="how-card-step" aria-hidden="true">
+                    {item.step}
+                  </span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>
+                      {item.id === "ai-tips"
+                        ? aiTipsEnabled
+                          ? "Plain-language explanations and fix ideas for the most severe issues on this server."
+                          : "Not configured here — you still get axe findings, WCAG mapping, and a score."
+                        : item.body}
+                    </p>
+                    {item.id === "public-urls" && (
+                      <p className="how-examples">
+                        <span className="how-ok">✓ https://example.com</span>
+                        <span className="how-no">✗ localhost or 192.168.x.x</span>
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <details className="learn-more">
+              <summary>What URLs can I use?</summary>
+              <div className="learn-more-body">
+                <p>
+                  Lumen is for pages on the public web. We accept{" "}
+                  <strong>http</strong> and <strong>https</strong> URLs and
+                  block localhost, private IP ranges, and hostnames that resolve
+                  to them — so the checker cannot be used to probe your home or
+                  office network.
+                </p>
+                <p>
+                  Scans use automated rules only. Results help you improve
+                  accessibility but are <strong>not</strong> a legal certificate
+                  or a substitute for manual testing with assistive technology.
+                </p>
+              </div>
+            </details>
+          </section>
         </section>
       )}
 
@@ -270,14 +364,19 @@ export function ScanExperience() {
           <p className="brand compact">Lumen</p>
           <h2>Checking {scan.url}</h2>
           <p className="status-line">
-            {STATUS_LABEL[scan.status] ?? scan.status}
+            {STATUS_LABEL[
+              effectiveScanStatus(scan.status, aiTipsEnabled)
+            ] ?? scan.status}
           </p>
           <div className="progress-track" aria-hidden="true">
             <div className="progress-bar" />
           </div>
           <ol className="scan-steps">
-            {SCAN_STEPS.map((step) => {
-              const state = stepState(scan.status, step.id);
+            {scanSteps.map((step) => {
+              const state = stepState(
+                effectiveScanStatus(scan.status, aiTipsEnabled),
+                step.id,
+              );
               return (
                 <li key={step.id} className={`scan-step scan-step-${state}`}>
                   <span className="scan-step-marker" aria-hidden="true" />
@@ -290,6 +389,12 @@ export function ScanExperience() {
               );
             })}
           </ol>
+          {!aiTipsEnabled && (
+            <p className="scan-note hint">
+              AI guidance is off on this server; axe results and scoring still
+              run as usual.
+            </p>
+          )}
         </section>
       )}
 

@@ -72,3 +72,5 @@ $env:USE_DEMO_SCAN="1"; npm run dev
 ## AI tips
 
 With `AI_API_KEY` (or `OPENAI_API_KEY`) set, top issues by severity get explanation + suggested fix in the results panel. Without a key, axe results still work.
+
+`GET /api/config` returns `{ "aiTipsEnabled": true | false }` for the home UI (no secrets).
