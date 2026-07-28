@@ -3,6 +3,7 @@
  * Run: npm run validate:batch
  */
 import { FAIL_SITE_GUIDANCE } from "../src/lib/website-batch-fail-guidance";
+import { PASS_SITE_GUIDANCE } from "../src/lib/website-batch-pass-guidance";
 import {
   WEBSITE_BATCH_RESULTS,
   WEBSITE_BATCH_SUMMARY,
@@ -74,6 +75,18 @@ for (const row of WEBSITE_BATCH_RESULTS) {
 
   if (!isPass && !FAIL_SITE_GUIDANCE[row.id]) {
     check(false, `#${row.id} ${row.name} is Fail but missing FAIL_SITE_GUIDANCE`);
+  }
+
+  if (isPass && !PASS_SITE_GUIDANCE[row.id]) {
+    check(false, `#${row.id} ${row.name} is Pass but missing PASS_SITE_GUIDANCE`);
+  }
+
+  if (isPass && PASS_SITE_GUIDANCE[row.id]?.recommendations.length === 0) {
+    check(false, `#${row.id} ${row.name} Pass guidance has no recommendations`);
+  }
+
+  if (!isPass && FAIL_SITE_GUIDANCE[row.id]?.furtherActions.length === 0) {
+    check(false, `#${row.id} ${row.name} Fail guidance has no actions`);
   }
 
   tc += row.critical;

@@ -8,8 +8,9 @@ import {
   websiteBatchFailReason,
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
-import { guidanceForSite } from "@/lib/website-batch-fail-guidance";
+import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
+import { BatchGuidanceCell } from "./BatchGuidanceCell";
 
 export const metadata = {
   title: "Lumen | Website batch results",
@@ -109,19 +110,22 @@ export default function BatchResultsPage() {
                 <th scope="col">Minor</th>
                 <th scope="col">Total</th>
                 <th scope="col">Result</th>
-                <th scope="col">Notes &amp; recommended actions</th>
+                <th scope="col">Notes &amp; recommendations</th>
               </tr>
             </thead>
             <tbody>
               {WEBSITE_BATCH_RESULTS.map((row) => {
                 const pass = websiteBatchPass(row.score, row.critical);
-                const guidance = guidanceForSite(row.id);
+                const guidanceView = batchGuidanceForRow(row);
                 const failReason = websiteBatchFailReason(
                   row.score,
                   row.critical,
                 );
                 return (
-                  <tr key={row.id}>
+                  <tr
+                    key={row.id}
+                    className={`batch-row batch-row-${pass ? "pass" : "fail"}`}
+                  >
                     <td>{row.id}</td>
                     <td>
                       <a
@@ -170,34 +174,7 @@ export default function BatchResultsPage() {
                       )}
                     </td>
                     <td className="batch-notes">
-                      {pass ? (
-                        row.note ? (
-                          <p className="batch-note-line">{row.note}</p>
-                        ) : (
-                          "—"
-                        )
-                      ) : (
-                        <>
-                          {(row.note ?? guidance?.note) && (
-                            <p className="batch-note-line">
-                              <strong>Note:</strong>{" "}
-                              {row.note ?? guidance?.note}
-                            </p>
-                          )}
-                          {guidance?.furtherActions.length ? (
-                            <ul className="batch-actions">
-                              {guidance.furtherActions.map((action) => (
-                                <li key={action}>{action}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="batch-note-line hint">
-                              Re-scan in{" "}
-                              <Link href="/">Lumen</Link> for rule-level fixes.
-                            </p>
-                          )}
-                        </>
-                      )}
+                      <BatchGuidanceCell guidance={guidanceView} />
                     </td>
                   </tr>
                 );

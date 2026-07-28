@@ -73,6 +73,21 @@ These are **tester recommendations** (not fixes applied by this project). Rule-l
 | 27 | W3C bad demo | Known-bad demo | Regression/learning only — not production remediation. |
 | 28 | W3Schools | | Triage serious then moderates; re-scan; use AI tips if enabled. |
 
+### Passed sites — notes and recommended actions
+
+Shown on `/batch` with **Maintain Pass** cards (`web/src/lib/website-batch-pass-guidance.ts`).
+
+| # | Site | Note (summary) | Recommendations (summary) |
+|--:|------|----------------|---------------------------|
+| 1 | Google UK | Perfect score | Baseline benchmark; re-scan after UI changes |
+| 4 | BBC iPlayer | 2 moderate | Fix moderates; keep critical at 0 |
+| 5 | BBC News | 1 moderate | Triage moderate; monitor BBC updates |
+| 6 | Disney+ UK | Clean scan | Periodic re-scan |
+| 7 | GitHub | Profile page scope | Re-scan profile; scan other URLs separately |
+| 10 | Google Maps | Clean scan | Re-scan after Maps shell updates |
+| 25 | Wikipedia | 3 minor | Optional polish; watch main-page changes |
+| 26 | example.com | Regression URL | CI/batch checks; pair with W3C bad demo |
+
 ---
 
 ## Results table
