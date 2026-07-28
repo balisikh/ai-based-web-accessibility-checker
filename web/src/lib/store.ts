@@ -113,7 +113,8 @@ export function createScanId(): string {
 }
 
 export function toSummary(scan: Scan): ScanSummary {
-  const { issues: _issues, ...summary } = scan;
+  const { issues, ...summary } = scan;
+  void issues;
   return summary;
 }
 

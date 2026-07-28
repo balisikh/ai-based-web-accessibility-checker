@@ -54,5 +54,8 @@ export async function assertPublicHostname(hostname: string): Promise<void> {
       }
     }
   }
-  throw new Error("Could not resolve that hostname. Check the URL and try again.");
+  throw new Error(
+    "Could not resolve that hostname. Check the URL and try again.",
+    { cause: lastError },
+  );
 }
