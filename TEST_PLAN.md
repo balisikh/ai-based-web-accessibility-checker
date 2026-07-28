@@ -9,6 +9,45 @@
 
 ---
 
+## Test plan overview
+
+Use this table to track **Lumen tool** tests (UI, security, API) separately from **website** scans in [`TEST_RESULTS.md`](./TEST_RESULTS.md).
+
+| Area | ID | What to test | Expected | Status | Notes |
+|------|-----|--------------|----------|--------|-------|
+| **Environment** | ENV-01 | Node 20+, Chrome installed, `npm run dev` on port **4376** | App loads | Manual | See §2 |
+| **Environment** | ENV-02 | `GET /api/health` | `ok: true`, `db`, `ai` | Manual | |
+| **Environment** | ENV-03 | Demo mode **off** (`USE_DEMO_SCAN` unset) | Live Playwright/axe scans | Manual | |
+| **Multi-site** | WEB-01 | Scan **10+** public https URLs | Results + log in `TEST_RESULTS.md` | **Done (25)** | MVP 10 met; paused at **#25** — continue **#26+** |
+| **Multi-site** | WEB-02 | Per-site Pass/Fail rule | Score ≥ 85 and critical = 0 → Pass | **Done (25)** | 8 Pass / 17 Fail (2026-07-27) |
+| **Multi-site** | WEB-03 | example.com | Strong/clean score | **Pending** | Suggested regression |
+| **Multi-site** | WEB-04 | W3C bad demo | Many issues / low score | **Pending** | Suggested regression |
+| **UI** | UI-01 | Homepage load | Brand, URL field, Check, chips | Manual | |
+| **UI** | UI-02 | Example chip | Fills example.com URL | Manual | |
+| **UI** | UI-03 | W3C chip | Fills W3C bad demo URL | Manual | |
+| **UI** | UI-04 | Checking screen | Progress + checklist | Manual | |
+| **UI** | UI-05 | Back to home (while checking) | Returns to homepage | Manual | |
+| **UI** | UI-06 | New scan (after results) | Returns to homepage | Manual | |
+| **UI** | UI-07 | Issue detail | WCAG, rule, selector, snippet | Manual | |
+| **UI** | UI-08 | Severity filter | List filters by severity | Manual | |
+| **Security** | SEC-01 | Invalid URL `not-a-url` | Clear error; no scan | Manual | |
+| **Security** | SEC-02 | `http://127.0.0.1` | Private/local blocked | Manual | |
+| **Security** | SEC-03 | `http://192.168.0.1` | Private/local blocked | Manual | |
+| **Security** | SEC-04 | Many scans quickly | **429** rate-limit message | Manual | Dev default 120/min |
+| **API** | API-01 | `GET /api/health` | JSON health payload | Optional | |
+| **API** | API-02 | `POST /api/scans` | `201` + `scanId` | Optional | |
+| **API** | API-03 | `GET /api/scans/:id` | → `completed` or `failed` | Optional | |
+| **API** | API-04 | `GET /api/scans/:id/issues` | Issue array | Optional | |
+| **API** | API-05 | Export JSON | Downloadable report | Optional | |
+| **AI** | AI-01 | Health with key | `"ai": true` | If keyed | |
+| **AI** | AI-02 | W3C bad demo scan | AI tips on issues | If keyed | Needs WEB-04 |
+| **AI** | AI-03 | No API key | Scan completes without AI | If no key | |
+| **Regression** | REG-01 | Port 4376, live scans, results not stuck | All OK after code changes | Manual | See §8 |
+
+**Status key:** **Done (N)** = logged in results / verified · **Pending** = not run yet · **Manual** = checklist (mark Pass/Fail when you run it) · **Optional** / **If keyed** = run when relevant
+
+---
+
 ## 1. Goals
 
 Confirm that a tester can:
@@ -37,9 +76,20 @@ Confirm that a tester can:
 
 ## 3. Multi-site scan sequence (core test)
 
-**Target:** **10 websites** minimum for MVP; extended batch documented separately.
+**Target:** **10 websites** minimum for MVP (**met**). Extended logging: **25 websites** in [`TEST_RESULTS.md`](./TEST_RESULTS.md) (**8 Pass / 17 Fail**), paused at **#25** — continue **#26+**.
 
-**Completed batch (2026-07-27):** **15 websites** — full scores, severities, and Pass/Fail in [`TEST_RESULTS.md`](./TEST_RESULTS.md) (**7 Pass / 8 Fail**). Initial 10-site goal was exceeded with ChatGPT, Spotify, Google Maps, Gmail, Docs, Sheets, Slides, and Yahoo.
+### Planned sites (test plan vs results log)
+
+| Plan # | Site | URL | Purpose | Results log # | Website result |
+|------:|------|-----|---------|-------------:|----------------|
+| 1 | Google UK | https://www.google.co.uk/ | Large public site | 1 | Pass |
+| 2 | YouTube | https://www.youtube.com/ | Complex JS app | 2 | Fail |
+| 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | Local public page | 3 | Fail |
+| 4 | Example | https://example.com/ | Simple clean page | — | **Not run** |
+| 5 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | Known-bad page | — | **Not run** |
+| 6+ | Tester choice | Various (see results log) | Extended coverage | 4–25 | Mixed |
+
+Additional sites logged beyond the original plan table (iPlayer, News, Disney+, GitHub, ChatGPT, Spotify, Maps, Google workspace, Yahoo, Amazon, eBay, Netflix, ITVX, C4, C5, Lidl, Tesco, Iceland, Wikipedia) are listed in full in [`TEST_RESULTS.md`](./TEST_RESULTS.md).
 
 Suggested sequence for **new** testers (or regression):
 
@@ -50,7 +100,7 @@ Suggested sequence for **new** testers (or regression):
 | 3 | BBC Weather Southall | https://www.bbc.co.uk/weather/2637490 | Real local public-service page |
 | 4 | Example | https://example.com/ | Simple clean page; expect strong/clean score |
 | 5 | W3C bad demo | https://www.w3.org/WAI/demos/bad/before/home.html | Known-bad page; expect many issues / low score |
-| 6+ | Tester choice | Any other public https sites | Fill remaining slots; log in `TEST_RESULTS.md` |
+| 6+ | Tester choice | Any other public https sites | Log as **#26+** in `TEST_RESULTS.md` |
 
 ### Pass criteria for each site
 - [ ] Checklist progresses: Fetch → Render → Rules → AI → Score  
@@ -146,5 +196,5 @@ When something fails, capture:
 | Role | Name | Date | Result |
 |------|------|------|--------|
 | Tester | Manual MVP run | 2026-07-27 | **Pass** (tool) |
-| Website batch | 15 sites logged | 2026-07-27 | See [`TEST_RESULTS.md`](./TEST_RESULTS.md) |
-| Notes | Multi-site scans, export, and results UI verified. Website Pass/Fail is per-site (7 Pass / 8 Fail), not Lumen tool quality. example.com and W3C bad demo reserved for a future regression run. | | |
+| Website batch | **25** sites logged | 2026-07-27 | See [`TEST_RESULTS.md`](./TEST_RESULTS.md) — **8 Pass / 17 Fail**; continue **#26+** |
+| Notes | Multi-site scans, export, and results UI verified. **Pending:** example.com, W3C bad demo (WEB-03, WEB-04). | | |
