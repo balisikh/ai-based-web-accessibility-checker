@@ -10,6 +10,32 @@ Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and
 
 ---
 
+## Demo (screenshots)
+
+Run locally: `cd web && npm run dev` → [http://localhost:4376](http://localhost:4376)
+
+| Home (scan URL) | Batch results (28 sites) | Results (sample layout) |
+|-----------------|--------------------------|-------------------------|
+| ![Lumen home — accessibility checker](docs/screenshots/home-desktop.png) | ![Website batch pass/fail dashboard](docs/screenshots/batch-desktop.png) | ![Scan results with score and issues](docs/screenshots/results-desktop.png) |
+
+**Mobile (390px)**
+
+![Lumen home on a phone-width viewport](docs/screenshots/home-mobile.png)
+
+### Refresh screenshots
+
+With the app running on port **4376**:
+
+```bash
+cd web
+npx playwright install chromium   # once
+npm run screenshots
+```
+
+Files are written to [`docs/screenshots/`](docs/screenshots/). See [`docs/screenshots/README.md`](docs/screenshots/README.md) for manual capture tips.
+
+---
+
 ## What it does
 
 1. You paste a public website URL  
