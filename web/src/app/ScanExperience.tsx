@@ -39,10 +39,15 @@ const SEVERITY_HINT: Record<Severity, string> = {
 };
 
 const EXAMPLE_URLS = [
-  { label: "example.com", url: "https://example.com" },
+  {
+    label: "example.com",
+    url: "https://example.com",
+    description: "Simple public page — usually a strong Pass (batch #26)",
+  },
   {
     label: "W3C bad demo",
     url: "https://www.w3.org/WAI/demos/bad/before/home.html",
+    description: "Known-bad demo — expect many issues (batch #27, Fail)",
   },
 ] as const;
 
@@ -340,14 +345,29 @@ export function ScanExperience() {
                 <button
                   key={example.url}
                   type="button"
-                  className="example-chip"
+                  className={`example-chip${
+                    example.label === "W3C bad demo" ? " example-chip-demo-bad" : ""
+                  }`}
                   disabled={phase === "submitting"}
+                  title={example.description}
+                  aria-label={`${example.label}: ${example.description}`}
                   onClick={() => setUrl(example.url)}
                 >
                   {example.label}
                 </button>
               ))}
             </div>
+            <p className="hint example-descriptions">
+              <span className="example-desc example-desc-pass">
+                <strong>example.com</strong> — quick Pass-style check
+              </span>
+              <span className="example-desc-sep" aria-hidden="true">
+                ·
+              </span>
+              <span className="example-desc example-desc-fail">
+                <strong>W3C bad demo</strong> — many issues on purpose
+              </span>
+            </p>
 
             <p id="url-hint" className="hint">
               Public http or https URLs only — private and local addresses are
@@ -408,34 +428,34 @@ export function ScanExperience() {
                   Open batch dashboard →
                 </Link>
               </div>
-              <div className="hero-spotlight hero-spotlight-pass">
-                <strong>Pass vs Fail guidance</strong>
-                <p>
-                  See severity totals and recommended actions for each public
-                  URL in the portfolio test set.
-                </p>
-              </div>
-              <div className="hero-spotlight">
-                <strong>Pass rule (websites)</strong>
-                <p>
-                  Score ≥ 85 with zero critical issues. Sites can still have
-                  moderate or minor findings — triage those like Fail follow-ups.
-                </p>
-              </div>
-              <div className="hero-spotlight">
-                <strong>Assistive only</strong>
-                <p>
-                  Automated axe findings help you improve pages; they are not a
-                  legal WCAG certificate or full manual audit.
-                </p>
-              </div>
+              <details className="learn-more home-sidebar-guide">
+                <summary>Pass/Fail rule &amp; disclaimer</summary>
+                <div className="learn-more-body">
+                  <p>
+                    <strong className="home-guide-pass">Pass (websites):</strong>{" "}
+                    score at least 85 and zero critical issues. Moderate or
+                    minor findings still need triage so the site stays a Pass.
+                  </p>
+                  <p>
+                    <strong>Batch dashboard:</strong>{" "}
+                    <Link href="/batch">28-site snapshot</Link> with Pass/Fail,
+                    severity totals, and recommended actions for each URL.
+                  </p>
+                  <p>
+                    <strong>Assistive only:</strong> Automated axe results help
+                    you improve pages — not a legal WCAG certificate or full
+                    manual audit.
+                  </p>
+                </div>
+              </details>
             </aside>
           </div>
 
-          <section className="how-to-use" aria-labelledby={howToUseId}>
+          <section className="how-to-use home-guide-section" aria-labelledby={howToUseId}>
             <h2 id={howToUseId}>How to use Lumen</h2>
             <p className="how-to-use-lede">
-              Step-by-step from URL to report.
+              Step-by-step from URL to report. Works the same in Light, Dark, and
+              System theme.
             </p>
             <ol className="how-grid how-to-use-grid">
               {HOW_TO_USE_STEPS.map((item) => (
@@ -453,7 +473,7 @@ export function ScanExperience() {
           </section>
 
           <section
-            className="how-it-works"
+            className="how-it-works home-guide-section"
             aria-labelledby={howItWorksId}
           >
             <div className="how-it-works-head">
