@@ -19,6 +19,16 @@
   --serious: #bb3e03;
   --moderate: #ca6702;
   --minor: #0a9396;
+  --pass: #0a9396;
+  --pass-muted: rgba(10, 147, 150, 0.12);
+  --pass-border: rgba(10, 147, 150, 0.32);
+  --pass-row-bg: rgba(10, 147, 150, 0.06);
+  --fail-row-bg: rgba(155, 34, 38, 0.05);
+  --fail-muted: rgba(155, 34, 38, 0.12);
+  --batch-tile-bg: rgba(255, 255, 255, 0.88);
+  --batch-table-surface: rgba(255, 255, 255, 0.92);
+  --batch-table-head: rgba(13, 92, 99, 0.08);
+  --batch-guidance-surface: rgba(255, 255, 255, 0.96);
   --shadow: 0 18px 50px rgba(13, 92, 99, 0.12);
   --radius: 18px;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
@@ -57,6 +67,16 @@ html[data-theme="dark"] {
   --serious: #fdba74;
   --moderate: #fcd34d;
   --minor: #2dd4bf;
+  --pass: #2dd4bf;
+  --pass-muted: rgba(45, 212, 191, 0.14);
+  --pass-border: rgba(45, 212, 191, 0.4);
+  --pass-row-bg: rgba(45, 212, 191, 0.1);
+  --fail-row-bg: rgba(248, 113, 113, 0.1);
+  --fail-muted: rgba(248, 113, 113, 0.16);
+  --batch-tile-bg: rgba(24, 34, 32, 0.92);
+  --batch-table-surface: rgba(18, 26, 24, 0.96);
+  --batch-table-head: rgba(45, 212, 191, 0.12);
+  --batch-guidance-surface: rgba(22, 32, 30, 0.98);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
 }
 
@@ -81,6 +101,16 @@ html[data-theme="dark"] {
     --serious: #fdba74;
     --moderate: #fcd34d;
     --minor: #2dd4bf;
+    --pass: #2dd4bf;
+    --pass-muted: rgba(45, 212, 191, 0.14);
+    --pass-border: rgba(45, 212, 191, 0.4);
+    --pass-row-bg: rgba(45, 212, 191, 0.1);
+    --fail-row-bg: rgba(248, 113, 113, 0.1);
+    --fail-muted: rgba(248, 113, 113, 0.16);
+    --batch-tile-bg: rgba(24, 34, 32, 0.92);
+    --batch-table-surface: rgba(18, 26, 24, 0.96);
+    --batch-table-head: rgba(45, 212, 191, 0.12);
+    --batch-guidance-surface: rgba(22, 32, 30, 0.98);
     --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   }
 }
@@ -533,7 +563,7 @@ html[data-theme="system"] .site-nav-link.is-active {
 }
 
 .hero-stat-pass {
-  color: #0a9396;
+  color: var(--pass);
 }
 
 .hero-stat-fail {
@@ -1740,32 +1770,112 @@ pre {
   gap: 0.75rem;
 }
 
+.batch-read-guide {
+  margin: 0 0 1.25rem;
+}
+
+.batch-section-title {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  color: var(--brand-deep);
+}
+
+.batch-section-title-table {
+  margin-top: 1.25rem;
+}
+
+.batch-legend {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.75rem 0 0;
+}
+
+.batch-legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.batch-legend-swatch {
+  width: 0.85rem;
+  height: 2.2rem;
+  border-radius: 4px;
+  margin-top: 0.1rem;
+}
+
+.batch-legend-pass .batch-legend-swatch {
+  background: var(--pass);
+  box-shadow: inset 0 0 0 1px var(--pass-border);
+}
+
+.batch-legend-fail .batch-legend-swatch {
+  background: var(--critical);
+}
+
+.batch-legend-guidance .batch-legend-swatch {
+  background: linear-gradient(90deg, var(--pass) 50%, var(--critical) 50%);
+}
+
+.batch-read-list {
+  margin: 0.85rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
 .batch-summary li {
   padding: 0.85rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--batch-tile-bg);
   border: 1px solid var(--line);
   display: grid;
   gap: 0.3rem;
   box-shadow: 0 6px 18px rgba(13, 92, 99, 0.05);
 }
 
+.batch-summary li strong {
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .batch-summary-pass {
-  border-color: rgba(10, 147, 150, 0.28);
+  border-color: var(--pass-border);
   background: linear-gradient(
     165deg,
-    rgba(10, 147, 150, 0.1),
-    rgba(255, 255, 255, 0.92)
+    var(--pass-muted),
+    var(--batch-tile-bg) 70%
   );
 }
 
 .batch-summary-fail {
-  border-color: rgba(155, 34, 38, 0.22);
+  border-color: rgba(155, 34, 38, 0.28);
   background: linear-gradient(
     165deg,
-    rgba(155, 34, 38, 0.07),
-    rgba(255, 255, 255, 0.92)
+    var(--fail-muted),
+    var(--batch-tile-bg) 70%
   );
+}
+
+html[data-theme="dark"] .batch-summary-fail,
+html[data-theme="system"] .batch-summary-fail {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .batch-summary-fail {
+    border-color: rgba(248, 113, 113, 0.35);
+  }
 }
 
 .batch-summary-label {
@@ -1777,7 +1887,27 @@ pre {
 }
 
 .batch-summary-pass strong {
-  color: #0a9396;
+  color: var(--pass);
+}
+
+.batch-summary-sev {
+  border-left: 4px solid var(--line);
+}
+
+.batch-summary-sev-critical {
+  border-left-color: var(--critical);
+}
+
+.batch-summary-sev-serious {
+  border-left-color: var(--serious);
+}
+
+.batch-summary-sev-moderate {
+  border-left-color: var(--moderate);
+}
+
+.batch-summary-sev-minor {
+  border-left-color: var(--minor);
 }
 
 .batch-summary-sub {
@@ -1824,7 +1954,7 @@ pre {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--batch-table-surface);
 }
 
 .batch-table {
@@ -1845,8 +1975,11 @@ pre {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  background: rgba(13, 92, 99, 0.06);
+  color: var(--ink);
+  background: var(--batch-table-head);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .batch-table tbody tr:last-child td {
@@ -1854,31 +1987,46 @@ pre {
 }
 
 .batch-row-pass {
-  background: rgba(10, 147, 150, 0.04);
+  background: var(--pass-row-bg);
 }
 
 .batch-row-fail {
-  background: rgba(180, 50, 40, 0.03);
+  background: var(--fail-row-bg);
 }
 
 .batch-guidance {
   border-radius: 12px;
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--batch-guidance-surface);
   box-shadow: 0 4px 14px rgba(13, 92, 99, 0.06);
 }
 
 .batch-guidance-pass {
-  border-left: 4px solid #0a9396;
-  border-color: rgba(10, 147, 150, 0.35);
-  border-left-color: #0a9396;
+  border-left: 4px solid var(--pass);
+  border-color: var(--pass-border);
+  border-left-color: var(--pass);
 }
 
 .batch-guidance-fail {
   border-left: 4px solid var(--critical);
   border-color: rgba(180, 50, 40, 0.28);
   border-left-color: var(--critical);
+}
+
+html[data-theme="dark"] .batch-guidance-fail,
+html[data-theme="system"] .batch-guidance-fail {
+  border-color: rgba(248, 113, 113, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .batch-guidance-fail {
+    border-color: rgba(248, 113, 113, 0.28);
+  }
+}
+
+.batch-guidance-pass .batch-guidance-kicker {
+  color: var(--pass);
 }
 
 .batch-guidance-kicker {
@@ -1894,22 +2042,59 @@ pre {
   color: var(--critical);
 }
 
-.batch-guidance-pass .batch-guidance-kicker {
-  color: #0a9396;
-}
-
 .batch-guidance-note {
   margin: 0 0 0.5rem;
   padding: 0.4rem 0.5rem;
   border-radius: 8px;
-  background: rgba(13, 92, 99, 0.06);
+  background: var(--pass-muted);
   font-size: 0.84rem;
   line-height: 1.4;
   color: var(--ink);
 }
 
 .batch-guidance-fail .batch-guidance-note {
-  background: rgba(180, 50, 40, 0.08);
+  background: var(--fail-muted);
+}
+
+.batch-badge-pass {
+  background: var(--pass-muted);
+  color: var(--pass);
+  border: 1px solid var(--pass-border);
+}
+
+.batch-badge-fail {
+  background: var(--fail-muted);
+  color: var(--critical);
+  border: 1px solid rgba(155, 34, 38, 0.25);
+}
+
+html[data-theme="dark"] .batch-badge-fail,
+html[data-theme="system"] .batch-badge-fail {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .batch-badge-fail {
+    border-color: rgba(248, 113, 113, 0.35);
+  }
+}
+
+.batch-row-callout-pass {
+  color: var(--pass);
+  font-weight: 600;
+}
+
+.batch-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--pass-muted);
+  color: var(--brand-deep);
 }
 
 .batch-guidance-note-label {
@@ -1948,16 +2133,6 @@ pre {
   border-radius: 8px;
 }
 
-.batch-badge-pass {
-  background: rgba(10, 147, 150, 0.15);
-  color: #0a9396;
-}
-
-.batch-badge-fail {
-  background: rgba(155, 34, 38, 0.12);
-  color: var(--critical);
-}
-
 .batch-critical-num {
   font-weight: 800;
   color: var(--critical);
@@ -1975,11 +2150,6 @@ pre {
   font-size: 0.82rem;
   color: var(--ink-soft);
   line-height: 1.35;
-}
-
-.batch-row-callout-pass {
-  color: #0a9396;
-  font-weight: 600;
 }
 
 .batch-tag-row {
@@ -2091,7 +2261,7 @@ pre {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--batch-tile-bg);
   box-shadow: 0 6px 20px rgba(13, 92, 99, 0.06);
   max-width: 100%;
   min-width: 0;
@@ -2100,7 +2270,7 @@ pre {
 }
 
 .batch-card-pass {
-  border-left: 4px solid #0a9396;
+  border-left: 4px solid var(--pass);
 }
 
 .batch-card-fail {

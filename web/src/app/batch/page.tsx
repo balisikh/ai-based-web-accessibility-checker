@@ -9,6 +9,7 @@ import {
 } from "@/lib/website-pass-fail";
 import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
+import { BatchReadGuide } from "./BatchReadGuide";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
 import { BatchMobileCards } from "./BatchMobileCards";
 import { BatchResultCallouts } from "./BatchResultCallouts";
@@ -56,6 +57,9 @@ export default function BatchResultsPage() {
           </Link>
         </div>
 
+        <BatchReadGuide />
+
+        <h2 className="batch-section-title">Overview</h2>
         <ul className="batch-summary" aria-label="Batch totals">
           <li>
             <span className="batch-summary-label">Tested</span>
@@ -79,23 +83,24 @@ export default function BatchResultsPage() {
           </li>
         </ul>
 
+        <h2 className="batch-section-title">Severity totals (all 28 sites)</h2>
         <ul
           className="batch-summary batch-summary-severity"
           aria-label="Severity totals across all 28 sites"
         >
-          <li>
+          <li className="batch-summary-sev batch-summary-sev-critical">
             <span className="sev sev-critical">Critical</span>
             <strong>{WEBSITE_BATCH_SUMMARY.totalCritical}</strong>
           </li>
-          <li>
+          <li className="batch-summary-sev batch-summary-sev-serious">
             <span className="sev sev-serious">Serious</span>
             <strong>{WEBSITE_BATCH_SUMMARY.totalSerious}</strong>
           </li>
-          <li>
+          <li className="batch-summary-sev batch-summary-sev-moderate">
             <span className="sev sev-moderate">Moderate</span>
             <strong>{WEBSITE_BATCH_SUMMARY.totalModerate}</strong>
           </li>
-          <li>
+          <li className="batch-summary-sev batch-summary-sev-minor">
             <span className="sev sev-minor">Minor</span>
             <strong>{WEBSITE_BATCH_SUMMARY.totalMinor}</strong>
           </li>
@@ -110,6 +115,9 @@ export default function BatchResultsPage() {
 
         <BatchMobileCards rows={WEBSITE_BATCH_RESULTS} />
 
+        <h2 className="batch-section-title batch-section-title-table">
+          All websites
+        </h2>
         <div className="batch-table-wrap batch-table-desktop">
           <table className="batch-table">
             <caption className="sr-only">

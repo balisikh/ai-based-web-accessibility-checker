@@ -9,7 +9,7 @@ export function BatchGuidanceCell({ guidance }: { guidance: BatchSiteGuidanceVie
       <p className="batch-guidance-kicker">{guidance.kicker}</p>
       {guidance.note ? (
         <p className="batch-guidance-note">
-          <span className="batch-guidance-note-label">Note</span>
+          <span className="batch-guidance-note-label">Note</span>{" "}
           {guidance.note}
         </p>
       ) : null}
