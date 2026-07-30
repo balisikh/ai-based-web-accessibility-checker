@@ -19,7 +19,7 @@ Use this table to track **Lumen tool** tests (UI, security, API) separately from
 | **Environment** | ENV-02 | `GET /api/health` | `ok: true`, `db`, `ai` | Manual | |
 | **Environment** | ENV-03 | Demo mode **off** (`USE_DEMO_SCAN` unset) | Live Playwright/axe scans | Manual | |
 | **Multi-site** | WEB-01 | Scan public https URLs (log in results) | Results + scores in `TEST_RESULTS.md` | **Done (28)** | Target **27** met; **#28** W3Schools added |
-| **Multi-site** | WEB-02 | Per-site Pass/Fail rule | Score ≥ 85 and critical = 0 → Pass | **Done (28)** | **8 Pass / 20 Fail** (resync 2026-07-28) |
+| **Multi-site** | WEB-02 | Per-site Pass/Fail rule | Score ≥ 85 and critical = 0 → Pass | **Done (28)** | **8 Pass / 20 Fail** (resync 2026-07-30) |
 | **Multi-site** | WEB-03 | example.com | Strong/clean score | **Done** | #26 Pass (86) |
 | **Multi-site** | WEB-04 | W3C bad demo | Many issues / low score | **Done** | #27 Fail (0) |
 | **UI** | UI-01 | Homepage load | Brand, URL field, Check, chips | Manual | |
@@ -76,7 +76,7 @@ Confirm that a tester can:
 
 ## 3. Multi-site scan sequence (core test)
 
-**Target:** **10 websites** minimum for MVP (**met**). **Extended target #27 complete**; **28** sites logged in [`TEST_RESULTS.md`](./TEST_RESULTS.md) (**8 Pass / 20 Fail** after resync 2026-07-28), including **#26–#27** (example.com, W3C bad demo) and **#28** W3Schools.
+**Target:** **10 websites** minimum for MVP (**met**). **Extended target #27 complete**; **28** sites logged in [`TEST_RESULTS.md`](./TEST_RESULTS.md) (**8 Pass / 20 Fail** after resync 2026-07-30), including **#26–#27** (example.com, W3C bad demo) and **#28** W3Schools.
 
 ### Planned sites (test plan vs results log)
 
@@ -214,5 +214,5 @@ When something fails, capture:
 | Role | Name | Date | Result |
 |------|------|------|--------|
 | Tester | Manual MVP run | 2026-07-27 | **Pass** (tool) |
-| Website batch | **28** sites logged | 2026-07-28 | [`TEST_RESULTS.md`](./TEST_RESULTS.md) — **8 Pass / 20 Fail** (live resync) |
+| Website batch | **28** sites logged | 2026-07-30 | [`TEST_RESULTS.md`](./TEST_RESULTS.md) — **8 Pass / 20 Fail** (live resync) |
 | Notes | Extended batch **#1–#27** complete; **#28** W3Schools (score 0). Website scores showcase automated Pass/Fail only. | | |

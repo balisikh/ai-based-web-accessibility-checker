@@ -74,7 +74,7 @@ export const FAIL_SITE_GUIDANCE: Record<number, FailSiteGuidance> = {
     ],
   },
   16: {
-    note: "Score/bot pages vary; severities may need refresh.",
+    note: "Rescan 2026-07-30 failed (axe error) — prior snapshot kept; score/bot pages vary.",
     furtherActions: [
       "Re-scan in Lumen when page loads fully (avoid captcha/bot shell).",
       "Fix reported serious/moderate issues (see export JSON).",
