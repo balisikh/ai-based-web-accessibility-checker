@@ -4,42 +4,66 @@ export type HomeFaq = {
   paragraphs: string[];
 };
 
-/** Expandable FAQs below “How Lumen checks a page” (URLs + limits are separate). */
-export const HOME_EXTRA_FAQS: HomeFaq[] = [
+/**
+ * Common questions on the home page (collapsed details).
+ * Order: URLs → limits → score → AI → failures → data.
+ */
+export const HOME_FAQS: HomeFaq[] = [
+  {
+    id: "urls",
+    summary: "What URLs can I use?",
+    paragraphs: [
+      "Lumen scans pages on the public web. Use http or https links that open in a normal browser without signing in.",
+      "Blocked: localhost, 127.0.0.1, private IPs (192.168.x.x, 10.x.x.x), and hostnames that resolve to them — SSRF protection so Lumen cannot probe your home or office network.",
+      "Try example.com for a quick Pass-style check, or W3C bad demo for many intentional issues. Both buttons fill the URL field above.",
+    ],
+  },
+  {
+    id: "scan-limits",
+    summary: "What are the limits of a scan?",
+    paragraphs: [
+      "Each run checks one URL, not a whole website. Most public pages finish in a few seconds to about a minute.",
+      "Login-only, paywalled, or bot-challenged pages may show a sign-in shell or partial content — batch results for Gmail and similar sites note this.",
+      "Findings are automated axe rules only. They help you improve accessibility but are not a legal WCAG certificate or a substitute for manual testing with assistive technology.",
+    ],
+  },
   {
     id: "score-pass-fail",
     summary: "How is the score calculated? What does Pass / Fail mean?",
     paragraphs: [
-      "The score is 0–100 from automated issue counts (axe-core). Higher is better. Strong on the results screen means 85 or above.",
-      "In our website batch tests, Pass means score at least 85 and zero critical issues. Fail is score below 85 or any critical issue. Live scan results show the same Batch Pass/Fail badge when those rules apply.",
-      "Open Website batch results from the link below this section for the 28-site snapshot and severity totals.",
+      "The score is 0–100 from issue counts: each critical −25, serious −15, moderate −7, minor −3 (minimum 0). Zero issues = 100. Results label: Strong (≥85), Fair (60–84), Needs work (<60).",
+      "Batch Pass / Fail (also shown on live results): Pass = score ≥ 85 and critical = 0. Fail = score below 85 or any critical issue. A Pass can still have moderate or minor issues to triage.",
+      "The 28-site batch snapshot on Website batch results uses the same rule; live scans and the batch table are separate — run Check accessibility to scan a URL now.",
     ],
   },
   {
     id: "ai-tips",
     summary: "What are AI tips? Why are they off?",
     paragraphs: [
-      "When enabled, Lumen sends the top few issues (by severity) to an OpenAI-compatible API for a short explanation and suggested fix. Rule findings and scoring run without AI.",
-      "AI tips are off when this Lumen server has no AI_API_KEY or OPENAI_API_KEY in its environment. That is a deployment setting, not something the website you scan controls.",
-      "Operators add a key in web/.env.local (local) or host secrets (production), then restart the app. The home pill and GET /api/config show whether AI is configured.",
+      "When enabled, Lumen sends the top few issues (by severity) to an OpenAI-compatible API for a short explanation and suggested fix. Rule findings, score, and Export JSON work without AI.",
+      "AI tips are off when this server has no AI_API_KEY or OPENAI_API_KEY. That is a deployment setting, not something the website you scan controls.",
+      "The How Lumen checks a page pill and GET /api/health show whether AI is configured. Add a key in web/.env.local (local) or host secrets (production), then restart.",
     ],
   },
   {
     id: "failures-rate-limit",
     summary: "Why did my scan fail or say rate limited?",
     paragraphs: [
-      "Scans can fail when the URL is blocked (private or local), the page times out, the site blocks automated browsers, or Playwright cannot launch a browser.",
-      "A 429 rate limit means too many scan requests from your IP in a short window. Default is 5 per minute in production (RATE_LIMIT_MAX and RATE_LIMIT_WINDOW_MS). Local dev allows more unless you override those variables.",
-      "Fix the URL, wait a minute, or ask the operator to raise limits for testing. Use Try again after errors when the message is transient.",
+      "Scans fail when the URL is blocked (private/local), the page times out, the site blocks automated browsers, or Chrome/Playwright cannot launch.",
+      "429 rate limited means too many POST /api/scans requests from your IP. Default: 5 per minute in production (RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS). Local npm run dev allows more unless you override those variables.",
+      "Fix the URL, wait about a minute, or use Try again for transient errors. For heavy testing, raise RATE_LIMIT_MAX in .env.local.",
     ],
   },
   {
     id: "data-privacy",
     summary: "What happens to my URL and scan data?",
     paragraphs: [
-      "Each scan stores the URL, findings, and score in the app database (Postgres or local PGlite under web/data/). There are no user accounts in the MVP.",
-      "Data is used to show your results and Export JSON. Do not paste secrets into URLs; query tokens in links may be stored.",
-      "Retention is not automated in the MVP. See DEPLOY.md for backup and database notes on hosted environments.",
+      "Each scan stores the URL, findings, and score in the app database (Postgres in production, or local PGlite under web/data/). There are no user accounts in the MVP.",
+      "Data is used to show your results and Export JSON. Do not paste secrets into URLs — query tokens in links may be stored.",
+      "Retention is not automated in the MVP. See web/DEPLOY.md for backup and database notes on hosted environments.",
     ],
   },
 ];
+
+/** @deprecated Use HOME_FAQS */
+export const HOME_EXTRA_FAQS = HOME_FAQS;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
-import { HOME_EXTRA_FAQS } from "@/lib/home-faqs";
+import { HOME_FAQS } from "@/lib/home-faqs";
 import { HOW_TO_USE_STEPS } from "@/lib/how-to-use";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 import { validateScanUrl } from "@/lib/validate-url";
@@ -516,39 +516,17 @@ export function ScanExperience() {
               ))}
             </ol>
             <div className="learn-more-group">
+              <h3 className="home-faq-heading">Common questions</h3>
+              <p className="home-faq-lede">
+                About live scans — expand any item. Light / Dark / System theme
+                affects display only, not scan results.
+              </p>
               <p className="batch-link-row">
                 <Link href="/batch" className="batch-dashboard-link">
-                  Website batch results
+                  Website batch results (28-site snapshot)
                 </Link>
               </p>
-              <details className="learn-more">
-                <summary>What URLs can I use?</summary>
-                <div className="learn-more-body">
-                  <p>
-                    Lumen is for pages on the public web. We accept{" "}
-                    <strong>http</strong> and <strong>https</strong> URLs and
-                    block localhost, private IP ranges, and hostnames that resolve
-                    to them — so the checker cannot be used to probe your home or
-                    office network.
-                  </p>
-                </div>
-              </details>
-              <details className="learn-more">
-                <summary>What are the limits of a scan?</summary>
-                <div className="learn-more-body">
-                  <p>
-                    Each run checks <strong>one URL</strong>, not a whole website.
-                    Most public pages finish in a few seconds to about a minute.
-                    Login-only or paywalled content may not fully appear.
-                  </p>
-                  <p>
-                    Results come from automated rules only. They help you improve
-                    accessibility but are <strong>not</strong> a legal certificate
-                    or a substitute for manual testing with assistive technology.
-                  </p>
-                </div>
-              </details>
-              {HOME_EXTRA_FAQS.map((faq) => (
+              {HOME_FAQS.map((faq) => (
                 <details key={faq.id} className="learn-more">
                   <summary>{faq.summary}</summary>
                   <div className="learn-more-body">
