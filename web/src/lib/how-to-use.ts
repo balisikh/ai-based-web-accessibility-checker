@@ -1,4 +1,4 @@
-/** In-app copy of README “How to use” — keep in sync when that section changes. */
+/** Canonical “How to use Lumen” steps — README points here; do not duplicate in docs. */
 export type HowToUseStep = {
   step: number;
   id: string;

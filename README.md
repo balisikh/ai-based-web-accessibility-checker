@@ -106,21 +106,21 @@ USE_DEMO_SCAN=1 npm run dev
 
 ## How to use
 
-The home screen includes a **How to use Lumen** section (backed by [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts)). Keep it aligned with this list:
+In-app copy (do not duplicate here):
 
-1. Open the app and enter a public `https://` URL (for example `https://example.com`)  
-2. Click **Check accessibility**  
-3. Wait for status steps (fetch → render → rules → optional AI → score)  
-4. Review the score and issue list; open an issue for WCAG refs, snippet, and AI tips (if enabled)  
-5. Click **Export JSON** to download the report  
+| Section | Source |
+|---------|--------|
+| **How to use Lumen** (5 steps) | [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts) |
+| **Common questions** (8 FAQs) | [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts) |
+| Shared labels, Pass/Fail rule, disclaimers | [`web/src/lib/product-copy.ts`](./web/src/lib/product-copy.ts) |
 
-Private/local addresses (for example `localhost`, `127.0.0.1`) are blocked on purpose.
+Run locally: `cd web && npm run dev` → [http://localhost:4376](http://localhost:4376). CI runs `npm run validate:copy` to keep README free of duplicated step/FAQ text.
 
 ---
 
 ## Common questions
 
-On the home page ([http://localhost:4376](http://localhost:4376) when running `npm run dev`), expand **Common questions** under *How Lumen checks a page* for URLs, scan limits, score and Pass/Fail rules, live scan vs batch snapshot, JSON export, AI tips, rate limits, and data storage. Copy lives in [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts). When you deploy a public host, replace the link above with your live URL in this paragraph and in **Demo**.
+Expand **Common questions** on the home page under *How Lumen checks a page*. Full copy is only in [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts). When you deploy, replace localhost links in **Demo** with your live URL.
 
 ---
 
@@ -148,14 +148,15 @@ On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.gi
 
 | Job | What it checks |
 |-----|----------------|
-| **web** | `npm ci` → ESLint → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
+| **web** | `npm ci` → ESLint → **product copy validation** (README vs source files) → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
 | **responsive-viewport** | Viewport overflow on `/`, `/batch`, `/fixtures/results` (Playwright; no live URL scan in CI) |
 
 Run the same checks locally:
 
 ```bash
 cd web
-npm run ci              # lint + validate:batch + build
+npm run ci              # lint + validate:copy + validate:batch + build
+npm run validate:copy   # README must not duplicate in-app copy
 npm run validate:batch  # snapshot only
 npm run smoke:scan      # local/manual live axe scan (not run in CI)
 ```
@@ -197,6 +198,9 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 | [`TEST_PLAN.md`](./TEST_PLAN.md) | Manual test plan (multi-site scans) |
 | [`TEST_RESULTS.md`](./TEST_RESULTS.md) | Website Pass/Fail results log |
 | [`web/README.md`](./web/README.md) | App setup, env, pipeline |
+| [`web/src/lib/product-copy.ts`](./web/src/lib/product-copy.ts) | Shared UI labels, Pass/Fail rule, disclaimers |
+| [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts) | How to use Lumen (in-app steps) |
+| [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts) | Common questions (in-app FAQs) |
 
 ---
 

@@ -9,6 +9,11 @@ import {
 } from "@/lib/website-pass-fail";
 import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
 import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
+import {
+  BATCH_NOTES_COLUMN_HINT,
+  BATCH_SNAPSHOT_NOTE,
+  PASS_FAIL_RULE_LINE,
+} from "@/lib/product-copy";
 import { BatchReadGuide } from "./BatchReadGuide";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
 import { BatchMobileCards } from "./BatchMobileCards";
@@ -46,9 +51,8 @@ export default function BatchResultsPage() {
             <p className="batch-page-eyebrow">Portfolio test set</p>
             <h1 id="batch-heading">Website batch results</h1>
             <p className="lede batch-lede">
-              Static snapshot (last full live resync{" "}
-              <strong>{BATCH_SNAPSHOT_DATE}</strong>) — loads instantly and does
-              not run scans. Live checks use the{" "}
+              {BATCH_SNAPSHOT_NOTE} Last full live resync{" "}
+              <strong>{BATCH_SNAPSHOT_DATE}</strong>. Live checks use the{" "}
               <Link href="/">accessibility checker</Link>.
             </p>
           </div>
@@ -107,10 +111,8 @@ export default function BatchResultsPage() {
         </ul>
 
         <p className="hint batch-rule">
-          <strong>Pass:</strong> score ≥ 85 and critical = 0.{" "}
-          <strong>Fail:</strong> otherwise. Pass and Fail rows both use{" "}
-          <strong>Notes &amp; recommendations</strong> when there are issues to
-          triage. Source: <code>TEST_RESULTS.md</code> in the repo.
+          {PASS_FAIL_RULE_LINE} {BATCH_NOTES_COLUMN_HINT} Source:{" "}
+          <code>TEST_RESULTS.md</code> in the repo.
         </p>
 
         <BatchMobileCards rows={WEBSITE_BATCH_RESULTS} />

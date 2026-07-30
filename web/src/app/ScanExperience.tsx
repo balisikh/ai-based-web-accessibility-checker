@@ -5,6 +5,20 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { HOW_IT_WORKS_ITEMS } from "@/lib/how-it-works";
 import { HOME_FAQS } from "@/lib/home-faqs";
 import { HOW_TO_USE_STEPS } from "@/lib/how-to-use";
+import {
+  DISCLAIMER_ASSISTIVE,
+  DISCLAIMER_ASSISTIVE_SHORT,
+  FAQ_HEADING,
+  FAQ_LEDE,
+  HOW_IT_WORKS_HEADING,
+  HOW_TO_USE_HEADING,
+  HOW_TO_USE_LEDE,
+  PASS_FAIL_PASS_BODY,
+  PASS_FAIL_PASS_HEADING,
+  SCORE_BATCH_PASS_NOTE,
+  URL_PUBLIC_HINT,
+} from "@/lib/product-copy";
+import { TRY_EXAMPLE_URLS } from "@/lib/try-examples";
 import type { Issue, ScanStatus, ScanSummary, Severity } from "@/lib/types";
 import { validateScanUrl } from "@/lib/validate-url";
 import {
@@ -38,18 +52,7 @@ const SEVERITY_HINT: Record<Severity, string> = {
   minor: "Small improvements when you can.",
 };
 
-const EXAMPLE_URLS = [
-  {
-    label: "example.com",
-    url: "https://example.com",
-    description: "Simple public page — usually a strong Pass (batch #26)",
-  },
-  {
-    label: "W3C bad demo",
-    url: "https://www.w3.org/WAI/demos/bad/before/home.html",
-    description: "Known-bad demo — expect many issues (batch #27, Fail)",
-  },
-] as const;
+const EXAMPLE_URLS = TRY_EXAMPLE_URLS;
 
 const SCAN_STEPS = [
   { id: "fetching", label: "Fetch page" },
@@ -346,11 +349,13 @@ export function ScanExperience() {
                   key={example.url}
                   type="button"
                   className={`example-chip${
-                    example.label === "W3C bad demo" ? " example-chip-demo-bad" : ""
+                    "chipClass" in example && example.chipClass === "demo-bad"
+                      ? " example-chip-demo-bad"
+                      : ""
                   }`}
                   disabled={phase === "submitting"}
-                  title={example.description}
-                  aria-label={`${example.label}: ${example.description}`}
+                  title={example.ariaDescription}
+                  aria-label={`${example.label}: ${example.ariaDescription}`}
                   onClick={() => setUrl(example.url)}
                 >
                   {example.label}
@@ -358,20 +363,29 @@ export function ScanExperience() {
               ))}
             </div>
             <p className="hint example-descriptions">
-              <span className="example-desc example-desc-pass">
-                <strong>example.com</strong> — quick Pass-style check
-              </span>
-              <span className="example-desc-sep" aria-hidden="true">
-                ·
-              </span>
-              <span className="example-desc example-desc-fail">
-                <strong>W3C bad demo</strong> — many issues on purpose
-              </span>
+              {EXAMPLE_URLS.map((example, index) => (
+                <span key={example.url}>
+                  {index > 0 ? (
+                    <span className="example-desc-sep" aria-hidden="true">
+                      {" "}
+                      ·{" "}
+                    </span>
+                  ) : null}
+                  <span
+                    className={`example-desc${
+                      "chipClass" in example && example.chipClass === "demo-bad"
+                        ? " example-desc-fail"
+                        : " example-desc-pass"
+                    }`}
+                  >
+                    <strong>{example.label}</strong> — {example.hint}
+                  </span>
+                </span>
+              ))}
             </p>
 
             <p id="url-hint" className="hint">
-              Public http or https URLs only — private and local addresses are
-              blocked.
+              {URL_PUBLIC_HINT}
             </p>
             {error && (
               <>
@@ -432,9 +446,10 @@ export function ScanExperience() {
                 <summary>Pass/Fail rule &amp; disclaimer</summary>
                 <div className="learn-more-body">
                   <p>
-                    <strong className="home-guide-pass">Pass (websites):</strong>{" "}
-                    score at least 85 and zero critical issues. Moderate or
-                    minor findings still need triage so the site stays a Pass.
+                    <strong className="home-guide-pass">
+                      {PASS_FAIL_PASS_HEADING}:
+                    </strong>{" "}
+                    {PASS_FAIL_PASS_BODY}
                   </p>
                   <p>
                     <strong>Batch dashboard:</strong>{" "}
@@ -442,9 +457,7 @@ export function ScanExperience() {
                     severity totals, and recommended actions for each URL.
                   </p>
                   <p>
-                    <strong>Assistive only:</strong> Automated axe results help
-                    you improve pages — not a legal WCAG certificate or full
-                    manual audit.
+                    <strong>Assistive only:</strong> {DISCLAIMER_ASSISTIVE}
                   </p>
                 </div>
               </details>
@@ -452,11 +465,8 @@ export function ScanExperience() {
           </div>
 
           <section className="how-to-use home-guide-section" aria-labelledby={howToUseId}>
-            <h2 id={howToUseId}>How to use Lumen</h2>
-            <p className="how-to-use-lede">
-              Step-by-step from URL to report. Works the same in Light, Dark, and
-              System theme.
-            </p>
+            <h2 id={howToUseId}>{HOW_TO_USE_HEADING}</h2>
+            <p className="how-to-use-lede">{HOW_TO_USE_LEDE}</p>
             <ol className="how-grid how-to-use-grid">
               {HOW_TO_USE_STEPS.map((item) => (
                 <li key={item.id} className="how-card">
@@ -477,7 +487,7 @@ export function ScanExperience() {
             aria-labelledby={howItWorksId}
           >
             <div className="how-it-works-head">
-              <h2 id={howItWorksId}>How Lumen checks a page</h2>
+              <h2 id={howItWorksId}>{HOW_IT_WORKS_HEADING}</h2>
               <span
                 className={`ai-status-pill${aiTipsEnabled ? " ai-status-on" : ""}`}
               >
@@ -516,11 +526,8 @@ export function ScanExperience() {
               ))}
             </ol>
             <div className="learn-more-group">
-              <h3 className="home-faq-heading">Common questions</h3>
-              <p className="home-faq-lede">
-                About live scans — expand any item. Light / Dark / System theme
-                affects display only, not scan results.
-              </p>
+              <h3 className="home-faq-heading">{FAQ_HEADING}</h3>
+              <p className="home-faq-lede">{FAQ_LEDE}</p>
               <p className="batch-link-row">
                 <Link href="/batch" className="batch-dashboard-link">
                   Website batch results (28-site snapshot)
@@ -643,8 +650,7 @@ export function ScanExperience() {
           <p className="score-explainer">
             Score <strong>0–100</strong> from automated issue counts.{" "}
             <strong>{rating.label}</strong> means {scan.score ?? 0} (85+ is
-            Strong). In our website test batches, <strong>Pass</strong> also
-            requires zero critical issues.
+            Strong). {SCORE_BATCH_PASS_NOTE}
           </p>
 
           <ul className="count-row" aria-label="Issue counts by severity">
@@ -724,9 +730,7 @@ export function ScanExperience() {
                 </div>
               </div>
 
-              <p className="disclaimer">
-                Assistive findings only — not a legal accessibility certificate.
-              </p>
+              <p className="disclaimer">{DISCLAIMER_ASSISTIVE_SHORT}</p>
 
               <div className="results-grid">
                 <div className="issue-list" role="list">

@@ -1,3 +1,13 @@
+import {
+  DISCLAIMER_SCAN_LIMITS,
+  HOW_IT_WORKS_HEADING,
+  PASS_FAIL_RULE_FAQ,
+  PASS_FAIL_RULE_INLINE,
+  SCORE_FORMULA,
+  SCORE_LABELS,
+} from "./product-copy";
+import { tryExamplesFaqSentence } from "./try-examples";
+
 export type HomeFaq = {
   id: string;
   summary: string;
@@ -15,7 +25,7 @@ export const HOME_FAQS: HomeFaq[] = [
     paragraphs: [
       "Lumen scans pages on the public web. Use http or https links that open in a normal browser without signing in.",
       "Blocked: localhost, 127.0.0.1, private IPs (192.168.x.x, 10.x.x.x), and hostnames that resolve to them — SSRF protection so Lumen cannot probe your home or office network.",
-      "Try example.com for a quick Pass-style check, or W3C bad demo for many intentional issues. Both buttons fill the URL field above.",
+      tryExamplesFaqSentence(),
     ],
   },
   {
@@ -24,15 +34,15 @@ export const HOME_FAQS: HomeFaq[] = [
     paragraphs: [
       "Each run checks one URL, not a whole website. Most public pages finish in a few seconds to about a minute.",
       "Login-only, paywalled, or bot-challenged pages may show a sign-in shell or partial content — batch results for Gmail and similar sites note this.",
-      "Findings are automated axe rules only. They help you improve accessibility but are not a legal WCAG certificate or a substitute for manual testing with assistive technology.",
+      DISCLAIMER_SCAN_LIMITS,
     ],
   },
   {
     id: "score-pass-fail",
     summary: "How is the score calculated? What does Pass / Fail mean?",
     paragraphs: [
-      "The score is 0–100 from issue counts: each critical −25, serious −15, moderate −7, minor −3 (minimum 0). Zero issues = 100. Results label: Strong (≥85), Fair (60–84), Needs work (<60).",
-      "Batch Pass / Fail (also shown on live results): Pass = score ≥ 85 and critical = 0. Fail = score below 85 or any critical issue. A Pass can still have moderate or minor issues to triage.",
+      `The score is 0–100 from issue counts: ${SCORE_FORMULA} Results label: ${SCORE_LABELS}`,
+      PASS_FAIL_RULE_FAQ,
       "The 28-site batch snapshot on Website batch results uses the same rule; live scans and the batch table are separate — run Check accessibility to scan a URL now.",
     ],
   },
@@ -43,7 +53,7 @@ export const HOME_FAQS: HomeFaq[] = [
     paragraphs: [
       "A live scan runs when you click Check accessibility: Playwright opens that URL now, axe runs, and you get fresh results, Export JSON, and optional AI tips.",
       "Website batch results is a static snapshot of 28 public sites from the test plan (last resync date on that page). It loads instantly, does not re-scan the web, and includes Pass/Fail counts plus recommended actions per site.",
-      "Use live scan to check a URL today; use batch to see portfolio-wide evaluation and compare sites. Both use the same Pass rule (score ≥ 85, critical = 0) on live results and in the batch table.",
+      `Use live scan to check a URL today; use batch to see portfolio-wide evaluation and compare sites. Both use the same Pass rule (${PASS_FAIL_RULE_INLINE}) on live results and in the batch table.`,
     ],
   },
   {
@@ -61,7 +71,7 @@ export const HOME_FAQS: HomeFaq[] = [
     paragraphs: [
       "When enabled, Lumen sends the top few issues (by severity) to an OpenAI-compatible API for a short explanation and suggested fix. Rule findings, score, and Export JSON work without AI.",
       "AI tips are off when this server has no AI_API_KEY or OPENAI_API_KEY. That is a deployment setting, not something the website you scan controls.",
-      "The How Lumen checks a page pill and GET /api/health show whether AI is configured. Add a key in web/.env.local (local) or host secrets (production), then restart.",
+      `The ${HOW_IT_WORKS_HEADING} pill and GET /api/health show whether AI is configured. Add a key in web/.env.local (local) or host secrets (production), then restart.`,
     ],
   },
   {

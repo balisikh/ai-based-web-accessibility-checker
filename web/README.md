@@ -17,6 +17,8 @@ npm run test:responsive   # needs npm run start in another terminal
 
 Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
+User-facing copy lives in `src/lib/` — [`product-copy.ts`](./src/lib/product-copy.ts), [`how-to-use.ts`](./src/lib/how-to-use.ts), [`home-faqs.ts`](./src/lib/home-faqs.ts). README points there; `npm run validate:copy` enforces no duplication.
+
 ## Responsive layout
 
 Content is capped at **1100px** with **device-tier** gutters and breakpoints.
