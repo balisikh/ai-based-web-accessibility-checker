@@ -120,7 +120,7 @@ Private/local addresses (for example `localhost`, `127.0.0.1`) are blocked on pu
 
 ## Common questions
 
-On the home page ([http://localhost:4376](http://localhost:4376) when running `npm run dev`), expand **Common questions** under *How Lumen checks a page* for URLs, scan limits, score and Pass/Fail rules, AI tips, rate limits, and data storage. Copy lives in [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts). When you deploy a public host, replace the link above with your live URL in this paragraph and in **Demo**.
+On the home page ([http://localhost:4376](http://localhost:4376) when running `npm run dev`), expand **Common questions** under *How Lumen checks a page* for URLs, scan limits, score and Pass/Fail rules, live scan vs batch snapshot, JSON export, AI tips, rate limits, and data storage. Copy lives in [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts). When you deploy a public host, replace the link above with your live URL in this paragraph and in **Demo**.
 
 ---
 

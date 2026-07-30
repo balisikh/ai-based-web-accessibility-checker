@@ -6,7 +6,7 @@ export type HomeFaq = {
 
 /**
  * Common questions on the home page (collapsed details).
- * Order: URLs → limits → score → AI → failures → data.
+ * Order: URLs → limits → score → live vs batch → export → AI → failures → data.
  */
 export const HOME_FAQS: HomeFaq[] = [
   {
@@ -34,6 +34,25 @@ export const HOME_FAQS: HomeFaq[] = [
       "The score is 0–100 from issue counts: each critical −25, serious −15, moderate −7, minor −3 (minimum 0). Zero issues = 100. Results label: Strong (≥85), Fair (60–84), Needs work (<60).",
       "Batch Pass / Fail (also shown on live results): Pass = score ≥ 85 and critical = 0. Fail = score below 85 or any critical issue. A Pass can still have moderate or minor issues to triage.",
       "The 28-site batch snapshot on Website batch results uses the same rule; live scans and the batch table are separate — run Check accessibility to scan a URL now.",
+    ],
+  },
+  {
+    id: "live-vs-batch",
+    summary:
+      "What's the difference between a live scan and Website batch results?",
+    paragraphs: [
+      "A live scan runs when you click Check accessibility: Playwright opens that URL now, axe runs, and you get fresh results, Export JSON, and optional AI tips.",
+      "Website batch results is a static snapshot of 28 public sites from the test plan (last resync date on that page). It loads instantly, does not re-scan the web, and includes Pass/Fail counts plus recommended actions per site.",
+      "Use live scan to check a URL today; use batch to see portfolio-wide evaluation and compare sites. Both use the same Pass rule (score ≥ 85, critical = 0) on live results and in the batch table.",
+    ],
+  },
+  {
+    id: "export-share",
+    summary: "Can I export or share my scan?",
+    paragraphs: [
+      "Yes — on the results screen, Export JSON downloads a report (URL, score, severities, issues) for tickets, docs, or your own tooling.",
+      "There is no PDF export or public share link in the MVP. Scan data is stored on this server (see What happens to my URL and scan data?) but not published to other users.",
+      "To share findings, send the JSON file or describe score and top issues. After deploy, you can point reviewers to your hosted Lumen URL for live scans.",
     ],
   },
   {
