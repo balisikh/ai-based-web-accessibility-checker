@@ -28,8 +28,23 @@ Other hosts (Railway, Fly.io, Azure Container Apps) can pull the same GHCR image
 | `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | Tune scan rate limits. |
 | `OPENAI_API_KEY` or `AI_API_KEY` | Enable AI tips on the server. |
 | `AI_MODEL`, `AI_BASE_URL`, `AI_MAX_ISSUES` | Optional AI tuning. |
+| `NEXT_PUBLIC_SITE_URL` | **Production:** full public URL (e.g. `https://lumen.example.com`) for canonical links, Open Graph, `sitemap.xml`, and `robots.txt`. Without it, metadata defaults to `localhost:4376`. |
 
 Do **not** commit secrets. Use the host dashboard or GitHub Actions secrets.
+
+## SEO (search visibility)
+
+Set **`NEXT_PUBLIC_SITE_URL`** to your deployed origin (no trailing path). Lumen then serves:
+
+| Route | Purpose |
+|-------|---------|
+| `/sitemap.xml` | Home + batch pages for crawlers |
+| `/robots.txt` | Allows `/`, disallows `/api/` and `/fixtures/` |
+| Per-page `<link rel="canonical">` | Avoids duplicate URL issues |
+| Open Graph + Twitter cards | Uses `/og.png` for link previews |
+| JSON-LD (`WebApplication`, `WebSite`, batch breadcrumbs) | Rich results context |
+
+After deploy, verify in [Google Search Console](https://search.google.com/search-console) (submit sitemap) and test previews with [opengraph.xyz](https://www.opengraph.xyz/) or similar.
 
 ## Local Docker smoke test
 

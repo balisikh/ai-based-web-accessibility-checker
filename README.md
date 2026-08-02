@@ -137,8 +137,9 @@ Copy [`web/.env.example`](./web/.env.example) to `web/.env.local`:
 | `AI_MODEL` | Model name (default `gpt-4o-mini`) |
 | `AI_MAX_ISSUES` | How many top issues to enrich (default `5`) |
 | `USE_DEMO_SCAN=1` | Sample findings instead of live Playwright/axe |
+| `NEXT_PUBLIC_SITE_URL` | Public deploy URL for SEO (canonical, sitemap, Open Graph) |
 
-Full details: [`web/README.md`](./web/README.md)
+Full details: [`web/README.md`](./web/README.md) · SEO: [`web/DEPLOY.md`](./web/DEPLOY.md#seo-search-visibility)
 
 ---
 
@@ -201,6 +202,7 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 | [`web/src/lib/product-copy.ts`](./web/src/lib/product-copy.ts) | Shared UI labels, Pass/Fail rule, disclaimers |
 | [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts) | How to use Lumen (in-app steps) |
 | [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts) | Common questions (in-app FAQs) |
+| [`web/src/lib/seo.ts`](./web/src/lib/seo.ts) | SEO metadata (titles, Open Graph, keywords) |
 
 ---
 

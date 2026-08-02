@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
+import { pageMetadata } from "@/lib/seo";
 import {
   WEBSITE_BATCH_RESULTS,
   WEBSITE_BATCH_SUMMARY,
@@ -19,11 +21,12 @@ import { BatchGuidanceCell } from "./BatchGuidanceCell";
 import { BatchMobileCards } from "./BatchMobileCards";
 import { BatchResultCallouts } from "./BatchResultCallouts";
 
-export const metadata = {
-  title: "Lumen | Website batch results",
+export const metadata = pageMetadata({
+  title: "28-site batch accessibility results",
   description:
-    "Pass and fail counts for the 28-site accessibility batch (static snapshot).",
-};
+    "Pass and fail counts for 28 public websites — static axe snapshot with scores, severity totals, and recommended actions per site.",
+  path: "/batch",
+});
 
 type BatchSeverity = "critical" | "serious" | "moderate" | "minor";
 
@@ -45,6 +48,7 @@ function BatchSeverityCount({
 export default function BatchResultsPage() {
   return (
     <main className="scan-shell">
+      <JsonLd page="batch" />
       <section className="batch-panel" aria-labelledby="batch-heading">
         <div className="batch-page-head">
           <div>

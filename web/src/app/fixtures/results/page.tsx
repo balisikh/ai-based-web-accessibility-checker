@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 
 /** Static layout sample for responsive overflow tests (not a real scan). */
-export const metadata = {
-  title: "Lumen | Results layout fixture",
-  robots: { index: false, follow: false },
-};
+export const metadata = pageMetadata({
+  title: "Results layout fixture",
+  description: "Internal layout fixture for responsive tests.",
+  path: "/fixtures/results",
+  noIndex: true,
+});
 
 export default function ResultsLayoutFixturePage() {
   return (

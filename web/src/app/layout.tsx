@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Figtree, Fraunces } from "next/font/google";
 import { SiteHeader } from "./SiteHeader";
 import { ThemeInitScript } from "./ThemeInitScript";
+import { rootMetadata } from "@/lib/seo";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -19,11 +20,7 @@ const fraunces = Fraunces({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Lumen | Accessibility Checker",
-  description:
-    "AI-based web accessibility checker: scan a URL for WCAG-oriented issues, scores, and fix guidance.",
-};
+export const metadata: Metadata = rootMetadata();
 
 export default function RootLayout({
   children,
@@ -32,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-GB"
       className={`${figtree.variable} ${fraunces.variable} h-full`}
       data-theme="system"
       suppressHydrationWarning
