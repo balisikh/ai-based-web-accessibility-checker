@@ -1,5 +1,7 @@
 # Lumen — AI-Based Web Accessibility Checker
 
+[![CI](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
+
 Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and (optionally) AI-guided fix tips.
 
 **Live product UI brand:** Lumen  
