@@ -1,0 +1,141 @@
+/**
+ * Build portfolio HTML and save as PDF (uses local screenshot files, not base64).
+ * Run: npm run docs:pdf
+ */
+import { chromium } from "playwright";
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const ROOT = path.resolve(process.cwd(), "..");
+const DOCS = path.join(ROOT, "docs");
+const HTML = path.join(DOCS, "Lumen-Portfolio-Documentation.html");
+const OUT = path.join(DOCS, "Lumen-Portfolio-Documentation.pdf");
+
+const SHOTS = [
+  { title: "Home — accessibility checker", file: "screenshots/home-desktop.png" },
+  { title: "Batch results — 28 sites", file: "screenshots/batch-desktop.png" },
+  { title: "Results — sample layout", file: "screenshots/results-desktop.png" },
+  { title: "Mobile home (390px)", file: "screenshots/home-mobile.png" },
+];
+
+function buildHtml(): string {
+  const figures = SHOTS.map(
+    (shot) =>
+      `<figure><figcaption>${shot.title}</figcaption><img src="${shot.file}" alt="${shot.title}" /></figure>`,
+  ).join("\n");
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  return `<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <title>Lumen — Portfolio Documentation</title>
+  <style>
+    body { font-family: "Segoe UI", system-ui, sans-serif; color: #14221f; line-height: 1.5; max-width: 780px; margin: 0 auto; padding: 1.5rem; }
+    h1 { color: #083f44; font-size: 1.65rem; margin-bottom: 0.25rem; }
+    h2 { color: #083f44; font-size: 1.1rem; margin-top: 1.5rem; border-bottom: 2px solid rgba(13,92,99,.15); padding-bottom: 0.3rem; }
+    .subtitle { color: #3d524c; margin-top: 0; }
+    .note { background: #f3f7f5; border-left: 4px solid #e85d04; padding: 0.65rem 0.9rem; margin: 0.85rem 0; font-size: 0.88rem; }
+    table { border-collapse: collapse; width: 100%; margin: 0.65rem 0; font-size: 0.85rem; }
+    th, td { border: 1px solid rgba(20,34,31,.12); padding: 0.4rem 0.55rem; text-align: left; }
+    th { background: rgba(13,92,99,.08); }
+    figure { margin: 1rem 0; page-break-inside: avoid; }
+    figcaption { font-weight: 600; margin-bottom: 0.3rem; color: #083f44; font-size: 0.9rem; }
+    img { display: block; width: 100%; max-height: 520px; object-fit: contain; object-position: top left; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }
+    footer { margin-top: 1.5rem; font-size: 0.75rem; color: #3d524c; }
+  </style>
+</head>
+<body>
+  <h1>Lumen — Portfolio Documentation</h1>
+  <p class="subtitle">AI-Based Web Accessibility Checker</p>
+  <p>Repository: github.com/balisikh/ai-based-web-accessibility-checker · Local: http://localhost:4376</p>
+  <div class="note">Assistive findings only — not a legal accessibility certificate or formal conformance audit.</div>
+
+  <h2>Overview</h2>
+  <p>Lumen scans a public URL with Playwright + axe-core, returns a score, severities, rule help, optional AI tips, and JSON export.</p>
+  <ol>
+    <li>Paste a public website URL</li>
+    <li>Headless Chrome renders the page</li>
+    <li>axe-core checks WCAG A/AA-oriented rules</li>
+    <li>Score, severities, and issue details</li>
+    <li>Optional AI tips; JSON export</li>
+  </ol>
+
+  <h2>UI screenshots</h2>
+  ${figures}
+
+  <h2>Layout (light mode)</h2>
+  <ul>
+    <li><strong>Header:</strong> Lumen logo, Checker / Batch results, Light / Dark / System</li>
+    <li><strong>Background:</strong> Soft grey gradient + grid pattern</li>
+    <li><strong>Card:</strong> White panel with teal gradient strip on top</li>
+    <li><strong>Home CTA:</strong> Orange Check accessibility button</li>
+    <li><strong>Batch CTA:</strong> Teal Run a live scan button</li>
+  </ul>
+
+  <h2>Batch snapshot (2026-07-30)</h2>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Websites tested</td><td>28</td></tr>
+    <tr><td>Passed</td><td>8 (4 clean · 4 with issues)</td></tr>
+    <tr><td>Failed</td><td>20</td></tr>
+    <tr><td>Total issues</td><td>374</td></tr>
+  </table>
+  <p><strong>Pass rule:</strong> Score ≥ 85 and Critical = 0.</p>
+  <p><strong>Passed sites:</strong> Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Google Maps, Wikipedia, example.com</p>
+
+  <h2>MVP features</h2>
+  <table>
+    <tr><th>Area</th><th>Status</th></tr>
+    <tr><td>Scan UI, Playwright + axe</td><td>Done</td></tr>
+    <tr><td>Rate limiting, persistence, JSON export</td><td>Done</td></tr>
+    <tr><td>Optional AI tips, anonymous use</td><td>Done</td></tr>
+    <tr><td>PDF export / accounts / crawl</td><td>Not yet</td></tr>
+  </table>
+
+  <h2>Stack</h2>
+  <ul>
+    <li>Next.js (React) + TypeScript</li>
+    <li>Playwright (Chrome) + axe-core</li>
+    <li>Postgres or PGlite</li>
+    <li>Optional OpenAI-compatible AI tips</li>
+  </ul>
+
+  <footer>Generated ${date} from docs/screenshots and project README.</footer>
+</body>
+</html>`;
+}
+
+async function main(): Promise<void> {
+  await writeFile(HTML, buildHtml(), "utf8");
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--disable-dev-shm-usage", "--no-sandbox"],
+  });
+  try {
+    const page = await browser.newPage();
+    await page.goto(pathToFileURL(HTML).href, {
+      waitUntil: "load",
+      timeout: 60_000,
+    });
+    await page.waitForTimeout(500);
+    await page.pdf({
+      path: OUT,
+      format: "A4",
+      printBackground: true,
+      margin: { top: "14mm", bottom: "14mm", left: "12mm", right: "12mm" },
+    });
+    console.log("Wrote", OUT);
+  } finally {
+    await browser.close();
+  }
+}
+
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});

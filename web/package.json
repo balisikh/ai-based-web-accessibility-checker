@@ -17,6 +17,7 @@
     "smoke:scan": "tsx scripts/smoke-scan.ts https://example.com",
     "test:responsive": "tsx scripts/responsive-viewport-check.ts",
     "screenshots": "tsx scripts/capture-screenshots.ts",
+    "docs:pdf": "node --max-old-space-size=4096 ./node_modules/tsx/dist/cli.mjs scripts/export-portfolio-pdf.ts",
     "ci": "npm run lint && npm run validate:copy && npm run validate:batch && npm run build"
   },
   "dependencies": {
