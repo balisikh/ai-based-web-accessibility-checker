@@ -113,7 +113,7 @@ In-app copy (do not duplicate here):
 | Section | Source |
 |---------|--------|
 | **How to use Lumen** (5 steps) | [`web/src/lib/how-to-use.ts`](./web/src/lib/how-to-use.ts) |
-| **Common questions** (8 FAQs) | [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts) |
+| **Common questions** (10 FAQs) | [`web/src/lib/home-faqs.ts`](./web/src/lib/home-faqs.ts) |
 | Shared labels, Pass/Fail rule, disclaimers | [`web/src/lib/product-copy.ts`](./web/src/lib/product-copy.ts) |
 
 Run locally: `cd web && npm run dev` → [http://localhost:4376](http://localhost:4376). CI runs `npm run validate:copy` to keep README free of duplicated step/FAQ text.

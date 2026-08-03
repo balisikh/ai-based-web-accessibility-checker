@@ -16,7 +16,7 @@ export type HomeFaq = {
 
 /**
  * Common questions on the home page (collapsed details).
- * Order: URLs → limits → score → live vs batch → export → AI → failures → data.
+ * Order: URLs → limits → score → live vs batch → export → AI → failures → data → free → author.
  */
 export const HOME_FAQS: HomeFaq[] = [
   {
@@ -90,6 +90,24 @@ export const HOME_FAQS: HomeFaq[] = [
       "Each scan stores the URL, findings, and score in the app database (Postgres in production, or local PGlite under web/data/). There are no user accounts in the MVP.",
       "Data is used to show your results and Export JSON. Do not paste secrets into URLs — query tokens in links may be stored.",
       "Retention is not automated in the MVP. See web/DEPLOY.md for backup and database notes on hosted environments.",
+    ],
+  },
+  {
+    id: "is-free",
+    summary: "Is this free?",
+    paragraphs: [
+      "Yes — Lumen is free to use in this MVP: no sign-up, no payment, and no subscription. Paste a public URL and run a scan.",
+      "Scans are rate-limited per IP (see Why did my scan fail or say rate limited?) so the service stays fair on shared hosts. There is no paid tier or commercial support SLA in this version.",
+      "Optional AI tips use an API key on the server you use (local or deployed) — that cost is borne by whoever runs Lumen, not by visitors running scans.",
+    ],
+  },
+  {
+    id: "who-built",
+    summary: "Who built this?",
+    paragraphs: [
+      "Lumen is an AI-based web accessibility checker built as a portfolio project by Baljinder Sikh (GitHub: balisikh).",
+      "Stack: Next.js, Playwright, axe-core, optional OpenAI-compatible AI tips, and a 28-site batch evaluation snapshot documented in TEST_RESULTS.md.",
+      "Source, docs, and issues: https://github.com/balisikh/ai-based-web-accessibility-checker",
     ],
   },
 ];
