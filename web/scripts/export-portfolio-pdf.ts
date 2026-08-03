@@ -12,17 +12,33 @@ const DOCS = path.join(ROOT, "docs");
 const HTML = path.join(DOCS, "Lumen-Portfolio-Documentation.html");
 const OUT = path.join(DOCS, "Lumen-Portfolio-Documentation.pdf");
 
-const SHOTS = [
-  { title: "Home — accessibility checker", file: "screenshots/home-desktop.png" },
-  { title: "Batch results — 28 sites", file: "screenshots/batch-desktop.png" },
-  { title: "Results — sample layout", file: "screenshots/results-desktop.png" },
-  { title: "Mobile home (390px)", file: "screenshots/home-mobile.png" },
+const SHOTS: { title: string; file: string; className: string }[] = [
+  {
+    title: "Home — accessibility checker",
+    file: "screenshots/pdf/home-desktop.png",
+    className: "shot-desktop",
+  },
+  {
+    title: "Batch results — 28 sites (overview)",
+    file: "screenshots/pdf/batch-desktop.png",
+    className: "shot-desktop",
+  },
+  {
+    title: "Results — sample layout",
+    file: "screenshots/pdf/results-desktop.png",
+    className: "shot-desktop",
+  },
+  {
+    title: "Mobile home (390px)",
+    file: "screenshots/pdf/home-mobile.png",
+    className: "shot-mobile",
+  },
 ];
 
 function buildHtml(): string {
   const figures = SHOTS.map(
     (shot) =>
-      `<figure><figcaption>${shot.title}</figcaption><img src="${shot.file}" alt="${shot.title}" /></figure>`,
+      `<figure class="${shot.className}"><figcaption>${shot.title}</figcaption><img src="${shot.file}" alt="${shot.title}" /></figure>`,
   ).join("\n");
 
   const date = new Date().toISOString().slice(0, 10);
@@ -33,7 +49,7 @@ function buildHtml(): string {
   <meta charset="utf-8" />
   <title>Lumen — Portfolio Documentation</title>
   <style>
-    body { font-family: "Segoe UI", system-ui, sans-serif; color: #14221f; line-height: 1.5; max-width: 780px; margin: 0 auto; padding: 1.5rem; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; color: #14221f; line-height: 1.5; max-width: 920px; margin: 0 auto; padding: 1.5rem; }
     h1 { color: #083f44; font-size: 1.65rem; margin-bottom: 0.25rem; }
     h2 { color: #083f44; font-size: 1.1rem; margin-top: 1.5rem; border-bottom: 2px solid rgba(13,92,99,.15); padding-bottom: 0.3rem; }
     .subtitle { color: #3d524c; margin-top: 0; }
@@ -41,9 +57,11 @@ function buildHtml(): string {
     table { border-collapse: collapse; width: 100%; margin: 0.65rem 0; font-size: 0.85rem; }
     th, td { border: 1px solid rgba(20,34,31,.12); padding: 0.4rem 0.55rem; text-align: left; }
     th { background: rgba(13,92,99,.08); }
-    figure { margin: 1rem 0; page-break-inside: avoid; }
-    figcaption { font-weight: 600; margin-bottom: 0.3rem; color: #083f44; font-size: 0.9rem; }
-    img { display: block; width: 100%; max-height: 520px; object-fit: contain; object-position: top left; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
+    figure { margin: 1.25rem 0 1.75rem; page-break-inside: avoid; }
+    figcaption { font-weight: 600; margin-bottom: 0.45rem; color: #083f44; font-size: 0.95rem; }
+    figure img { display: block; width: 100%; height: auto; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
+    figure.shot-mobile { text-align: center; max-width: 420px; margin-left: auto; margin-right: auto; }
+    figure.shot-mobile img { width: 100%; }
     ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }
     footer { margin-top: 1.5rem; font-size: 0.75rem; color: #3d524c; }
     .incident { background: #fff7f0; border: 1px solid rgba(232,93,4,.25); border-radius: 8px; padding: 0.75rem 0.9rem; margin: 0.85rem 0; font-size: 0.86rem; }
@@ -142,7 +160,7 @@ async function main(): Promise<void> {
       path: OUT,
       format: "A4",
       printBackground: true,
-      margin: { top: "14mm", bottom: "14mm", left: "12mm", right: "12mm" },
+      margin: { top: "10mm", bottom: "10mm", left: "8mm", right: "8mm" },
     });
     console.log("Wrote", OUT);
   } finally {
