@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Low-RAM machines: use 1 worker for static generation (avoids build OOM).
+  experimental: {
+    cpus: 1,
+  },
   serverExternalPackages: [
     "playwright",
     "playwright-core",

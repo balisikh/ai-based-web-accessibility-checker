@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4376",
+    "dev:low-mem": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev -p 4376 --webpack",
     "build": "next build",
+    "build:low-mem": "node --max-old-space-size=8192 ./node_modules/next/dist/bin/next build",
     "start": "next start -p 4376",
+    "start:low-mem": "node --max-old-space-size=2048 ./node_modules/next/dist/bin/next start -p 4376",
     "lint": "eslint",
     "validate:batch": "tsx scripts/validate-batch-snapshot.ts",
     "validate:copy": "tsx scripts/validate-product-copy.ts",
