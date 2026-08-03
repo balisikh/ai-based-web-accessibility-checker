@@ -7,13 +7,45 @@ For the project overview and quick start, see the [root README](../README.md).
 ## Scripts
 
 ```bash
-npm run dev    # local development → http://localhost:4376
-npm run build  # production build
+npm run dev    # local development → http://localhost:4376 (webpack — see troubleshooting)
+npm run build  # production build (webpack)
 npm run start  # run production server
 npm run lint   # eslint
 npm run ci     # lint + validate:batch + build
 npm run test:responsive   # needs npm run start in another terminal
 ```
+
+**Windows (low RAM):** `.\scripts\start-local.ps1` — builds once if needed, then `start:low-mem`.  
+**Plain white text / no layout?** `.\scripts\fix-styles.ps1` — stops stale server, deletes broken `.next`, rebuilds, restarts.
+
+## Troubleshooting: page looks like plain text (no colours / layout)
+
+The HTML is fine; **CSS did not compile or load**. Common on low-memory Windows machines.
+
+**Cause:** Next.js 16 defaults to **Turbopack**, which can crash while processing `src/app/globals.css` (~2.4k lines + Tailwind v4). The server may still respond with unstyled HTML (`LLumenCheckerBatch results…`).
+
+**Fix:**
+
+1. Stop any old server (Ctrl+C in the terminal).
+2. Delete a broken build if present: remove the `web/.next` folder.
+3. Start with **webpack** (all `dev` / `build` scripts in this repo now pass `--webpack`):
+
+```powershell
+cd web
+npm run build:low-mem
+npm run start:low-mem
+```
+
+Or for development:
+
+```powershell
+npm run dev
+```
+
+4. Open **http://localhost:4376** (not `https`) and hard-refresh (**Ctrl+F5**).
+5. In DevTools → **Network**, reload — you should see a `.css` file with status **200**. If it is red/404, the build failed; close other apps and rebuild.
+
+**Do not** open `docs/Lumen-Portfolio-Documentation.html` or `.md` in the browser expecting the live app — use localhost for the styled UI.
 
 Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
