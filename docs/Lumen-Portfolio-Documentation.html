@@ -17,6 +17,7 @@
     img { display: block; width: 100%; max-height: 520px; object-fit: contain; object-position: top left; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
     ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }
     footer { margin-top: 1.5rem; font-size: 0.75rem; color: #3d524c; }
+    .incident { background: #fff7f0; border: 1px solid rgba(232,93,4,.25); border-radius: 8px; padding: 0.75rem 0.9rem; margin: 0.85rem 0; font-size: 0.86rem; }
   </style>
 </head>
 <body>
@@ -77,6 +78,20 @@
     <li>Postgres or PGlite</li>
     <li>Optional OpenAI-compatible AI tips</li>
   </ul>
+
+  <h2>Local development note — plain-text UI incident (Aug 2026)</h2>
+  <div class="incident">
+    <p>During local testing the app briefly showed <strong>unstyled plain text</strong> (e.g. nav labels run together). The design was not removed — <strong>CSS failed to load</strong>.</p>
+  </div>
+  <p><strong>Symptom:</strong> White page, black text; HTML OK but stylesheet returned <strong>500</strong> from a stale/corrupt <code>.next</code> build on port 4376.</p>
+  <p><strong>Cause:</strong> On low-memory Windows, Turbopack could crash compiling <code>globals.css</code>, leaving a broken build that still served HTML.</p>
+  <p><strong>Fix (commit 541ec96):</strong></p>
+  <ul>
+    <li><code>dev</code> / <code>build</code> default to <strong>webpack</strong></li>
+    <li><code>web/scripts/fix-styles.ps1</code> — stop server, delete <code>.next</code>, rebuild, restart</li>
+    <li>Troubleshooting in <code>web/README.md</code> — confirm CSS status <strong>200</strong> in DevTools → Network</li>
+  </ul>
+  <p><strong>Resolution:</strong> After clean rebuild, UI matched screenshots again (header, gradient, card, batch table). Images in this PDF show the intended layout.</p>
 
   <footer>Generated 2026-08-03 from docs/screenshots and project README.</footer>
 </body>

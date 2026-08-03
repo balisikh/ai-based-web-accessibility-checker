@@ -126,6 +126,41 @@ npm run build:low-mem
 npm run start:low-mem
 ```
 
+Or if the page shows **plain white text** (no colours or layout):
+
+```powershell
+cd web
+.\scripts\fix-styles.ps1
+```
+
+---
+
+## Local development note — plain-text UI incident (Aug 2026)
+
+During local testing, the app briefly appeared as **unstyled plain text** (e.g. `LLumenCheckerBatch results…` run together). The design and CSS in the repo were **not removed** — styles failed to load at runtime.
+
+### What happened
+
+| Symptom | Cause |
+|---------|--------|
+| White page, black plain text | HTML loaded but **CSS did not** |
+| Nav labels run together | No spacing/styles from `globals.css` |
+| Looked like “84 passed” in overview | Numbers ran together when copied without layout |
+
+The browser requested a CSS file (e.g. `/_next/static/css/….css`) but the file returned **500 Internal Server Error** — often from a **stale or corrupt `.next` build** still running on port 4376.
+
+On **low-memory Windows**, Next.js 16 **Turbopack** could also crash while compiling `globals.css` (~2.4k lines + Tailwind v4), leaving a broken build that still served HTML.
+
+### What we fixed (commit `541ec96`)
+
+1. **`dev` and `build` default to webpack** — more stable than Turbopack on low RAM  
+2. **`web/scripts/fix-styles.ps1`** — stops old server, deletes `.next`, rebuilds, restarts  
+3. **Troubleshooting docs** in `web/README.md` — how to confirm CSS returns **200** in DevTools → Network  
+
+### Resolution
+
+After a clean rebuild and fresh server, the UI matched the screenshots again: sticky header, gradient background, white card with teal strip, overview tiles, and batch table. Screenshots in this document show the **intended styled layout**.
+
 ---
 
 ## Disclaimer
