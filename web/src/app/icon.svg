@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Lumen">
+  <defs>
+    <linearGradient id="lumen-mark" x1="8%" y1="8%" x2="92%" y2="92%">
+      <stop offset="0%" stop-color="#083f44" />
+      <stop offset="45%" stop-color="#0d5c63" />
+      <stop offset="100%" stop-color="#0a9396" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#lumen-mark)" />
+  <text
+    x="16"
+    y="22.5"
+    fill="#ffffff"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="18"
+    font-weight="700"
+    text-anchor="middle"
+  >
+    L
+  </text>
+</svg>
