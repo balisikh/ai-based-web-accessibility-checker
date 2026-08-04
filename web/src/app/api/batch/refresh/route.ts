@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
-import { isBatchRefreshEnabled } from "@/lib/batch-refresh-config";
+import {
+  getBatchRefreshRateLimit,
+  isBatchRefreshEnabled,
+} from "@/lib/batch-refresh-config";
+import {
+  clearBatchRefreshJobIfDone,
+  getBatchRefreshJob,
+  isBatchRefreshRunning,
+  runBatchRefreshJob,
+} from "@/lib/batch-refresh-job";
 import { runBatchLiveRescan } from "@/lib/batch-live-rescan";
 import { saveBatchSnapshot } from "@/lib/batch-snapshot-store";
 import {
@@ -9,13 +18,23 @@ import {
 } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
-/** Full batch rescan (~28 sites) can take many minutes on a local server. */
 export const maxDuration = 900;
 
-const globalRefresh = globalThis as typeof globalThis & {
-  __lumenBatchRefreshInFlight?: Promise<void>;
-};
+/** Poll refresh progress (non-blocking). */
+export async function GET() {
+  if (!isBatchRefreshEnabled()) {
+    return NextResponse.json(
+      { error: "Batch refresh is disabled." },
+      { status: 503 },
+    );
+  }
 
+  clearBatchRefreshJobIfDone();
+  const job = getBatchRefreshJob();
+  return NextResponse.json({ job });
+}
+
+/** Start a background batch rescan — returns immediately while work continues. */
 export async function POST(request: Request) {
   if (!isBatchRefreshEnabled()) {
     return NextResponse.json(
@@ -27,12 +46,19 @@ export async function POST(request: Request) {
     );
   }
 
+  if (isBatchRefreshRunning()) {
+    return NextResponse.json(
+      {
+        error: "A batch refresh is already in progress.",
+        job: getBatchRefreshJob(),
+      },
+      { status: 409 },
+    );
+  }
+
   const ip = getClientIp(request);
-  const dev = process.env.NODE_ENV === "development";
-  const rate = checkRateLimitWithOptions(`batch-refresh:${ip}`, {
-    limit: dev ? 3 : 1,
-    windowMs: dev ? 60_000 : 3_600_000,
-  });
+  const rateOpts = getBatchRefreshRateLimit();
+  const rate = checkRateLimitWithOptions(`batch-refresh:${ip}`, rateOpts);
 
   if (!rate.ok) {
     return NextResponse.json(
@@ -44,34 +70,24 @@ export async function POST(request: Request) {
     );
   }
 
-  if (globalRefresh.__lumenBatchRefreshInFlight) {
-    return NextResponse.json(
-      { error: "A batch refresh is already in progress." },
-      { status: 409, headers: rateLimitHeaders(rate) },
-    );
-  }
-
-  const work = (async () => {
+  void runBatchRefreshJob(async () => {
     const snapshot = await runBatchLiveRescan();
     await saveBatchSnapshot(snapshot);
-    return snapshot;
-  })();
-
-  globalRefresh.__lumenBatchRefreshInFlight = work.then(() => undefined);
-  let snapshot;
-  try {
-    snapshot = await work;
-  } finally {
-    globalRefresh.__lumenBatchRefreshInFlight = undefined;
-  }
+    return {
+      date: snapshot.date,
+      meta: snapshot.meta,
+      summary: snapshot.summary,
+    };
+  });
 
   return NextResponse.json(
     {
       ok: true,
-      date: snapshot.date,
-      meta: snapshot.meta,
-      summary: snapshot.summary,
+      started: true,
+      job: getBatchRefreshJob(),
+      message:
+        "Batch rescan started in the background. Poll GET /api/batch/refresh for progress.",
     },
-    { headers: rateLimitHeaders(rate) },
+    { status: 202, headers: rateLimitHeaders(rate) },
   );
 }

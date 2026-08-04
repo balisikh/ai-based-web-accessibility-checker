@@ -62,6 +62,8 @@ There is a **Refresh snapshot** button in the batch page header (next to **Run a
 
 Enabled in `next dev`, or production with `BATCH_REFRESH_ENABLED=1`. Otherwise the button explains that sync comes from git / CI.
 
+Refresh runs as a **background job** (POST returns immediately; the button polls progress). The rest of the app stays usable. Tune speed vs memory with `BATCH_RESCAN_CONCURRENCY` (default 2) and `BATCH_RESCAN_SITE_TIMEOUT_MS` (default 90s per site). Local rate limit defaults to **5 per 10 minutes** when refresh is enabled outside CI (override with `BATCH_REFRESH_RATE_LIMIT_*`).
+
 Read status without rescanning: `GET /api/batch/snapshot` → `{ date, meta, summary, source }`.
 
 ### Manual sync (committed — survives deploys)
