@@ -1,14 +1,15 @@
 /**
- * Build portfolio HTML and save as PDF (uses local screenshot files, not base64).
+ * Build portfolio HTML from Lumen-Portfolio-Documentation.md and save as PDF.
  * Run: npm run docs:pdf
  */
 import { chromium } from "playwright";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(process.cwd(), "..");
 const DOCS = path.join(ROOT, "docs");
+const MD = path.join(DOCS, "Lumen-Portfolio-Documentation.md");
 const HTML = path.join(DOCS, "Lumen-Portfolio-Documentation.html");
 const OUT = path.join(DOCS, "Lumen-Portfolio-Documentation.pdf");
 
@@ -45,117 +46,211 @@ const SHOTS: { title: string; file: string; className: string }[] = [
   },
 ];
 
-function buildHtml(): string {
-  const figures = SHOTS.map(
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function inlineMarkdown(text: string): string {
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+}
+
+function buildScreenshotFigures(): string {
+  return SHOTS.map(
     (shot) =>
-      `<figure class="${shot.className}"><figcaption>${shot.title}</figcaption><img src="${shot.file}" alt="${shot.title}" /></figure>`,
+      `<figure class="${shot.className}"><figcaption>${escapeHtml(shot.title)}</figcaption><img src="${shot.file}" alt="${escapeHtml(shot.title)}" /></figure>`,
   ).join("\n");
+}
 
-  const date = new Date().toISOString().slice(0, 10);
+function isTableRow(line: string): boolean {
+  return line.trimStart().startsWith("|");
+}
 
+function parseTableRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+function isTableSeparator(line: string): boolean {
+  return /^\|[\s\-:|]+\|$/.test(line.trim());
+}
+
+function mdToHtml(md: string): string {
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  const html: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed === "<!-- SCREENSHOTS -->") {
+      html.push(buildScreenshotFigures());
+      i += 1;
+      continue;
+    }
+
+    if (trimmed === "---") {
+      html.push("<hr />");
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("# ")) {
+      html.push(`<h1>${inlineMarkdown(trimmed.slice(2))}</h1>`);
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      html.push(`<h2>${inlineMarkdown(trimmed.slice(3))}</h2>`);
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("> ")) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("> ")) {
+        quoteLines.push(lines[i].trim().slice(2));
+        i += 1;
+      }
+      html.push(
+        `<blockquote class="note">${quoteLines.map((q) => inlineMarkdown(q)).join(" ")}</blockquote>`,
+      );
+      continue;
+    }
+
+    if (isTableRow(trimmed)) {
+      const tableLines: string[] = [];
+      while (i < lines.length && isTableRow(lines[i].trim())) {
+        tableLines.push(lines[i].trim());
+        i += 1;
+      }
+      const dataRows = tableLines.filter((row) => !isTableSeparator(row));
+      if (dataRows.length === 0) continue;
+
+      const headerCells = parseTableRow(dataRows[0]);
+      const bodyRows = dataRows.slice(1);
+      html.push("<table>");
+      html.push("<tr>" + headerCells.map((c) => `<th>${inlineMarkdown(c)}</th>`).join("") + "</tr>");
+      for (const row of bodyRows) {
+        const cells = parseTableRow(row);
+        html.push("<tr>" + cells.map((c) => `<td>${inlineMarkdown(c)}</td>`).join("") + "</tr>");
+      }
+      html.push("</table>");
+      continue;
+    }
+
+    if (trimmed.startsWith("```")) {
+      const codeLines: string[] = [];
+      i += 1;
+      while (i < lines.length && !lines[i].trim().startsWith("```")) {
+        codeLines.push(escapeHtml(lines[i]));
+        i += 1;
+      }
+      i += 1;
+      html.push(`<pre><code>${codeLines.join("\n")}</code></pre>`);
+      continue;
+    }
+
+    if (/^\d+\.\s/.test(trimmed)) {
+      html.push("<ol>");
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+        html.push(`<li>${inlineMarkdown(lines[i].trim().replace(/^\d+\.\s/, ""))}</li>`);
+        i += 1;
+      }
+      html.push("</ol>");
+      continue;
+    }
+
+    if (trimmed.startsWith("- ")) {
+      html.push("<ul>");
+      while (i < lines.length && lines[i].trim().startsWith("- ")) {
+        html.push(`<li>${inlineMarkdown(lines[i].trim().slice(2))}</li>`);
+        i += 1;
+      }
+      html.push("</ul>");
+      continue;
+    }
+
+    if (trimmed === "") {
+      i += 1;
+      continue;
+    }
+
+    if (trimmed.startsWith("*") && trimmed.endsWith("*")) {
+      html.push(`<p class="footer-note">${inlineMarkdown(trimmed.slice(1, -1))}</p>`);
+      i += 1;
+      continue;
+    }
+
+    html.push(`<p>${inlineMarkdown(trimmed)}</p>`);
+    i += 1;
+  }
+
+  return html.join("\n");
+}
+
+function buildHtml(body: string): string {
   return `<!DOCTYPE html>
 <html lang="en-GB">
 <head>
   <meta charset="utf-8" />
   <title>Lumen — Portfolio Documentation</title>
   <style>
-    body { font-family: "Segoe UI", system-ui, sans-serif; color: #14221f; line-height: 1.5; max-width: 920px; margin: 0 auto; padding: 1.5rem; }
-    h1 { color: #083f44; font-size: 1.65rem; margin-bottom: 0.25rem; }
-    h2 { color: #083f44; font-size: 1.1rem; margin-top: 1.5rem; border-bottom: 2px solid rgba(13,92,99,.15); padding-bottom: 0.3rem; }
-    .subtitle { color: #3d524c; margin-top: 0; }
-    .note { background: #f3f7f5; border-left: 4px solid #e85d04; padding: 0.65rem 0.9rem; margin: 0.85rem 0; font-size: 0.88rem; }
-    table { border-collapse: collapse; width: 100%; margin: 0.65rem 0; font-size: 0.85rem; }
-    th, td { border: 1px solid rgba(20,34,31,.12); padding: 0.4rem 0.55rem; text-align: left; }
+    @page { margin: 10mm 8mm; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; color: #14221f; line-height: 1.45; max-width: 920px; margin: 0 auto; padding: 1rem 1.25rem; font-size: 10.5pt; }
+    h1 { color: #083f44; font-size: 1.55rem; margin-bottom: 0.2rem; page-break-after: avoid; }
+    h2 { color: #083f44; font-size: 1.05rem; margin-top: 1.1rem; border-bottom: 2px solid rgba(13,92,99,.15); padding-bottom: 0.25rem; page-break-after: avoid; }
+    h3 { color: #0d5c63; font-size: 0.95rem; margin-top: 0.85rem; page-break-after: avoid; }
+    p { margin: 0.4rem 0; font-size: 0.88rem; }
+    .note { background: #f3f7f5; border-left: 4px solid #e85d04; padding: 0.55rem 0.75rem; margin: 0.65rem 0; font-size: 0.85rem; }
+    .footer-note { font-size: 0.75rem; color: #3d524c; margin-top: 1rem; }
+    table { border-collapse: collapse; width: 100%; margin: 0.45rem 0 0.65rem; font-size: 0.8rem; page-break-inside: avoid; }
+    th, td { border: 1px solid rgba(20,34,31,.12); padding: 0.3rem 0.45rem; text-align: left; vertical-align: top; }
     th { background: rgba(13,92,99,.08); }
-    figure { margin: 1.25rem 0 1.75rem; page-break-inside: avoid; }
-    figcaption { font-weight: 600; margin-bottom: 0.45rem; color: #083f44; font-size: 0.95rem; }
+    td:first-child { font-weight: 600; width: 22%; color: #083f44; }
+    figure { margin: 0.85rem 0 1.1rem; page-break-inside: avoid; }
+    figcaption { font-weight: 600; margin-bottom: 0.35rem; color: #083f44; font-size: 0.88rem; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
-    figure.shot-tall { page-break-before: auto; }
-    figure.shot-tall img { max-height: none; }
-    figure.shot-mobile { text-align: center; max-width: 420px; margin-left: auto; margin-right: auto; }
-    figure.shot-mobile img { width: 100%; }
-    ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }
-    footer { margin-top: 1.5rem; font-size: 0.75rem; color: #3d524c; }
-    .incident { background: #fff7f0; border: 1px solid rgba(232,93,4,.25); border-radius: 8px; padding: 0.75rem 0.9rem; margin: 0.85rem 0; font-size: 0.86rem; }
+    figure.shot-mobile { max-width: 380px; margin-left: auto; margin-right: auto; }
+    pre { background: #f3f7f5; border: 1px solid rgba(20,34,31,.1); border-radius: 6px; padding: 0.5rem 0.65rem; font-size: 0.78rem; overflow-x: auto; page-break-inside: avoid; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.82em; background: rgba(13,92,99,.06); padding: 0.05rem 0.25rem; border-radius: 3px; }
+    pre code { background: none; padding: 0; }
+    ul, ol { padding-left: 1.15rem; font-size: 0.85rem; margin: 0.35rem 0; }
+    li { margin: 0.15rem 0; }
+    hr { border: none; border-top: 1px solid rgba(20,34,31,.12); margin: 0.75rem 0; }
+    blockquote.note { margin: 0.65rem 0; }
+    h2, h3 { break-after: avoid; }
+    table, figure, pre { break-inside: avoid; }
   </style>
 </head>
 <body>
-  <h1>Lumen — Portfolio Documentation</h1>
-  <p class="subtitle">AI-Based Web Accessibility Checker</p>
-  <p>Repository: github.com/balisikh/ai-based-web-accessibility-checker · Local: http://localhost:4376</p>
-  <div class="note">Assistive findings only — not a legal accessibility certificate or formal conformance audit.</div>
-
-  <h2>Overview</h2>
-  <p>Lumen scans a public URL with Playwright + axe-core, returns a score, severities, rule help, optional AI tips, and JSON export.</p>
-  <ol>
-    <li>Paste a public website URL</li>
-    <li>Headless Chrome renders the page</li>
-    <li>axe-core checks WCAG A/AA-oriented rules</li>
-    <li>Score, severities, and issue details</li>
-    <li>Optional AI tips; JSON export</li>
-  </ol>
-
-  <h2>UI screenshots</h2>
-  ${figures}
-
-  <h2>Layout (light mode)</h2>
-  <ul>
-    <li><strong>Header:</strong> Lumen logo, Checker / Batch results, Light / Dark / System</li>
-    <li><strong>Background:</strong> Soft grey gradient + grid pattern</li>
-    <li><strong>Card:</strong> White panel with teal gradient strip on top</li>
-    <li><strong>Home CTA:</strong> Orange Check accessibility button</li>
-    <li><strong>Batch CTA:</strong> Teal Run a live scan button</li>
-  </ul>
-
-  <h2>Batch snapshot (2026-07-30)</h2>
-  <table>
-    <tr><th>Metric</th><th>Value</th></tr>
-    <tr><td>Websites tested</td><td>28</td></tr>
-    <tr><td>Passed</td><td>8 (4 clean · 4 with issues)</td></tr>
-    <tr><td>Failed</td><td>20</td></tr>
-    <tr><td>Total issues</td><td>374</td></tr>
-  </table>
-  <p><strong>Pass rule:</strong> Score ≥ 85 and Critical = 0.</p>
-  <p><strong>Passed sites:</strong> Google UK, BBC iPlayer, BBC News, Disney+ UK, GitHub (balisikh), Google Maps, Wikipedia, example.com</p>
-
-  <h2>MVP features</h2>
-  <table>
-    <tr><th>Area</th><th>Status</th></tr>
-    <tr><td>Scan UI, Playwright + axe</td><td>Done</td></tr>
-    <tr><td>Rate limiting, persistence, JSON export</td><td>Done</td></tr>
-    <tr><td>Optional AI tips, anonymous use</td><td>Done</td></tr>
-    <tr><td>PDF export / accounts / crawl</td><td>Not yet</td></tr>
-  </table>
-
-  <h2>Stack</h2>
-  <ul>
-    <li>Next.js (React) + TypeScript</li>
-    <li>Playwright (Chrome) + axe-core</li>
-    <li>Postgres or PGlite</li>
-    <li>Optional OpenAI-compatible AI tips</li>
-  </ul>
-
-  <h2>Local development note — plain-text UI incident (Aug 2026)</h2>
-  <div class="incident">
-    <p>During local testing the app briefly showed <strong>unstyled plain text</strong> (e.g. nav labels run together). The design was not removed — <strong>CSS failed to load</strong>.</p>
-  </div>
-  <p><strong>Symptom:</strong> White page, black text; HTML OK but stylesheet returned <strong>500</strong> from a stale/corrupt <code>.next</code> build on port 4376.</p>
-  <p><strong>Cause:</strong> On low-memory Windows, Turbopack could crash compiling <code>globals.css</code>, leaving a broken build that still served HTML.</p>
-  <p><strong>Fix (commit 541ec96):</strong></p>
-  <ul>
-    <li><code>dev</code> / <code>build</code> default to <strong>webpack</strong></li>
-    <li><code>web/scripts/fix-styles.ps1</code> — stop server, delete <code>.next</code>, rebuild, restart</li>
-    <li>Troubleshooting in <code>web/README.md</code> — confirm CSS status <strong>200</strong> in DevTools → Network</li>
-  </ul>
-  <p><strong>Resolution:</strong> After clean rebuild, UI matched screenshots again (header, gradient, card, batch table). Images in this PDF show the intended layout.</p>
-
-  <footer>Generated ${date} from docs/screenshots and project README.</footer>
+${body}
 </body>
 </html>`;
 }
 
 async function main(): Promise<void> {
-  await writeFile(HTML, buildHtml(), "utf8");
+  const md = await readFile(MD, "utf8");
+  const body = mdToHtml(md);
+  const html = buildHtml(body);
+  await writeFile(HTML, html, "utf8");
 
   const browser = await chromium.launch({
     headless: true,
@@ -167,7 +262,7 @@ async function main(): Promise<void> {
       waitUntil: "load",
       timeout: 60_000,
     });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(800);
     await page.pdf({
       path: OUT,
       format: "A4",
@@ -175,6 +270,7 @@ async function main(): Promise<void> {
       margin: { top: "10mm", bottom: "10mm", left: "8mm", right: "8mm" },
     });
     console.log("Wrote", OUT);
+    console.log("Wrote", HTML);
   } finally {
     await browser.close();
   }
