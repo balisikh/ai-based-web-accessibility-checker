@@ -16,7 +16,7 @@ npm run typecheck:scripts   # TypeScript for scripts/ only (also run in GitHub C
 npm run test:responsive   # needs npm run start in another terminal
 ```
 
-**CI vs app build:** `npm run build` typechecks `src/` only (`scripts/` is excluded from the main `tsconfig.json`). Maintenance scripts are checked separately via `npm run typecheck:scripts` — same split as GitHub Actions.
+**CI vs app build:** `npm run build` typechecks `src/` only (`scripts/` is excluded from the main `tsconfig.json`). Maintenance scripts are checked separately via `npm run typecheck:scripts` (uses `tsconfig.scripts.json`, including DOM types for Playwright browser callbacks and shared `src/lib` imports) — same split as GitHub Actions.
 
 **Windows (low RAM):** `.\scripts\start-local.ps1` — builds once if needed, then `start:low-mem`.  
 **Plain white text / no layout?** `.\scripts\fix-styles.ps1` — stops stale server, deletes broken `.next`, rebuilds, restarts.
