@@ -49,6 +49,30 @@ npm run dev
 
 Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
+## Updating the batch snapshot (latest live rescan date)
+
+The `/batch` page is **static** for speed. The date and scores come from [`website-batch-results.ts`](./src/lib/website-batch-results.ts), updated after a **full live rescan** of all 28 sites.
+
+```powershell
+cd web
+# Chrome required; takes several minutes
+npm run batch:sync
+```
+
+This runs: **rescan all 28 URLs** → **write snapshot + `BATCH_SNAPSHOT_DATE`** → **validate**.
+
+Or step by step:
+
+```powershell
+npm run batch:rescan          # → batch-rescan-report.json
+npm run batch:apply-rescan    # → website-batch-results.ts (date + scores)
+npm run validate:batch
+```
+
+Then update [`TEST_RESULTS.md`](../TEST_RESULTS.md) in the repo root if you keep that log in sync, rebuild, and commit.
+
+The batch page shows: **Last full live resync `{date}` (`27/28 sites scanned live · 1 kept prior snapshot`)** when some URLs fail (e.g. bot shells).
+
 User-facing copy lives in `src/lib/` — [`product-copy.ts`](./src/lib/product-copy.ts), [`how-to-use.ts`](./src/lib/how-to-use.ts), [`home-faqs.ts`](./src/lib/home-faqs.ts). README points there; `npm run validate:copy` enforces no duplication.
 
 ## Responsive layout

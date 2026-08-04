@@ -36,10 +36,16 @@ export type RateLimitResult =
  * Defaults: 5/min in production, 60/min in development.
  * Override with RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS.
  */
-export function checkRateLimit(key: string): RateLimitResult {
-  const defaultMax = process.env.NODE_ENV === "development" ? 120 : 5;
-  const limit = envInt("RATE_LIMIT_MAX", defaultMax);
-  const windowMs = envInt("RATE_LIMIT_WINDOW_MS", 60_000);
+export type RateLimitOptions = {
+  limit: number;
+  windowMs: number;
+};
+
+function checkRateLimitBucket(
+  key: string,
+  limit: number,
+  windowMs: number,
+): RateLimitResult {
   const now = Date.now();
   const buckets = getBuckets();
   const existing = buckets.get(key);
@@ -68,6 +74,20 @@ export function checkRateLimit(key: string): RateLimitResult {
     limit,
     resetAt: existing.resetAt,
   };
+}
+
+export function checkRateLimitWithOptions(
+  key: string,
+  options: RateLimitOptions,
+): RateLimitResult {
+  return checkRateLimitBucket(key, options.limit, options.windowMs);
+}
+
+export function checkRateLimit(key: string): RateLimitResult {
+  const defaultMax = process.env.NODE_ENV === "development" ? 120 : 5;
+  const limit = envInt("RATE_LIMIT_MAX", defaultMax);
+  const windowMs = envInt("RATE_LIMIT_WINDOW_MS", 60_000);
+  return checkRateLimitBucket(key, limit, windowMs);
 }
 
 export function getClientIp(request: Request): string {

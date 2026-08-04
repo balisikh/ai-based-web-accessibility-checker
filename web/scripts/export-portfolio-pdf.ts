@@ -14,14 +14,24 @@ const OUT = path.join(DOCS, "Lumen-Portfolio-Documentation.pdf");
 
 const SHOTS: { title: string; file: string; className: string }[] = [
   {
-    title: "Home — accessibility checker",
+    title: "Home — accessibility checker (hero)",
     file: "screenshots/pdf/home-desktop.png",
+    className: "shot-desktop",
+  },
+  {
+    title: "Home — complete page (how-to, rules & FAQ)",
+    file: "screenshots/pdf/home-desktop-complete.png",
     className: "shot-desktop",
   },
   {
     title: "Batch results — 28 sites (overview)",
     file: "screenshots/pdf/batch-desktop.png",
     className: "shot-desktop",
+  },
+  {
+    title: "Batch results — complete page (website table)",
+    file: "screenshots/pdf/batch-desktop-complete.png",
+    className: "shot-desktop shot-tall",
   },
   {
     title: "Results — sample layout",
@@ -60,6 +70,8 @@ function buildHtml(): string {
     figure { margin: 1.25rem 0 1.75rem; page-break-inside: avoid; }
     figcaption { font-weight: 600; margin-bottom: 0.45rem; color: #083f44; font-size: 0.95rem; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
+    figure.shot-tall { page-break-before: auto; }
+    figure.shot-tall img { max-height: none; }
     figure.shot-mobile { text-align: center; max-width: 420px; margin-left: auto; margin-right: auto; }
     figure.shot-mobile img { width: 100%; }
     ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }

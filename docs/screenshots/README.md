@@ -17,8 +17,10 @@ Portfolio PDF uses **top crops** so images are large and fit ~1 page each (not t
 
 | File | Source | Crop (top) |
 |------|--------|------------|
-| `pdf/home-desktop.png` | `home-desktop.png` | 1280×920 |
+| `pdf/home-desktop.png` | `home-desktop.png` | 1280×920 (hero) |
+| `pdf/home-desktop-complete.png` | `home-desktop.png` | 1280×1320 from 780px (how-to, rules, FAQ) |
 | `pdf/batch-desktop.png` | `batch-desktop.png` | 1280×1180 (header + overview + severity) |
+| `pdf/batch-desktop-complete.png` | `batch-desktop.png` | 1280×2200 from 1180px (website table) |
 | `pdf/results-desktop.png` | `results-desktop.png` | 1280×900 |
 | `pdf/home-mobile.png` | `home-mobile.png` | 390×780 |
 

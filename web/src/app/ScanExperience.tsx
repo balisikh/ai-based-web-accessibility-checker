@@ -28,6 +28,7 @@ import {
 import {
   BATCH_SNAPSHOT_DATE,
   WEBSITE_BATCH_SUMMARY,
+  batchResyncDetail,
 } from "@/lib/website-batch-results";
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
@@ -436,7 +437,7 @@ export function ScanExperience() {
                 </p>
                 <p className="hero-stat-meta">
                   {WEBSITE_BATCH_SUMMARY.totalIssues} issues · resync{" "}
-                  {BATCH_SNAPSHOT_DATE}
+                  {BATCH_SNAPSHOT_DATE} ({batchResyncDetail()})
                 </p>
                 <Link href="/batch" className="hero-stat-link">
                   Open batch dashboard →

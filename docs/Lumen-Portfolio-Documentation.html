@@ -15,6 +15,8 @@
     figure { margin: 1.25rem 0 1.75rem; page-break-inside: avoid; }
     figcaption { font-weight: 600; margin-bottom: 0.45rem; color: #083f44; font-size: 0.95rem; }
     figure img { display: block; width: 100%; height: auto; border: 1px solid rgba(20,34,31,.12); border-radius: 6px; }
+    figure.shot-tall { page-break-before: auto; }
+    figure.shot-tall img { max-height: none; }
     figure.shot-mobile { text-align: center; max-width: 420px; margin-left: auto; margin-right: auto; }
     figure.shot-mobile img { width: 100%; }
     ul, ol { padding-left: 1.2rem; font-size: 0.9rem; }
@@ -39,8 +41,10 @@
   </ol>
 
   <h2>UI screenshots</h2>
-  <figure class="shot-desktop"><figcaption>Home — accessibility checker</figcaption><img src="screenshots/pdf/home-desktop.png" alt="Home — accessibility checker" /></figure>
+  <figure class="shot-desktop"><figcaption>Home — accessibility checker (hero)</figcaption><img src="screenshots/pdf/home-desktop.png" alt="Home — accessibility checker (hero)" /></figure>
+<figure class="shot-desktop"><figcaption>Home — complete page (how-to, rules & FAQ)</figcaption><img src="screenshots/pdf/home-desktop-complete.png" alt="Home — complete page (how-to, rules & FAQ)" /></figure>
 <figure class="shot-desktop"><figcaption>Batch results — 28 sites (overview)</figcaption><img src="screenshots/pdf/batch-desktop.png" alt="Batch results — 28 sites (overview)" /></figure>
+<figure class="shot-desktop shot-tall"><figcaption>Batch results — complete page (website table)</figcaption><img src="screenshots/pdf/batch-desktop-complete.png" alt="Batch results — complete page (website table)" /></figure>
 <figure class="shot-desktop"><figcaption>Results — sample layout</figcaption><img src="screenshots/pdf/results-desktop.png" alt="Results — sample layout" /></figure>
 <figure class="shot-mobile"><figcaption>Mobile home (390px)</figcaption><img src="screenshots/pdf/home-mobile.png" alt="Mobile home (390px)" /></figure>
 
@@ -95,6 +99,6 @@
   </ul>
   <p><strong>Resolution:</strong> After clean rebuild, UI matched screenshots again (header, gradient, card, batch table). Images in this PDF show the intended layout.</p>
 
-  <footer>Generated 2026-08-03 from docs/screenshots and project README.</footer>
+  <footer>Generated 2026-08-04 from docs/screenshots and project README.</footer>
 </body>
 </html>

@@ -18,6 +18,23 @@ export type WebsiteBatchResult = {
 
 export const BATCH_SNAPSHOT_DATE = "2026-07-30";
 
+/** Last full live rescan stats (from batch-rescan-report.json via batch:apply-rescan). */
+export const BATCH_SNAPSHOT_META = {
+  date: BATCH_SNAPSHOT_DATE,
+  rescannedOk: 27,
+  rescannedFailed: 1,
+  total: 28,
+} as const;
+
+/** Human-readable resync coverage for batch page and home sidebar. */
+export function batchResyncDetail(): string {
+  const { rescannedOk, total, rescannedFailed } = BATCH_SNAPSHOT_META;
+  if (rescannedFailed === 0) {
+    return `all ${total} sites scanned live`;
+  }
+  return `${rescannedOk}/${total} sites scanned live · ${rescannedFailed} kept prior snapshot`;
+}
+
 export const WEBSITE_BATCH_RESULTS: WebsiteBatchResult[] = [
   { id: 1, name: "Google UK", url: "https://www.google.co.uk/", score: 100, critical: 0, serious: 0, moderate: 0, minor: 0, totalIssues: 0, date: "2026-07-30" },
   { id: 2, name: "YouTube", url: "https://www.youtube.com/", score: 0, critical: 4, serious: 0, moderate: 0, minor: 0, totalIssues: 4, date: "2026-07-30" },

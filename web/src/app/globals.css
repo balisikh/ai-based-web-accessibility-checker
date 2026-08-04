@@ -45,6 +45,7 @@
   --gutter-tablet: 1.25rem;
   --gutter-laptop: 2rem;
   --gutter-desktop: 2.5rem;
+  --batch-head-cta-ink: #ffffff;
 }
 
 html[data-theme="dark"] {
@@ -78,6 +79,7 @@ html[data-theme="dark"] {
   --batch-table-head: rgba(45, 212, 191, 0.12);
   --batch-guidance-surface: rgba(22, 32, 30, 0.98);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --batch-head-cta-ink: #0c1211;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -112,6 +114,7 @@ html[data-theme="dark"] {
     --batch-table-head: rgba(45, 212, 191, 0.12);
     --batch-guidance-surface: rgba(22, 32, 30, 0.98);
     --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    --batch-head-cta-ink: #0c1211;
   }
 }
 
@@ -1812,13 +1815,88 @@ pre {
   align-self: start;
   white-space: nowrap;
   background: var(--brand);
-  color: #fff;
+  color: var(--batch-head-cta-ink);
   border: 0;
+  border-radius: 14px;
+  padding: 0.95rem 1.2rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  transition: background 160ms ease, color 160ms ease;
 }
 
 .batch-head-cta:hover {
   background: var(--brand-deep);
-  color: #fff;
+  color: var(--batch-head-cta-ink);
+}
+
+.batch-head-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-self: start;
+  min-width: min(100%, 14rem);
+}
+
+.batch-refresh-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.batch-refresh-btn {
+  align-self: stretch;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--brand);
+  border: 2px solid var(--brand);
+  border-radius: 14px;
+  padding: 0.85rem 1.1rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.batch-refresh-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+
+.batch-refresh-btn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.batch-refresh-status {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.batch-refresh-status-loading {
+  color: var(--brand-deep);
+}
+
+.batch-refresh-status-done {
+  color: var(--brand);
+}
+
+.batch-refresh-status-error {
+  color: var(--accent);
 }
 
 .batch-lede-section {

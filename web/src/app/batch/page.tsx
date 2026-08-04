@@ -2,10 +2,9 @@ import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { pageMetadata } from "@/lib/seo";
 import {
-  WEBSITE_BATCH_RESULTS,
-  WEBSITE_BATCH_SUMMARY,
-  BATCH_SNAPSHOT_DATE,
-} from "@/lib/website-batch-results";
+  batchResyncDetailFromMeta,
+  getBatchSnapshot,
+} from "@/lib/batch-snapshot-store";
 import {
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
@@ -16,6 +15,7 @@ import {
   BATCH_SNAPSHOT_NOTE,
   PASS_FAIL_RULE_LINE,
 } from "@/lib/product-copy";
+import { BatchRefreshButton } from "./BatchRefreshButton";
 import { BatchReadGuide } from "./BatchReadGuide";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
 import { BatchMobileCards } from "./BatchMobileCards";
@@ -45,7 +45,12 @@ function BatchSeverityCount({
   );
 }
 
-export default function BatchResultsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function BatchResultsPage() {
+  const snapshot = await getBatchSnapshot();
+  const { results, summary, date, meta } = snapshot;
+
   return (
     <main className="scan-shell">
       <JsonLd page="batch" />
@@ -56,13 +61,17 @@ export default function BatchResultsPage() {
             <h1 id="batch-heading">Website batch results</h1>
             <p className="lede batch-lede">
               {BATCH_SNAPSHOT_NOTE} Last full live resync{" "}
-              <strong>{BATCH_SNAPSHOT_DATE}</strong>. Live checks use the{" "}
+              <strong>{date}</strong> ({batchResyncDetailFromMeta(meta)}).
+              Live checks use the{" "}
               <Link href="/">accessibility checker</Link>.
             </p>
           </div>
-          <Link href="/" className="button-secondary batch-head-cta">
-            Run a live scan
-          </Link>
+          <div className="batch-head-actions">
+            <BatchRefreshButton />
+            <Link href="/" className="batch-head-cta">
+              Run a live scan
+            </Link>
+          </div>
         </div>
 
         <BatchReadGuide />
@@ -71,23 +80,23 @@ export default function BatchResultsPage() {
         <ul className="batch-summary" aria-label="Batch totals">
           <li>
             <span className="batch-summary-label">Tested</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.tested}</strong>
+            <strong>{summary.tested}</strong>
           </li>
           <li className="batch-summary-pass">
             <span className="batch-summary-label">Passed</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.passed}</strong>
+            <strong>{summary.passed}</strong>
             <span className="batch-summary-sub">
-              {WEBSITE_BATCH_SUMMARY.passedClean} clean ·{" "}
-              {WEBSITE_BATCH_SUMMARY.passedWithIssues} with issues
+              {summary.passedClean} clean · {summary.passedWithIssues} with
+              issues
             </span>
           </li>
           <li className="batch-summary-fail">
             <span className="batch-summary-label">Failed</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.failed}</strong>
+            <strong>{summary.failed}</strong>
           </li>
           <li>
             <span className="batch-summary-label">Total issues</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.totalIssues}</strong>
+            <strong>{summary.totalIssues}</strong>
           </li>
         </ul>
 
@@ -98,19 +107,19 @@ export default function BatchResultsPage() {
         >
           <li className="batch-summary-sev batch-summary-sev-critical">
             <span className="sev sev-critical">Critical</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.totalCritical}</strong>
+            <strong>{summary.totalCritical}</strong>
           </li>
           <li className="batch-summary-sev batch-summary-sev-serious">
             <span className="sev sev-serious">Serious</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.totalSerious}</strong>
+            <strong>{summary.totalSerious}</strong>
           </li>
           <li className="batch-summary-sev batch-summary-sev-moderate">
             <span className="sev sev-moderate">Moderate</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.totalModerate}</strong>
+            <strong>{summary.totalModerate}</strong>
           </li>
           <li className="batch-summary-sev batch-summary-sev-minor">
             <span className="sev sev-minor">Minor</span>
-            <strong>{WEBSITE_BATCH_SUMMARY.totalMinor}</strong>
+            <strong>{summary.totalMinor}</strong>
           </li>
         </ul>
 
@@ -119,7 +128,7 @@ export default function BatchResultsPage() {
           <code>TEST_RESULTS.md</code> in the repo.
         </p>
 
-        <BatchMobileCards rows={WEBSITE_BATCH_RESULTS} />
+        <BatchMobileCards rows={results} />
 
         <h2 className="batch-section-title batch-section-title-table">
           All websites
@@ -144,7 +153,7 @@ export default function BatchResultsPage() {
               </tr>
             </thead>
             <tbody>
-              {WEBSITE_BATCH_RESULTS.map((row) => {
+              {results.map((row) => {
                 const pass = websiteBatchPass(row.score, row.critical);
                 const guidanceView = batchGuidanceForRow(row);
                 return (

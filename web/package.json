@@ -14,6 +14,7 @@
     "validate:copy": "tsx scripts/validate-product-copy.ts",
     "batch:rescan": "tsx scripts/batch-rescan.ts",
     "batch:apply-rescan": "tsx scripts/apply-batch-rescan.ts",
+    "batch:sync": "npm run batch:rescan && npm run batch:apply-rescan && npm run validate:batch",
     "smoke:scan": "tsx scripts/smoke-scan.ts https://example.com",
     "test:responsive": "tsx scripts/responsive-viewport-check.ts",
     "screenshots": "tsx scripts/capture-screenshots.ts",
@@ -39,6 +40,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4",
     "tsx": "^4.19.4",
     "typescript": "^5"
