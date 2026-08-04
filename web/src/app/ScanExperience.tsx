@@ -26,10 +26,16 @@ import {
   websiteBatchPass,
 } from "@/lib/website-pass-fail";
 import {
-  BATCH_SNAPSHOT_DATE,
-  WEBSITE_BATCH_SUMMARY,
-  batchResyncDetail,
-} from "@/lib/website-batch-results";
+  batchResyncDetailFromMeta,
+  type BatchSnapshotMeta,
+  type WebsiteBatchSummary,
+} from "@/lib/batch-snapshot-store";
+
+export type BatchSidebarSnapshot = {
+  date: string;
+  meta: BatchSnapshotMeta;
+  summary: WebsiteBatchSummary;
+};
 
 type Phase = "idle" | "submitting" | "scanning" | "results" | "error";
 
@@ -115,7 +121,13 @@ function visibleScanSteps(aiTipsEnabled: boolean) {
   return SCAN_STEPS.filter((step) => step.id !== "ai_enrichment");
 }
 
-export function ScanExperience() {
+export function ScanExperience({
+  batchSnapshot,
+}: {
+  batchSnapshot: BatchSidebarSnapshot;
+}) {
+  const { date: batchSnapshotDate, meta: batchMeta, summary: batchSummary } =
+    batchSnapshot;
   const inputId = useId();
   const errorId = useId();
   const examplesId = useId();
@@ -415,29 +427,29 @@ export function ScanExperience() {
             <aside className="hero-aside" aria-label="Quick links">
               <div
                 className="hero-stat-card"
-                aria-label={`Batch snapshot: ${WEBSITE_BATCH_SUMMARY.tested} sites, ${WEBSITE_BATCH_SUMMARY.passed} pass, ${WEBSITE_BATCH_SUMMARY.failed} fail`}
+                aria-label={`Batch snapshot: ${batchSummary.tested} sites, ${batchSummary.passed} pass, ${batchSummary.failed} fail`}
               >
                 <p className="hero-stat-kicker">Portfolio snapshot</p>
                 <p className="hero-stat-value">
                   <span className="hero-stat-num">
-                    {WEBSITE_BATCH_SUMMARY.tested}
+                    {batchSummary.tested}
                   </span>
                   <span className="hero-stat-unit">sites tested</span>
                 </p>
                 <p className="hero-stat-split">
                   <span className="hero-stat-pass">
-                    {WEBSITE_BATCH_SUMMARY.passed} Pass
+                    {batchSummary.passed} Pass
                   </span>
                   <span className="hero-stat-sep" aria-hidden="true">
                     ·
                   </span>
                   <span className="hero-stat-fail">
-                    {WEBSITE_BATCH_SUMMARY.failed} Fail
+                    {batchSummary.failed} Fail
                   </span>
                 </p>
                 <p className="hero-stat-meta">
-                  {WEBSITE_BATCH_SUMMARY.totalIssues} issues · resync{" "}
-                  {BATCH_SNAPSHOT_DATE} ({batchResyncDetail()})
+                  {batchSummary.totalIssues} issues · resync{" "}
+                  {batchSnapshotDate} ({batchResyncDetailFromMeta(batchMeta)})
                 </p>
                 <Link href="/batch" className="hero-stat-link">
                   Open batch dashboard →

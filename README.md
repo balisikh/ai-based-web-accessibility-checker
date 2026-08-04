@@ -151,20 +151,23 @@ On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.gi
 
 | Job | What it checks |
 |-----|----------------|
-| **web** | `npm ci` → ESLint → **product copy validation** (README vs source files) → **batch snapshot validation** (28 sites, scores, totals, fail guidance) → `next build` |
+| **web** | `npm ci` → ESLint → script typecheck → **batch snapshot validation** → `next build` |
 | **responsive-viewport** | Viewport overflow on `/`, `/batch`, `/fixtures/results` (Playwright; no live URL scan in CI) |
 
 Run the same checks locally:
 
 ```bash
 cd web
-npm run ci              # lint + validate:copy + validate:batch + build
+npm run ci              # lint + typecheck:scripts + validate:copy + validate:batch + build
 npm run validate:copy   # README must not duplicate in-app copy
 npm run validate:batch  # snapshot only
+npm run batch:sync      # manual full live rescan + update snapshot file
 npm run smoke:scan      # local/manual live axe scan (not run in CI)
 ```
 
-The full **28-site batch rescan** is intentionally **not** in CI (slow and flaky). Update [`web/src/lib/website-batch-results.ts`](./web/src/lib/website-batch-results.ts) after manual rescans; CI keeps that file internally consistent.
+**Scheduled batch rescan** (separate from push CI): [`.github/workflows/batch-rescan.yml`](.github/workflows/batch-rescan.yml) — weekly Sunday 04:00 UTC + manual **workflow_dispatch**; runs `batch:sync` and commits [`website-batch-results.ts`](./web/src/lib/website-batch-results.ts) when scores change.
+
+**Refresh snapshot** on `/batch`: header button (active in dev or with `BATCH_REFRESH_ENABLED=1`). Read-only status: `GET /api/batch/snapshot`. Details: [`web/README.md`](./web/README.md#updating-the-batch-snapshot-latest-live-rescan-date).
 
 ---
 
@@ -225,7 +228,7 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 1. Deploy to a worker-capable host (Chrome/Playwright) — **Docker + CD workflow in repo**; wire host secrets  
 2. PDF export  
 3. Accounts + scan history  
-4. Multi-page crawl · optional scheduled batch rescan in CI  
+4. Multi-page crawl · scheduled batch rescan weekly in [`.github/workflows/batch-rescan.yml`](.github/workflows/batch-rescan.yml)  
 
 ---
 

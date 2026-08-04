@@ -1899,6 +1899,10 @@ pre {
   color: var(--accent);
 }
 
+.batch-refresh-status-idle {
+  color: var(--ink-soft);
+}
+
 .batch-lede-section {
   margin-bottom: 1.25rem;
 }

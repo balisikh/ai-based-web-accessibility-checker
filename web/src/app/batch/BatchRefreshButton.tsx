@@ -5,12 +5,25 @@ import { useCallback, useState } from "react";
 
 type RefreshState = "idle" | "loading" | "done" | "error";
 
-export function BatchRefreshButton() {
+type BatchRefreshButtonProps = {
+  /** When false (default production), button is visible but explains scheduled/CLI sync. */
+  enabled?: boolean;
+};
+
+export function BatchRefreshButton({ enabled = true }: BatchRefreshButtonProps) {
   const router = useRouter();
   const [state, setState] = useState<RefreshState>("idle");
   const [message, setMessage] = useState<string | null>(null);
 
   const onRefresh = useCallback(async () => {
+    if (!enabled) {
+      setMessage(
+        "Live refresh runs on this server when BATCH_REFRESH_ENABLED=1. Committed snapshots update via npm run batch:sync or the weekly GitHub batch-rescan workflow.",
+      );
+      setState("error");
+      return;
+    }
+
     setState("loading");
     setMessage("Rescanning all 28 sites — this may take several minutes…");
 
@@ -48,7 +61,7 @@ export function BatchRefreshButton() {
       setMessage("Network error — could not reach the refresh API.");
       setState("error");
     }
-  }, [router]);
+  }, [enabled, router]);
 
   const busy = state === "loading";
 
@@ -61,6 +74,11 @@ export function BatchRefreshButton() {
         disabled={busy}
         aria-busy={busy}
         aria-live="polite"
+        title={
+          enabled
+            ? "Run a full live rescan of all 28 batch sites"
+            : "Live refresh disabled on this host — use batch:sync or scheduled CI"
+        }
       >
         {busy ? "Refreshing snapshot…" : "Refresh snapshot"}
       </button>
@@ -70,6 +88,11 @@ export function BatchRefreshButton() {
           role="status"
         >
           {message}
+        </p>
+      ) : !enabled ? (
+        <p className="batch-refresh-status batch-refresh-status-idle">
+          Snapshot date syncs from git via weekly CI rescan or{" "}
+          <code>npm run batch:sync</code>.
         </p>
       ) : null}
     </div>

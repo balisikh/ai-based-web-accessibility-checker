@@ -100,6 +100,12 @@ export async function getBatchSnapshot(): Promise<BatchSnapshot> {
   return live ?? staticSnapshot();
 }
 
+export async function getBatchSnapshotSource(): Promise<"live" | "committed"> {
+  noStore();
+  const live = await readLiveSnapshot();
+  return live ? "live" : "committed";
+}
+
 export async function saveBatchSnapshot(snapshot: BatchSnapshot): Promise<void> {
   await fs.mkdir(path.dirname(SNAPSHOT_PATH), { recursive: true });
   await fs.writeFile(SNAPSHOT_PATH, JSON.stringify(snapshot, null, 2), "utf8");

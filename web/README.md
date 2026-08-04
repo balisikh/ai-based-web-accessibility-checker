@@ -54,27 +54,31 @@ Deploy: see [DEPLOY.md](./DEPLOY.md) (Docker + GitHub CD workflow).
 
 ## Updating the batch snapshot (latest live rescan date)
 
-The `/batch` page is **static** for speed. The date and scores come from [`website-batch-results.ts`](./src/lib/website-batch-results.ts), updated after a **full live rescan** of all 28 sites.
+Home and `/batch` read the same snapshot via `getBatchSnapshot()` — committed [`website-batch-results.ts`](./src/lib/website-batch-results.ts) by default, or runtime JSON after a live refresh.
+
+### Refresh snapshot button (`/batch`)
+
+There is a **Refresh snapshot** button in the batch page header (next to **Run a live scan**). It calls `POST /api/batch/refresh`, rescans all 28 sites, saves `data/batch-live-snapshot.json`, and reloads the page.
+
+Enabled in `next dev`, or production with `BATCH_REFRESH_ENABLED=1`. Otherwise the button explains that sync comes from git / CI.
+
+Read status without rescanning: `GET /api/batch/snapshot` → `{ date, meta, summary, source }`.
+
+### Manual sync (committed — survives deploys)
 
 ```powershell
 cd web
-# Chrome required; takes several minutes
-npm run batch:sync
+npm run batch:sync   # rescan → apply → validate
+git add src/lib/website-batch-results.ts
+git commit -m "chore: sync batch snapshot"
+git push
 ```
 
-This runs: **rescan all 28 URLs** → **write snapshot + `BATCH_SNAPSHOT_DATE`** → **validate**.
+Or: `batch:rescan` → `batch:apply-rescan` → `validate:batch`. Update [`TEST_RESULTS.md`](../TEST_RESULTS.md) if you keep that log in sync.
 
-Or step by step:
+### Scheduled CI rescan (weekly)
 
-```powershell
-npm run batch:rescan          # → batch-rescan-report.json
-npm run batch:apply-rescan    # → website-batch-results.ts (date + scores)
-npm run validate:batch
-```
-
-Then update [`TEST_RESULTS.md`](../TEST_RESULTS.md) in the repo root if you keep that log in sync, rebuild, and commit.
-
-The batch page shows: **Last full live resync `{date}` (`27/28 sites scanned live · 1 kept prior snapshot`)** when some URLs fail (e.g. bot shells).
+[`.github/workflows/batch-rescan.yml`](../.github/workflows/batch-rescan.yml) — **Sunday 04:00 UTC** and **workflow_dispatch**: runs `batch:sync`, commits `website-batch-results.ts` if changed, pushes to `main`.
 
 User-facing copy lives in `src/lib/` — [`product-copy.ts`](./src/lib/product-copy.ts), [`how-to-use.ts`](./src/lib/how-to-use.ts), [`home-faqs.ts`](./src/lib/home-faqs.ts). README points there; `npm run validate:copy` enforces no duplication.
 
@@ -122,6 +126,7 @@ Copy `.env.example` to `.env.local` and adjust:
 | `AI_MODEL` | Model name (default `gpt-4o-mini`) |
 | `AI_MAX_ISSUES` | Top issues to enrich (default `5`) |
 | `USE_DEMO_SCAN=1` | Sample findings instead of Playwright/axe |
+| `BATCH_REFRESH_ENABLED=1` | Enable **Refresh snapshot** on `/batch` in production (`POST /api/batch/refresh`) |
 
 ### Examples
 

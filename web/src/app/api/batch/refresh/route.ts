@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isBatchRefreshEnabled } from "@/lib/batch-refresh-config";
 import { runBatchLiveRescan } from "@/lib/batch-live-rescan";
 import { saveBatchSnapshot } from "@/lib/batch-snapshot-store";
 import {
@@ -14,12 +15,6 @@ export const maxDuration = 900;
 const globalRefresh = globalThis as typeof globalThis & {
   __lumenBatchRefreshInFlight?: Promise<void>;
 };
-
-function isBatchRefreshEnabled(): boolean {
-  if (process.env.BATCH_REFRESH_ENABLED === "0") return false;
-  if (process.env.NODE_ENV === "development") return true;
-  return process.env.BATCH_REFRESH_ENABLED === "1";
-}
 
 export async function POST(request: Request) {
   if (!isBatchRefreshEnabled()) {

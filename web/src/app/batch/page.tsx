@@ -1,20 +1,21 @@
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { pageMetadata } from "@/lib/seo";
+import { isBatchRefreshEnabled } from "@/lib/batch-refresh-config";
 import {
   batchResyncDetailFromMeta,
   getBatchSnapshot,
 } from "@/lib/batch-snapshot-store";
 import {
-  websiteBatchPass,
-} from "@/lib/website-pass-fail";
-import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
-import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
-import {
   BATCH_NOTES_COLUMN_HINT,
   BATCH_SNAPSHOT_NOTE,
   PASS_FAIL_RULE_LINE,
 } from "@/lib/product-copy";
+import {
+  websiteBatchPass,
+} from "@/lib/website-pass-fail";
+import { batchGuidanceForRow } from "@/lib/website-batch-guidance";
+import { BATCH_TAG_LABELS, tagsForBatchSite } from "@/lib/website-batch-tags";
 import { BatchRefreshButton } from "./BatchRefreshButton";
 import { BatchReadGuide } from "./BatchReadGuide";
 import { BatchGuidanceCell } from "./BatchGuidanceCell";
@@ -50,6 +51,7 @@ export const dynamic = "force-dynamic";
 export default async function BatchResultsPage() {
   const snapshot = await getBatchSnapshot();
   const { results, summary, date, meta } = snapshot;
+  const refreshEnabled = isBatchRefreshEnabled();
 
   return (
     <main className="scan-shell">
@@ -67,7 +69,7 @@ export default async function BatchResultsPage() {
             </p>
           </div>
           <div className="batch-head-actions">
-            <BatchRefreshButton />
+            <BatchRefreshButton enabled={refreshEnabled} />
             <Link href="/" className="batch-head-cta">
               Run a live scan
             </Link>
