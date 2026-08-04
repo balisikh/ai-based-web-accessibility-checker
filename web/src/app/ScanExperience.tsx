@@ -29,7 +29,7 @@ import {
   batchResyncDetailFromMeta,
   type BatchSnapshotMeta,
   type WebsiteBatchSummary,
-} from "@/lib/batch-snapshot-store";
+} from "@/lib/batch-snapshot-types";
 
 export type BatchSidebarSnapshot = {
   date: string;

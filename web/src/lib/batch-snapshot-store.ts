@@ -8,34 +8,14 @@ import {
   WEBSITE_BATCH_RESULTS,
   type WebsiteBatchResult,
 } from "./website-batch-results";
+import type { BatchSnapshot, WebsiteBatchSummary } from "./batch-snapshot-types";
 
-export type BatchSnapshotMeta = {
-  date: string;
-  rescannedOk: number;
-  rescannedFailed: number;
-  total: number;
-};
-
-export type WebsiteBatchSummary = {
-  tested: number;
-  passed: number;
-  failed: number;
-  passedClean: number;
-  passedWithIssues: number;
-  totalCritical: number;
-  totalSerious: number;
-  totalModerate: number;
-  totalMinor: number;
-  totalIssues: number;
-};
-
-export type BatchSnapshot = {
-  generatedAt: string;
-  date: string;
-  meta: BatchSnapshotMeta;
-  results: WebsiteBatchResult[];
-  summary: WebsiteBatchSummary;
-};
+export type {
+  BatchSnapshot,
+  BatchSnapshotMeta,
+  WebsiteBatchSummary,
+} from "./batch-snapshot-types";
+export { batchResyncDetailFromMeta } from "./batch-snapshot-types";
 
 const SNAPSHOT_PATH = path.join(
   process.cwd(),
@@ -109,12 +89,4 @@ export async function getBatchSnapshotSource(): Promise<"live" | "committed"> {
 export async function saveBatchSnapshot(snapshot: BatchSnapshot): Promise<void> {
   await fs.mkdir(path.dirname(SNAPSHOT_PATH), { recursive: true });
   await fs.writeFile(SNAPSHOT_PATH, JSON.stringify(snapshot, null, 2), "utf8");
-}
-
-export function batchResyncDetailFromMeta(meta: BatchSnapshotMeta): string {
-  const { rescannedOk, total, rescannedFailed } = meta;
-  if (rescannedFailed === 0) {
-    return `all ${total} sites scanned live`;
-  }
-  return `${rescannedOk}/${total} sites scanned live · ${rescannedFailed} kept prior snapshot`;
 }
