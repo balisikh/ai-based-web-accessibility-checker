@@ -40,6 +40,9 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      - name: Typecheck maintenance scripts
+        run: npm run typecheck:scripts
+
       - name: Validate batch snapshot (28 sites)
         run: npm run validate:batch
 

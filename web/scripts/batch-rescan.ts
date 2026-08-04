@@ -9,6 +9,10 @@ import { WEBSITE_BATCH_RESULTS } from "../src/lib/website-batch-results";
 import { analyzeUrlWithAxe } from "../src/lib/live-scan";
 import { countBySeverity, scoreFromIssues } from "../src/lib/store";
 import { websiteBatchPass } from "../src/lib/website-pass-fail";
+import {
+  type BatchRescanReport,
+  buildRescanSummary,
+} from "./lib/batch-rescan-report";
 
 type RescanRow = {
   id: number;
@@ -117,16 +121,11 @@ async function main() {
   }
 
   const outPath = path.join(process.cwd(), "batch-rescan-report.json");
-  const report = {
+  const report: BatchRescanReport = {
     generatedAt: new Date().toISOString(),
     durationSec: Math.round((Date.now() - started) / 1000),
     rows,
-    summary: {
-      ok: rows.filter((r) => r.ok).length,
-      failed: rows.filter((r) => !r.ok).length,
-      unchangedScore: rows.filter((r) => r.ok && r.delta.score === 0).length,
-      changedScore: rows.filter((r) => r.ok && r.delta.score !== 0).length,
-    },
+    summary: buildRescanSummary(rows),
   };
   fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
   console.log("\nWrote", outPath);

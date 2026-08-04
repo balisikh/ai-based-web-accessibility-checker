@@ -7,36 +7,10 @@ import path from "node:path";
 import { WEBSITE_BATCH_RESULTS } from "../src/lib/website-batch-results";
 import { websiteBatchPass } from "../src/lib/website-pass-fail";
 
-type ReportRow = {
-  id: number;
-  name: string;
-  url: string;
-  ok: boolean;
-  error?: string;
-  score?: number;
-  critical?: number;
-  serious?: number;
-  moderate?: number;
-  minor?: number;
-  totalIssues?: number;
-};
-
-/** Matches batch-rescan-report.json (summary is optional for older reports). */
-type BatchRescanReport = {
-  generatedAt: string;
-  rows: ReportRow[];
-  summary?: {
-    ok: number;
-    failed: number;
-  };
-};
-
-function rescanCounts(report: BatchRescanReport): { ok: number; failed: number } {
-  const ok = report.summary?.ok ?? report.rows.filter((r) => r.ok).length;
-  const failed =
-    report.summary?.failed ?? report.rows.filter((r) => !r.ok).length;
-  return { ok, failed };
-}
+import {
+  type BatchRescanReport,
+  rescanCounts,
+} from "./lib/batch-rescan-report";
 
 const reportPath = path.join(process.cwd(), "batch-rescan-report.json");
 const outPath = path.join(process.cwd(), "src/lib/website-batch-results.ts");

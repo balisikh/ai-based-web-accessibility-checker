@@ -11,9 +11,12 @@ npm run dev    # local development → http://localhost:4376 (webpack — see tr
 npm run build  # production build (webpack)
 npm run start  # run production server
 npm run lint   # eslint
-npm run ci     # lint + validate:batch + build
+npm run ci     # lint + typecheck:scripts + validate:copy + validate:batch + build
+npm run typecheck:scripts   # TypeScript for scripts/ only (also run in GitHub CI)
 npm run test:responsive   # needs npm run start in another terminal
 ```
+
+**CI vs app build:** `npm run build` typechecks `src/` only (`scripts/` is excluded from the main `tsconfig.json`). Maintenance scripts are checked separately via `npm run typecheck:scripts` — same split as GitHub Actions.
 
 **Windows (low RAM):** `.\scripts\start-local.ps1` — builds once if needed, then `start:low-mem`.  
 **Plain white text / no layout?** `.\scripts\fix-styles.ps1` — stops stale server, deletes broken `.next`, rebuilds, restarts.
