@@ -51,6 +51,7 @@
 <li>Export a <strong>JSON</strong> report</li>
 </ol>
 <h3>Technology stack</h3>
+<p><strong>Core application stack</strong> (summary):</p>
 <table>
 <tr><th>Layer</th><th>Technology</th></tr>
 <tr><td>Frontend / API</td><td>Next.js 16 (React) + TypeScript</td></tr>
@@ -59,6 +60,37 @@
 <tr><td>AI (optional)</td><td>OpenAI-compatible Chat Completions API</td></tr>
 <tr><td>CI/CD</td><td>GitHub Actions, Docker, GHCR</td></tr>
 </table>
+<p><strong>Full technology reference</strong> (everything used to build, style, test, and deploy Lumen):</p>
+<table>
+<tr><th>Category</th><th>Technology</th><th>Role in Lumen</th></tr>
+<tr><td><strong>Language</strong></td><td><strong>TypeScript</strong></td><td>Primary language — app (<code>src/</code>), API routes, scripts, types</td></tr>
+<tr><td><strong>Language</strong></td><td><strong>JavaScript</strong></td><td>Runtime (Node.js); React/Next compiles TS to JS for browser and server</td></tr>
+<tr><td><strong>UI framework</strong></td><td><strong>React 19</strong></td><td>Components, client interactivity (<code>ScanExperience</code>, theme toggle, batch refresh)</td></tr>
+<tr><td><strong>App framework</strong></td><td><strong>Next.js 16</strong></td><td>App Router, SSR, API routes (<code>/api/scans</code>, <code>/api/batch/*</code>), SEO routes</td></tr>
+<tr><td><strong>Styling</strong></td><td><strong>CSS</strong></td><td><code>globals.css</code> — layout, themes, responsive breakpoints, Pass/Fail colours</td></tr>
+<tr><td><strong>Styling</strong></td><td><strong>Tailwind CSS v4</strong></td><td>Utility classes + PostCSS pipeline (<code>@tailwindcss/postcss</code>)</td></tr>
+<tr><td><strong>Styling</strong></td><td><strong>CSS custom properties</strong></td><td>Light / Dark / System themes via <code>[data-theme]</code> variables</td></tr>
+<tr><td><strong>Scanner</strong></td><td><strong>Playwright</strong></td><td>Headless Chrome — page render, batch rescans, viewport CI, PDF export</td></tr>
+<tr><td><strong>Scanner</strong></td><td><strong>axe-core</strong> + <strong>@axe-core/playwright</strong></td><td>WCAG A/AA rule engine on rendered DOM</td></tr>
+<tr><td><strong>Database</strong></td><td><strong>PGlite</strong> (<code>@electric-sql/pglite</code>)</td><td>Embedded Postgres for local dev — <code>web/data/lumen-pg</code></td></tr>
+<tr><td><strong>Database</strong></td><td><strong>PostgreSQL</strong> + <strong><code>pg</code></strong> driver</td><td>Production persistence via <code>DATABASE_URL</code></td></tr>
+<tr><td><strong>AI</strong></td><td><strong>OpenAI-compatible REST API</strong></td><td>Optional Chat Completions for issue tips (<code>ai-enrichment.ts</code>)</td></tr>
+<tr><td><strong>Runtime</strong></td><td><strong>Node.js 22</strong></td><td>Dev server, build, scripts, CI (GitHub Actions)</td></tr>
+<tr><td><strong>Build</strong></td><td><strong>Webpack</strong></td><td>Stable CSS/JS bundling (<code>--webpack</code> on dev/build — avoids Turbopack issues on low RAM)</td></tr>
+<tr><td><strong>Package manager</strong></td><td><strong>npm</strong></td><td>Dependencies, scripts (<code>package.json</code>, <code>package-lock.json</code>)</td></tr>
+<tr><td><strong>Script runner</strong></td><td><strong>tsx</strong></td><td>Run TypeScript maintenance scripts without pre-compile</td></tr>
+<tr><td><strong>Lint / quality</strong></td><td><strong>ESLint</strong> + <strong>eslint-config-next</strong></td><td>Code style and Next.js rules — part of <code>npm run ci</code></td></tr>
+<tr><td><strong>Images</strong></td><td><strong>sharp</strong></td><td>PDF screenshot crops (<code>prepare-pdf-screenshots.ts</code>)</td></tr>
+<tr><td><strong>Version control</strong></td><td><strong>Git</strong></td><td>Source history, branches, commits; required for CI/CD and batch snapshot sync</td></tr>
+<tr><td><strong>Remote repo</strong></td><td><strong>GitHub</strong></td><td>Hosting, pull requests, Actions workflows, GHCR container registry</td></tr>
+<tr><td><strong>CI</strong></td><td><strong>GitHub Actions</strong></td><td><code>ci.yml</code> (lint, typecheck, validate, build, viewport); <code>batch-rescan.yml</code>; <code>cd.yml</code></td></tr>
+<tr><td><strong>Containers</strong></td><td><strong>Docker</strong> + <strong>Dockerfile</strong></td><td>Multi-stage image — deps → build → runner with Chromium (<code>web/Dockerfile</code>)</td></tr>
+<tr><td><strong>Registry</strong></td><td><strong>GHCR</strong></td><td><code>ghcr.io/&lt;owner&gt;/lumen-web</code> — production image from CD workflow</td></tr>
+<tr><td><strong>Local automation</strong></td><td><strong>PowerShell</strong> (<code>.ps1</code>)</td><td>Windows helpers — <code>start-local.ps1</code>, <code>fix-styles.ps1</code> (rebuild when CSS breaks)</td></tr>
+<tr><td><strong>Browser (local scan)</strong></td><td><strong>Google Chrome</strong></td><td>Playwright <code>channel: &quot;chrome&quot;</code> for live scans on developer machines</td></tr>
+<tr><td><strong>Browser (CI/Docker)</strong></td><td><strong>Chromium</strong></td><td><code>PLAYWRIGHT_CHROMIUM=1</code> / <code>playwright install chromium</code> in CI and container</td></tr>
+</table>
+<p><strong>Note:</strong> TypeScript and JavaScript are both part of the stack — you <strong>write</strong> TypeScript; <strong>Node and the browser run</strong> JavaScript after compile. <strong>CSS</strong> (not a separate CSS framework file per component) drives all visual design in <code>globals.css</code> with Tailwind v4 integration. <strong>Git</strong> is essential to the workflow: every push triggers CI; weekly batch rescan <strong>commits</strong> updated snapshot data to <code>main</code>.</p>
 <hr />
 <h2>UI screenshots (styled layout)</h2>
 <figure class="shot-desktop"><figcaption>Home — accessibility checker (hero)</figcaption><img src="screenshots/pdf/home-desktop.png" alt="Home — accessibility checker (hero)" /></figure>

@@ -25,6 +25,8 @@ Lumen scans a public URL for WCAG-oriented accessibility issues, returns a clear
 
 ### Technology stack
 
+**Core application stack** (summary):
+
 | Layer | Technology |
 |-------|------------|
 | Frontend / API | Next.js 16 (React) + TypeScript |
@@ -32,6 +34,39 @@ Lumen scans a public URL for WCAG-oriented accessibility issues, returns a clear
 | Data | Postgres or local PGlite |
 | AI (optional) | OpenAI-compatible Chat Completions API |
 | CI/CD | GitHub Actions, Docker, GHCR |
+
+**Full technology reference** (everything used to build, style, test, and deploy Lumen):
+
+| Category | Technology | Role in Lumen |
+|----------|------------|---------------|
+| **Language** | **TypeScript** | Primary language — app (`src/`), API routes, scripts, types |
+| **Language** | **JavaScript** | Runtime (Node.js); React/Next compiles TS to JS for browser and server |
+| **UI framework** | **React 19** | Components, client interactivity (`ScanExperience`, theme toggle, batch refresh) |
+| **App framework** | **Next.js 16** | App Router, SSR, API routes (`/api/scans`, `/api/batch/*`), SEO routes |
+| **Styling** | **CSS** | `globals.css` — layout, themes, responsive breakpoints, Pass/Fail colours |
+| **Styling** | **Tailwind CSS v4** | Utility classes + PostCSS pipeline (`@tailwindcss/postcss`) |
+| **Styling** | **CSS custom properties** | Light / Dark / System themes via `[data-theme]` variables |
+| **Scanner** | **Playwright** | Headless Chrome — page render, batch rescans, viewport CI, PDF export |
+| **Scanner** | **axe-core** + **@axe-core/playwright** | WCAG A/AA rule engine on rendered DOM |
+| **Database** | **PGlite** (`@electric-sql/pglite`) | Embedded Postgres for local dev — `web/data/lumen-pg` |
+| **Database** | **PostgreSQL** + **`pg`** driver | Production persistence via `DATABASE_URL` |
+| **AI** | **OpenAI-compatible REST API** | Optional Chat Completions for issue tips (`ai-enrichment.ts`) |
+| **Runtime** | **Node.js 22** | Dev server, build, scripts, CI (GitHub Actions) |
+| **Build** | **Webpack** | Stable CSS/JS bundling (`--webpack` on dev/build — avoids Turbopack issues on low RAM) |
+| **Package manager** | **npm** | Dependencies, scripts (`package.json`, `package-lock.json`) |
+| **Script runner** | **tsx** | Run TypeScript maintenance scripts without pre-compile |
+| **Lint / quality** | **ESLint** + **eslint-config-next** | Code style and Next.js rules — part of `npm run ci` |
+| **Images** | **sharp** | PDF screenshot crops (`prepare-pdf-screenshots.ts`) |
+| **Version control** | **Git** | Source history, branches, commits; required for CI/CD and batch snapshot sync |
+| **Remote repo** | **GitHub** | Hosting, pull requests, Actions workflows, GHCR container registry |
+| **CI** | **GitHub Actions** | `ci.yml` (lint, typecheck, validate, build, viewport); `batch-rescan.yml`; `cd.yml` |
+| **Containers** | **Docker** + **Dockerfile** | Multi-stage image — deps → build → runner with Chromium (`web/Dockerfile`) |
+| **Registry** | **GHCR** | `ghcr.io/<owner>/lumen-web` — production image from CD workflow |
+| **Local automation** | **PowerShell** (`.ps1`) | Windows helpers — `start-local.ps1`, `fix-styles.ps1` (rebuild when CSS breaks) |
+| **Browser (local scan)** | **Google Chrome** | Playwright `channel: "chrome"` for live scans on developer machines |
+| **Browser (CI/Docker)** | **Chromium** | `PLAYWRIGHT_CHROMIUM=1` / `playwright install chromium` in CI and container |
+
+**Note:** TypeScript and JavaScript are both part of the stack — you **write** TypeScript; **Node and the browser run** JavaScript after compile. **CSS** (not a separate CSS framework file per component) drives all visual design in `globals.css` with Tailwind v4 integration. **Git** is essential to the workflow: every push triggers CI; weekly batch rescan **commits** updated snapshot data to `main`.
 
 ---
 
