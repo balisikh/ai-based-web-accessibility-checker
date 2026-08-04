@@ -4,7 +4,7 @@ AI-Based Web Accessibility Checker
 
 Repository: https://github.com/balisikh/ai-based-web-accessibility-checker  
 Local app: http://localhost:4376  
-Document date: **2026-08-04**
+Document date: **2026-08-04** (includes scan PDF export + issue detail UX)
 
 > Assistive findings only — this tool is **not** a legal accessibility certificate or formal conformance audit.
 
@@ -21,7 +21,7 @@ Lumen scans a public URL for WCAG-oriented accessibility issues, returns a clear
 3. **axe-core** checks WCAG A/AA-oriented rules
 4. You get a **score**, severity breakdown, and issue details
 5. Optionally, **AI tips** explain top issues and suggest fixes
-6. Export a **JSON** report
+6. Export a **JSON** or **PDF** report
 
 ### Technology stack
 
@@ -128,8 +128,8 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 | **What it is** | The main user journey: URL input, live progress, score panel, issue list, and detail view. |
 | **Why we use it** | Scanning can take 10–60 seconds. Clear states reduce anxiety and match the “fast first report” product goal. |
 | **Key purpose** | Make accessibility checking feel simple for non-experts while still showing enough detail for developers. |
-| **How we implemented it** | `ScanExperience.tsx` (client) polls `GET /api/scans/:id`. Server components pass batch snapshot context. Copy from `how-to-use.ts` and `product-copy.ts`. Fixture route `/fixtures/results` for layout QA without live scans. |
-| **How to use it** | Open `/`. Enter a URL or click a **Try example** chip. Watch progress. Click an issue for rule help and (if enabled) AI tips. |
+| **How it is implemented** | `ScanExperience.tsx` (client) polls `GET /api/scans/:id`. Server components pass batch snapshot context. Copy from `how-to-use.ts` and `product-copy.ts`. Issue detail panel: theme-aware surfaces, readable snippet/selector boxes, severity pills, context notes for `color-contrast` and landmark rules (`globals.css`). Fixture route `/fixtures/results` for layout QA without live scans. |
+| **How to use it** | Open `/`. Enter a URL or click a **Try example** chip. Watch progress. Click an issue for rule help and (if enabled) AI tips. **Export JSON** or **Export PDF** when done. |
 
 ---
 
@@ -141,7 +141,7 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 | **Why we use it** | Teams need one number for triage and a clear portfolio benchmark across 28 sites. |
 | **Key purpose** | Deterministic scoring (rules find issues; score is formula-based, not AI-generated). |
 | **How we implemented it** | `store.ts` — `scoreFromIssues()`, `countBySeverity()`. Pass rule in `website-pass-fail.ts`: Pass if score ≥ 85 **and** critical = 0. Documented in `product-copy.ts` and home FAQs. |
-| **How to use it** | Results panel shows score + severity chips. Batch table shows Pass/Fail per site. Hover or read **Common questions** on home for the full rule. |
+| **How to use it** | Results panel shows score + severity chips. Batch table shows Pass/Fail per site. After scan → **Export JSON** or **Export PDF**. |
 
 ---
 
@@ -187,9 +187,21 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 |---|---|
 | **What it is** | Download of the full scan report as structured JSON. |
 | **Why we use it** | Developers and QA tools need machine-readable output for tickets, CI, or archival. |
-| **Key purpose** | Primary MVP export format (PDF export is roadmap). |
-| **How we implemented it** | `GET /api/scans/:id/export?format=json` — issues, score, metadata. UI button on results panel. |
+| **Key purpose** | Machine-readable handoff for developers and automation. |
+| **How we implemented it** | `GET /api/scans/:id/export?format=json` — issues, score, metadata. **Export JSON** button on results panel. |
 | **How to use it** | After a scan completes → **Export JSON** on the results view. |
+
+---
+
+### 7b. Scan report PDF export
+
+| | |
+|---|---|
+| **What it is** | Downloadable formatted PDF report after a scan completes — summary, score, Pass/Fail, severities, and full issue list. |
+| **Why we use it** | Stakeholders, tutors, and QA often need a readable document, not raw JSON. |
+| **Key purpose** | Shareable report for tickets, portfolios, and hand-ins. |
+| **How we implemented it** | `GET /api/scans/:id/export?format=pdf` — `scan-report-pdf.ts` builds printable HTML, Playwright renders A4 PDF. **Export PDF** button on results (`ScanExperience.tsx`). Returns **409** until scan completes. |
+| **How to use it** | Complete a scan → **Export PDF** on results, or open `/api/scans/{id}/export?format=pdf`. |
 
 ---
 
@@ -347,6 +359,7 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 | Per-IP rate limiting | Done |
 | Persistence (Postgres or PGlite) | Done |
 | JSON export | Done |
+| PDF export (scan report) | Done |
 | Optional AI enrichment | Done |
 | Anonymous use (no login) | Done |
 | Batch dashboard (28 sites) | Done |
@@ -355,7 +368,7 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 | Responsive layout + viewport CI | Done |
 | SEO (sitemap, OG, JSON-LD) | Done |
 | Docker + CD workflow | Done |
-| PDF export / accounts / multi-page crawl | Not yet |
+| Accounts / multi-page crawl | Not yet |
 
 ---
 
@@ -371,8 +384,8 @@ Each completed MVP item below explains **what it does**, **why it exists**, and 
 |---|---|
 | **What it does** | Guides the user from URL entry through live scan progress to a full results view: score ring, Pass/Fail badge, severity summary, filterable issue list, and per-issue detail (selector, HTML snippet, WCAG criteria, axe help link). |
 | **Why it exists** | Accessibility scanning is slow and technical. Progressive UI states (`queued` → `fetching` → `rendering` → `rule_analysis` → `ai_enrichment` → `scoring` → `completed`) set expectations and match the product goal of a fast, understandable first report. |
-| **How it is implemented** | **Client:** `web/src/app/ScanExperience.tsx` — submits `POST /api/scans`, polls `GET /api/scans/:id` every ~1s until `completed` or `failed`, renders issue panel and export button. **Server:** `web/src/app/page.tsx` passes batch snapshot date via `getBatchSnapshot()`. **Copy:** steps in `how-to-use.ts`, rules in `product-copy.ts`. **QA:** `/fixtures/results` shows layout without a live scan. **Styling:** `globals.css` — orange home CTA, teal accents, Pass/Fail row tints. |
-| **How to use it** | Open `/` → enter URL or click a **Try example** chip → **Check accessibility** → review results → click issues for detail → **Export JSON** when done. |
+| **How it is implemented** | **Client:** `web/src/app/ScanExperience.tsx` — submits `POST /api/scans`, polls `GET /api/scans/:id` every ~1s until `completed` or `failed`, renders issue panel and **Export JSON / Export PDF** buttons. **Issue detail UX:** theme-aware panels (light + dark), readable snippet and selector code blocks, severity pills, notes for color-contrast vs landmark rules. **Server:** `web/src/app/page.tsx` passes batch snapshot date via `getBatchSnapshot()`. **Copy:** steps in `how-to-use.ts`, rules in `product-copy.ts`. **QA:** `/fixtures/results` shows layout without a live scan. **Styling:** `globals.css` — orange home CTA, teal accents, Pass/Fail row tints. |
+| **How to use it** | Open `/` → enter URL or click a **Try example** chip → **Check accessibility** → review results → click issues for detail → **Export JSON** or **Export PDF** when done. |
 
 ---
 
@@ -425,9 +438,20 @@ Each completed MVP item below explains **what it does**, **why it exists**, and 
 | | |
 |---|---|
 | **What it does** | Downloads a complete machine-readable report after a scan finishes: URL, timestamps, WCAG target level, score, severity counts, and full issue array (including optional AI fields). |
-| **Why it exists** | Developers attach reports to tickets, feed QA pipelines, or archive findings. JSON is the MVP export format before PDF. |
-| **How it is implemented** | **API:** `GET /api/scans/:id/export?format=json` in `export/route.ts`. Returns **409** if scan not `completed`; **400** if format ≠ json. **Payload fields:** `generator`, `disclaimer`, `scannedUrl`, `scannedAt`, `completedAt`, `wcagLevelTarget`, `score`, `summaryCounts`, `issues[]`. **Download:** `Content-Disposition: attachment; filename="lumen-scan-{id}.json"`. **UI:** Export button on results panel in `ScanExperience.tsx`. |
-| **How to use it** | Complete a scan → click **Export JSON** or call the API directly with the scan ID. |
+| **Why it exists** | Developers attach reports to tickets, feed QA pipelines, or archive findings. |
+| **How it is implemented** | **API:** `GET /api/scans/:id/export?format=json` in `export/route.ts`. Returns **409** if scan not `completed`. **Payload fields:** `generator`, `disclaimer`, `scannedUrl`, `scannedAt`, `completedAt`, `wcagLevelTarget`, `score`, `summaryCounts`, `issues[]`. **Download:** `Content-Disposition: attachment; filename="lumen-scan-{id}.json"`. **UI:** **Export JSON** on results panel in `ScanExperience.tsx`. |
+| **How to use it** | Complete a scan → click **Export JSON** or call the API with the scan ID. |
+
+---
+
+### MVP-6b. Scan report PDF export — Done
+
+| | |
+|---|---|
+| **What it does** | Generates a formatted **PDF** report (A4) with disclaimer, URL, score, Pass/Fail, severity totals, and every issue (rule, WCAG, selector, snippet, optional AI text). |
+| **Why it exists** | JSON is ideal for tooling; PDF is easier for humans — tutors, stakeholders, portfolio evidence. |
+| **How it is implemented** | **API:** `GET /api/scans/:id/export?format=pdf`. **Generator:** `scan-report-pdf.ts` — HTML template + Playwright `page.pdf()`. **UI:** **Export PDF** button beside Export JSON. **Errors:** 409 if scan incomplete; 500 if PDF generation fails. |
+| **How to use it** | Complete a scan → **Export PDF** on results, or `GET /api/scans/{id}/export?format=pdf`. |
 
 ---
 
@@ -519,14 +543,14 @@ Each completed MVP item below explains **what it does**, **why it exists**, and 
 
 ---
 
-### MVP-15. Deferred: PDF export, accounts, multi-page crawl — Not yet
+### MVP-15. Deferred: accounts and multi-page crawl — Not yet
 
 | | |
 |---|---|
-| **What they would do** | **PDF export:** downloadable formatted report (like JSON but for stakeholders). **Accounts:** sign-in, saved scan history, per-user quotas. **Multi-page crawl:** start at one URL and automatically follow same-domain links to scan many pages in one job. |
-| **Why deferred** | MVP prioritizes **fast single-URL reports** and a **28-site portfolio benchmark**. PDF adds layout work; accounts add auth, privacy, and retention policy; crawl adds queues, deduplication, timeouts, and bot-wall handling — each is a major feature beyond v1 scope. |
-| **What exists today instead** | **JSON export** covers developer handoff. **Anonymous + rate limit** covers access control lightly. **Single URL + batch list** covers demo and regression without whole-site spidering. |
-| **Likely implementation path (future)** | PDF: server-side template from scan JSON (Playwright PDF or react-pdf). Accounts: NextAuth + user_id on scans table. Crawl: bounded BFS worker with max depth/pages, same-domain filter, shared scan queue — after public deploy proves demand. |
+| **What they would do** | **Accounts:** sign-in, saved scan history, per-user quotas. **Multi-page crawl:** start at one URL and automatically follow same-domain links to scan many pages in one job. |
+| **Why deferred** | MVP delivers **fast single-URL reports**, **JSON + PDF export**, and a **28-site portfolio benchmark**. Accounts add auth, privacy, and retention policy; crawl adds queues, deduplication, timeouts, and bot-wall handling. |
+| **What exists today instead** | **JSON + PDF export** cover handoff. **Anonymous + rate limit** covers access control lightly. **Single URL + batch list** covers demo and regression without whole-site spidering. |
+| **Likely implementation path (future)** | Accounts: NextAuth + `user_id` on scans table. Crawl: bounded BFS worker with max depth/pages, same-domain filter, shared scan queue — after public deploy proves demand. |
 
 ---
 
@@ -554,6 +578,7 @@ Each completed MVP item below explains **what it does**, **why it exists**, and 
 | GET | `/api/scans/:id` | Status, score, summary counts |
 | GET | `/api/scans/:id/issues` | Paginated/filtered issue list |
 | GET | `/api/scans/:id/export?format=json` | Download JSON report |
+| GET | `/api/scans/:id/export?format=pdf` | Download PDF report |
 | GET | `/api/batch/snapshot` | Batch date, meta, summary (no rescan) |
 | POST | `/api/batch/refresh` | Start background 28-site rescan (202) |
 | GET | `/api/batch/refresh` | Poll refresh job progress |
