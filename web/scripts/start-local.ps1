@@ -22,4 +22,5 @@ if (-not (Test-Path ".next\BUILD_ID")) {
 }
 
 Write-Host "Starting production server (more stable than dev on low RAM)..." -ForegroundColor Green
+Write-Host "Batch Refresh snapshot: enabled if BATCH_REFRESH_ENABLED=1 in .env.local" -ForegroundColor DarkGray
 npm run start:low-mem
