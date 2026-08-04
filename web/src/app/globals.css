@@ -46,6 +46,17 @@
   --gutter-laptop: 2rem;
   --gutter-desktop: 2.5rem;
   --batch-head-cta-ink: #ffffff;
+  --code-bg: #eef4f2;
+  --code-ink: #14221f;
+  --code-border: rgba(20, 34, 31, 0.14);
+  --snippet-bg: #f6faf8;
+  --snippet-ink: #14221f;
+  --snippet-border: rgba(20, 34, 31, 0.12);
+  --issue-surface: rgba(255, 255, 255, 0.92);
+  --issue-snippet-bg: #eef4f2;
+  --issue-snippet-ink: #14221f;
+  --issue-snippet-border: rgba(20, 34, 31, 0.18);
+  --count-tile-bg: rgba(255, 255, 255, 0.85);
 }
 
 html[data-theme="dark"] {
@@ -80,6 +91,17 @@ html[data-theme="dark"] {
   --batch-guidance-surface: rgba(22, 32, 30, 0.98);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   --batch-head-cta-ink: #0c1211;
+  --code-bg: #1e2a28;
+  --code-ink: #e8f0ed;
+  --code-border: rgba(232, 240, 237, 0.16);
+  --snippet-bg: #162220;
+  --snippet-ink: #e8f0ed;
+  --snippet-border: rgba(232, 240, 237, 0.14);
+  --issue-surface: rgba(26, 36, 34, 0.96);
+  --issue-snippet-bg: #0c1211;
+  --issue-snippet-ink: #f0f6f4;
+  --issue-snippet-border: rgba(232, 240, 237, 0.16);
+  --count-tile-bg: rgba(24, 34, 32, 0.92);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -115,6 +137,17 @@ html[data-theme="dark"] {
     --batch-guidance-surface: rgba(22, 32, 30, 0.98);
     --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
     --batch-head-cta-ink: #0c1211;
+    --code-bg: #1e2a28;
+    --code-ink: #e8f0ed;
+    --code-border: rgba(232, 240, 237, 0.16);
+    --snippet-bg: #162220;
+    --snippet-ink: #e8f0ed;
+    --snippet-border: rgba(232, 240, 237, 0.14);
+    --issue-surface: rgba(26, 36, 34, 0.96);
+    --issue-snippet-bg: #0c1211;
+    --issue-snippet-ink: #f0f6f4;
+    --issue-snippet-border: rgba(232, 240, 237, 0.16);
+    --count-tile-bg: rgba(24, 34, 32, 0.92);
   }
 }
 
@@ -1165,7 +1198,7 @@ html[data-theme="system"] .example-chip-demo-bad {
   height: 0.7rem;
   border-radius: 4px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--count-tile-bg);
   flex-shrink: 0;
 }
 
@@ -1354,8 +1387,19 @@ html[data-theme="system"] .example-chip-demo-bad {
   gap: 0.35rem;
   padding: 0.85rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--count-tile-bg);
   border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.count-row li strong {
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.count-row .sev {
+  font-size: 0.68rem;
 }
 
 .toolbar {
@@ -1417,13 +1461,14 @@ html[data-theme="system"] .example-chip-demo-bad {
 .issue-item {
   text-align: left;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--issue-surface);
   border-radius: 14px;
   padding: 0.8rem 0.9rem;
   display: grid;
   gap: 0.4rem;
   cursor: pointer;
   font: inherit;
+  color: var(--ink);
   transition: border-color 160ms ease, transform 160ms ease;
 }
 
@@ -1444,7 +1489,8 @@ html[data-theme="system"] .example-chip-demo-bad {
 .issue-detail {
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--issue-surface);
+  color: var(--ink);
   padding: 1rem 1.1rem;
   min-height: 16rem;
   min-width: 0;
@@ -1455,7 +1501,49 @@ html[data-theme="system"] .example-chip-demo-bad {
 .issue-detail h3 {
   margin: 0.45rem 0 0.85rem;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.issue-detail-label {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.issue-detail-hint {
+  margin: 0.15rem 0 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.issue-detail-context {
+  margin: 0.65rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(13, 92, 99, 0.08);
+  border: 1px solid rgba(13, 92, 99, 0.16);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .issue-detail-context,
+html[data-theme="system"] .issue-detail-context {
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .issue-detail-context {
+    background: rgba(45, 212, 191, 0.1);
+    border-color: rgba(45, 212, 191, 0.22);
+  }
 }
 
 .issue-detail h4 {
@@ -1476,16 +1564,77 @@ html[data-theme="system"] .example-chip-demo-bad {
   display: grid;
   grid-template-columns: 5.5rem 1fr;
   gap: 0.5rem;
+  align-items: start;
 }
 
 .meta dt {
   color: var(--ink-soft);
   font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .meta dd {
   margin: 0;
   word-break: break-word;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.issue-code {
+  display: block;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border: 1px solid var(--code-border);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+.issue-snippet {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: 12px;
+  background: var(--issue-snippet-bg) !important;
+  color: var(--issue-snippet-ink) !important;
+  border: 1px solid var(--issue-snippet-border);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.issue-snippet code {
+  font: inherit;
+  color: inherit !important;
+  background: none !important;
+  padding: 0;
+}
+
+.issue-help-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(13, 92, 99, 0.1);
+  border: 1px solid rgba(13, 92, 99, 0.22);
+  color: var(--brand-deep);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.issue-help-link:hover {
+  background: rgba(13, 92, 99, 0.16);
+  text-decoration: underline;
 }
 
 pre {
@@ -1494,8 +1643,9 @@ pre {
   overflow-x: auto;
   max-width: 100%;
   border-radius: 12px;
-  background: #173532;
-  color: #e7fffb;
+  background: var(--snippet-bg);
+  color: var(--snippet-ink);
+  border: 1px solid var(--snippet-border);
   font-size: 0.85rem;
 }
 
@@ -1519,6 +1669,159 @@ pre {
   letter-spacing: 0.06em;
   font-size: 0.72rem;
   font-weight: 750;
+}
+
+.sev-pill {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.sev-pill.sev-critical {
+  color: var(--critical);
+  background: rgba(155, 34, 38, 0.12);
+  border-color: rgba(155, 34, 38, 0.22);
+}
+
+.sev-pill.sev-serious {
+  color: var(--serious);
+  background: rgba(187, 62, 3, 0.12);
+  border-color: rgba(187, 62, 3, 0.22);
+}
+
+.sev-pill.sev-moderate {
+  color: var(--moderate);
+  background: rgba(202, 103, 2, 0.12);
+  border-color: rgba(202, 103, 2, 0.22);
+}
+
+.sev-pill.sev-minor {
+  color: var(--minor);
+  background: rgba(10, 147, 150, 0.12);
+  border-color: rgba(10, 147, 150, 0.22);
+}
+
+html[data-theme="dark"] .sev-pill.sev-critical,
+html[data-theme="system"] .sev-pill.sev-critical {
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.28);
+}
+
+html[data-theme="dark"] .sev-pill.sev-serious,
+html[data-theme="system"] .sev-pill.sev-serious {
+  background: rgba(253, 186, 116, 0.14);
+  border-color: rgba(253, 186, 116, 0.28);
+}
+
+html[data-theme="dark"] .sev-pill.sev-moderate,
+html[data-theme="system"] .sev-pill.sev-moderate {
+  color: #e8c468;
+  background: rgba(146, 105, 32, 0.28);
+  border-color: rgba(200, 150, 60, 0.38);
+}
+
+html[data-theme="light"] .issue-snippet {
+  background: #eef4f2 !important;
+  color: #14221f !important;
+  border-color: rgba(20, 34, 31, 0.16);
+}
+
+html[data-theme="light"] .issue-code {
+  background: #eef4f2;
+  color: #14221f;
+  border-color: rgba(20, 34, 31, 0.14);
+}
+
+html[data-theme="dark"] .issue-detail-label,
+html[data-theme="system"] .issue-detail-label,
+html[data-theme="dark"] .issue-detail-hint,
+html[data-theme="system"] .issue-detail-hint,
+html[data-theme="dark"] .meta dt,
+html[data-theme="system"] .meta dt {
+  color: #b8ccc4;
+}
+
+html[data-theme="dark"] .issue-detail,
+html[data-theme="system"] .issue-detail,
+html[data-theme="dark"] .issue-item,
+html[data-theme="system"] .issue-item {
+  background: #151f1d;
+  border-color: rgba(232, 240, 237, 0.14);
+}
+
+html[data-theme="dark"] .issue-snippet,
+html[data-theme="system"] .issue-snippet {
+  background: #0c1211 !important;
+  color: #f0f6f4 !important;
+  border-color: rgba(232, 240, 237, 0.18);
+}
+
+html[data-theme="dark"] .issue-code,
+html[data-theme="system"] .issue-code {
+  background: #0f1615;
+  color: #e8f0ed;
+  border-color: rgba(232, 240, 237, 0.14);
+}
+
+html[data-theme="dark"] .issue-help-link,
+html[data-theme="system"] .issue-help-link {
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .sev-pill.sev-moderate {
+    color: #e8c468;
+    background: rgba(146, 105, 32, 0.28);
+    border-color: rgba(200, 150, 60, 0.38);
+  }
+  html[data-theme="system"] .issue-detail-label,
+  html[data-theme="system"] .issue-detail-hint,
+  html[data-theme="system"] .meta dt {
+    color: #b8ccc4;
+  }
+  html[data-theme="system"] .issue-detail,
+  html[data-theme="system"] .issue-item {
+    background: #151f1d;
+    border-color: rgba(232, 240, 237, 0.14);
+  }
+  html[data-theme="system"] .issue-snippet {
+    background: #0c1211 !important;
+    color: #f0f6f4 !important;
+    border-color: rgba(232, 240, 237, 0.18);
+  }
+  html[data-theme="system"] .issue-code {
+    background: #0f1615;
+    color: #e8f0ed;
+    border-color: rgba(232, 240, 237, 0.14);
+  }
+  html[data-theme="system"] .issue-help-link {
+    color: #5eead4;
+    background: rgba(45, 212, 191, 0.1);
+    border-color: rgba(45, 212, 191, 0.22);
+  }
+}
+
+html[data-theme="dark"] .sev-pill.sev-minor,
+html[data-theme="system"] .sev-pill.sev-minor {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.26);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="system"] .sev-pill.sev-critical {
+    background: rgba(248, 113, 113, 0.14);
+    border-color: rgba(248, 113, 113, 0.28);
+  }
+  html[data-theme="system"] .sev-pill.sev-serious {
+    background: rgba(253, 186, 116, 0.14);
+    border-color: rgba(253, 186, 116, 0.28);
+  }
+  html[data-theme="system"] .sev-pill.sev-minor {
+    background: rgba(45, 212, 191, 0.12);
+    border-color: rgba(45, 212, 191, 0.26);
+  }
 }
 
 .sev-critical {

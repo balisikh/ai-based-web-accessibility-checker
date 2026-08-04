@@ -59,9 +59,10 @@ Files are written to [`docs/screenshots/`](docs/screenshots/). See [`docs/screen
 | Per-IP rate limiting | Done |
 | Persistence (Postgres or local PGlite) | Done |
 | JSON export | Done |
+| PDF export (scan report) | Done |
 | Optional AI enrichment | Done |
 | Anonymous use (no login) | Done |
-| PDF export / accounts / crawl | Not yet |
+| Accounts / multi-page crawl | Not yet |
 | **Deploy (production host)** | **Docker + CD in repo** — wire host, Postgres, secrets ([`web/DEPLOY.md`](./web/DEPLOY.md)) |
 
 ---
@@ -218,7 +219,8 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 | `POST` | `/api/scans` | Start a scan `{ "url": "https://..." }` |
 | `GET` | `/api/scans/:id` | Status, score, summary |
 | `GET` | `/api/scans/:id/issues` | Issue list |
-| `GET` | `/api/scans/:id/export?format=json` | Download report |
+| `GET` | `/api/scans/:id/export?format=json` | Download JSON report |
+| `GET` | `/api/scans/:id/export?format=pdf` | Download PDF report |
 | `GET` | `/api/health` | Health + DB/AI flags |
 
 ---
@@ -226,9 +228,8 @@ Locked MVP decisions: [`MVP_DECISIONS.md`](./MVP_DECISIONS.md)
 ## Roadmap (next)
 
 1. Deploy to a worker-capable host (Chrome/Playwright) — **Docker + CD workflow in repo**; wire host secrets  
-2. PDF export  
-3. Accounts + scan history  
-4. Multi-page crawl · scheduled batch rescan weekly in [`.github/workflows/batch-rescan.yml`](.github/workflows/batch-rescan.yml)  
+2. Accounts + scan history  
+3. Multi-page crawl · scheduled batch rescan weekly in [`.github/workflows/batch-rescan.yml`](.github/workflows/batch-rescan.yml)  
 
 ---
 

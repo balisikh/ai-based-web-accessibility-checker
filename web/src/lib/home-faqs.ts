@@ -51,7 +51,7 @@ export const HOME_FAQS: HomeFaq[] = [
     summary:
       "What's the difference between a live scan and Website batch results?",
     paragraphs: [
-      "A live scan runs when you click Check accessibility: Playwright opens that URL now, axe runs, and you get fresh results, Export JSON, and optional AI tips.",
+      "A live scan runs when you click Check accessibility: Playwright opens that URL now, axe runs, and you get fresh results, Export JSON, Export PDF, and optional AI tips.",
       "Website batch results is a static snapshot of 28 public sites from the test plan (last resync date on that page). It loads instantly, does not re-scan the web, and includes Pass/Fail counts plus recommended actions per site.",
       `Use live scan to check a URL today; use batch to see portfolio-wide evaluation and compare sites. Both use the same Pass rule (${PASS_FAIL_RULE_INLINE}) on live results and in the batch table.`,
     ],
@@ -60,8 +60,8 @@ export const HOME_FAQS: HomeFaq[] = [
     id: "export-share",
     summary: "Can I export or share my scan?",
     paragraphs: [
-      "Yes — on the results screen, Export JSON downloads a report (URL, score, severities, issues) for tickets, docs, or your own tooling.",
-      "There is no PDF export or public share link in the MVP. Scan data is stored on this server (see What happens to my URL and scan data?) but not published to other users.",
+      "Yes — on the results screen, Export JSON downloads structured data for tooling; Export PDF downloads a formatted report (summary, score, Pass/Fail, and issues) for tickets or stakeholders.",
+      "There is no public share link in the MVP. Scan data is stored on this server (see What happens to my URL and scan data?) but not published to other users.",
       "To share findings, send the JSON file or describe score and top issues. After deploy, you can point reviewers to your hosted Lumen URL for live scans.",
     ],
   },
@@ -69,7 +69,7 @@ export const HOME_FAQS: HomeFaq[] = [
     id: "ai-tips",
     summary: "What are AI tips? Why are they off?",
     paragraphs: [
-      "When enabled, Lumen sends the top few issues (by severity) to an OpenAI-compatible API for a short explanation and suggested fix. Rule findings, score, and Export JSON work without AI.",
+      "When enabled, Lumen sends the top few issues (by severity) to an OpenAI-compatible API for a short explanation and suggested fix. Rule findings, score, and Export JSON/PDF work without AI.",
       "AI tips are off when this server has no AI_API_KEY or OPENAI_API_KEY. That is a deployment setting, not something the website you scan controls.",
       `The ${HOW_IT_WORKS_HEADING} pill and GET /api/health show whether AI is configured. Add a key in web/.env.local (local) or host secrets (production), then restart.`,
     ],
@@ -88,7 +88,7 @@ export const HOME_FAQS: HomeFaq[] = [
     summary: "What happens to my URL and scan data?",
     paragraphs: [
       "Each scan stores the URL, findings, and score in the app database (Postgres in production, or local PGlite under web/data/). There are no user accounts in the MVP.",
-      "Data is used to show your results and Export JSON. Do not paste secrets into URLs — query tokens in links may be stored.",
+      "Data is used to show your results and Export JSON/PDF. Do not paste secrets into URLs — query tokens in links may be stored.",
       "Retention is not automated in the MVP. See web/DEPLOY.md for backup and database notes on hosted environments.",
     ],
   },

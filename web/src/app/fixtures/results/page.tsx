@@ -99,6 +99,7 @@ export default function ResultsLayoutFixturePage() {
           </label>
           <div className="toolbar-actions">
             <span className="button-secondary">Export JSON</span>
+            <span className="button-secondary">Export PDF</span>
             <span className="button-secondary">New scan</span>
           </div>
         </div>

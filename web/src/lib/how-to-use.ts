@@ -34,7 +34,7 @@ export const HOW_TO_USE_STEPS: HowToUseStep[] = [
   {
     step: 5,
     id: "export",
-    title: "Export JSON (optional)",
-    body: "On the results screen, use Export JSON to download the report for tickets, docs, or automation.",
+    title: "Export JSON or PDF (optional)",
+    body: "On the results screen, use Export JSON or Export PDF to download the report for tickets, docs, or sharing with stakeholders.",
   },
 ];

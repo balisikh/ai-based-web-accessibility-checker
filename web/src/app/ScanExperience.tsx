@@ -702,6 +702,12 @@ export function ScanExperience({
                 >
                   Export JSON
                 </a>
+                <a
+                  className="button-secondary"
+                  href={`/api/scans/${scan.id}/export?format=pdf`}
+                >
+                  Export PDF
+                </a>
                 <button type="button" className="button-secondary" onClick={backToHome}>
                   New scan
                 </button>
@@ -732,6 +738,12 @@ export function ScanExperience({
                     href={`/api/scans/${scan.id}/export?format=json`}
                   >
                     Export JSON
+                  </a>
+                  <a
+                    className="button-secondary"
+                    href={`/api/scans/${scan.id}/export?format=pdf`}
+                  >
+                    Export PDF
                   </a>
                   <button
                     type="button"
@@ -776,10 +788,11 @@ export function ScanExperience({
                   )}
                   {selected && (
                     <>
-                      <p className={`sev sev-${selected.severity}`}>
+                      <p className={`sev sev-pill sev-${selected.severity}`}>
                         {selected.severity}
                       </p>
                       <h3>{selected.message}</h3>
+                      <p className="issue-detail-label">Details</p>
                       <dl className="meta">
                         <div>
                           <dt>WCAG</dt>
@@ -792,24 +805,35 @@ export function ScanExperience({
                         <div>
                           <dt>Selector</dt>
                           <dd>
-                            <code>{selected.selector}</code>
+                            <code className="issue-code">{selected.selector}</code>
                           </dd>
                         </div>
                       </dl>
-                      <h4>Snippet</h4>
-                      <pre>
-                        <code>{selected.htmlSnippet}</code>
+                      {selected.ruleId === "color-contrast" && (
+                        <p className="issue-detail-context" role="note">
+                          This finding is about text/background colours on the
+                          scanned page. The snippet shows element markup only —
+                          contrast comes from CSS or HTML attributes on the live
+                          site, which may not all appear here.
+                        </p>
+                      )}
+                      <p className="issue-detail-label">HTML snippet</p>
+                      <p className="issue-detail-hint">
+                        Markup from the scanned page (shown as plain text, not
+                        rendered).
+                      </p>
+                      <pre className="issue-snippet">
+                        <code>{selected.htmlSnippet || "—"}</code>
                       </pre>
                       {selected.helpUrl && (
-                        <p>
-                          <a
-                            href={selected.helpUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Rule help
-                          </a>
-                        </p>
+                        <a
+                          className="issue-help-link"
+                          href={selected.helpUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Open rule help ↗
+                        </a>
                       )}
                       {selected.aiExplanation && (
                         <div className="ai-panel">

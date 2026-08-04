@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { renderScanReportPdf } from "@/lib/scan-report-pdf";
 import { getScan } from "@/lib/store";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -21,9 +23,30 @@ export async function GET(request: Request, { params }: Params) {
   }
 
   const format = new URL(request.url).searchParams.get("format") ?? "json";
+
+  if (format === "pdf") {
+    try {
+      const pdf = await renderScanReportPdf(scan);
+      return new NextResponse(new Uint8Array(pdf), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="lumen-scan-${scan.id}.pdf"`,
+        },
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "PDF export failed.";
+      return NextResponse.json(
+        { error: `Could not generate PDF report. ${message}` },
+        { status: 500 },
+      );
+    }
+  }
+
   if (format !== "json") {
     return NextResponse.json(
-      { error: "Only format=json is supported in this MVP shell." },
+      { error: "Supported formats: json, pdf." },
       { status: 400 },
     );
   }
