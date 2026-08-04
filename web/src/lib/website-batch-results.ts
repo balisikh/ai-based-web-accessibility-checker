@@ -24,7 +24,7 @@ export const BATCH_SNAPSHOT_META = {
   rescannedOk: 27,
   rescannedFailed: 1,
   total: 28,
-} as const;
+};
 
 /** Human-readable resync coverage for batch page and home sidebar. */
 export function batchResyncDetail(): string {

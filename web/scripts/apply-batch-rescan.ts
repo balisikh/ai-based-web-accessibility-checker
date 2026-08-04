@@ -21,15 +21,32 @@ type ReportRow = {
   totalIssues?: number;
 };
 
+/** Matches batch-rescan-report.json (summary is optional for older reports). */
+type BatchRescanReport = {
+  generatedAt: string;
+  rows: ReportRow[];
+  summary?: {
+    ok: number;
+    failed: number;
+  };
+};
+
+function rescanCounts(report: BatchRescanReport): { ok: number; failed: number } {
+  const ok = report.summary?.ok ?? report.rows.filter((r) => r.ok).length;
+  const failed =
+    report.summary?.failed ?? report.rows.filter((r) => !r.ok).length;
+  return { ok, failed };
+}
+
 const reportPath = path.join(process.cwd(), "batch-rescan-report.json");
 const outPath = path.join(process.cwd(), "src/lib/website-batch-results.ts");
 
-const report = JSON.parse(fs.readFileSync(reportPath, "utf8")) as {
-  generatedAt: string;
-  rows: ReportRow[];
-};
+const report = JSON.parse(
+  fs.readFileSync(reportPath, "utf8"),
+) as BatchRescanReport;
 
 const snapshotDate = report.generatedAt.slice(0, 10);
+const { ok: rescannedOk, failed: rescannedFailed } = rescanCounts(report);
 
 const lines: string[] = [
   `/**`,
@@ -55,10 +72,10 @@ const lines: string[] = [
   `/** Last full live rescan stats (from batch-rescan-report.json via batch:apply-rescan). */`,
   `export const BATCH_SNAPSHOT_META = {`,
   `  date: "${snapshotDate}",`,
-  `  rescannedOk: ${report.summary?.ok ?? report.rows.filter((r) => r.ok).length},`,
-  `  rescannedFailed: ${report.summary?.failed ?? report.rows.filter((r) => !r.ok).length},`,
+  `  rescannedOk: ${rescannedOk},`,
+  `  rescannedFailed: ${rescannedFailed},`,
   `  total: ${WEBSITE_BATCH_RESULTS.length},`,
-  `} as const;`,
+  `};`,
   ``,
   `/** Human-readable resync coverage for batch page and home sidebar. */`,
   `export function batchResyncDetail(): string {`,
