@@ -302,7 +302,7 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 
 ---
 
-## MVP feature checklist
+## MVP feature checklist (summary)
 
 | Area | Status |
 |------|--------|
@@ -321,6 +321,269 @@ Each feature below follows the same structure: **what it is**, **why we use it**
 | SEO (sitemap, OG, JSON-LD) | Done |
 | Docker + CD workflow | Done |
 | PDF export / accounts / multi-page crawl | Not yet |
+
+---
+
+## MVP features — detailed reference
+
+Each completed MVP item below explains **what it does**, **why it exists**, and **how it is implemented** in Lumen. Deferred items explain what they would add and why they are out of scope for v1.
+
+---
+
+### MVP-1. Scan UI (home → progress → results) — Done
+
+| | |
+|---|---|
+| **What it does** | Guides the user from URL entry through live scan progress to a full results view: score ring, Pass/Fail badge, severity summary, filterable issue list, and per-issue detail (selector, HTML snippet, WCAG criteria, axe help link). |
+| **Why it exists** | Accessibility scanning is slow and technical. Progressive UI states (`queued` → `fetching` → `rendering` → `rule_analysis` → `ai_enrichment` → `scoring` → `completed`) set expectations and match the product goal of a fast, understandable first report. |
+| **How it is implemented** | **Client:** `web/src/app/ScanExperience.tsx` — submits `POST /api/scans`, polls `GET /api/scans/:id` every ~1s until `completed` or `failed`, renders issue panel and export button. **Server:** `web/src/app/page.tsx` passes batch snapshot date via `getBatchSnapshot()`. **Copy:** steps in `how-to-use.ts`, rules in `product-copy.ts`. **QA:** `/fixtures/results` shows layout without a live scan. **Styling:** `globals.css` — orange home CTA, teal accents, Pass/Fail row tints. |
+| **How to use it** | Open `/` → enter URL or click a **Try example** chip → **Check accessibility** → review results → click issues for detail → **Export JSON** when done. |
+
+---
+
+### MVP-2. Live Playwright + axe-core analysis — Done
+
+| | |
+|---|---|
+| **What it does** | Renders the target URL in headless Chrome, waits for DOM readiness, runs axe-core WCAG-tagged rules, and maps violations into Lumen issue objects with severity, selector, and help URLs. |
+| **Why it exists** | Many accessibility failures only appear after JavaScript runs (SPAs, lazy content). axe-core is widely used, maps to WCAG success criteria, and keeps detection separate from AI explanation. |
+| **How it is implemented** | **Orchestration:** `scan-runner.ts` → `runLiveScan()` calls `analyzeUrlWithAxe()` then optional AI, then `scoreFromIssues()`. **Browser:** `live-scan.ts` — singleton Chromium via Playwright (`channel: "chrome"` locally; `PLAYWRIGHT_CHROMIUM=1` in Docker/CI). Navigation retries: `domcontentloaded` → `load` → `commit` (45s timeout each). **axe:** tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`; iframes excluded for stability. **Mapping:** `axe-mapper.ts` → `Issue` type in `types.ts`. **Retry:** one full retry with fresh browser on network errors. |
+| **How to use it** | Automatic on every live scan. Typical duration: **10–60 seconds** per URL depending on site weight and network. |
+
+---
+
+### MVP-3. URL validation + SSRF protections — Done
+
+| | |
+|---|---|
+| **What it does** | Rejects malformed URLs, non-http(s) schemes, localhost, private IP ranges, link-local addresses, and cloud metadata hostnames before any browser fetch occurs. DNS is resolved and checked again so hostname tricks cannot reach internal networks. |
+| **Why it exists** | A public scanner is an SSRF risk vector — without guards, an attacker could probe internal services (`192.168.x.x`, `169.254.x.x`, `metadata.google.internal`). |
+| **How it is implemented** | **Format:** `validate-url.ts` — trim, add `https://` if missing, require `http:`/`https:`, block `PRIVATE_HOST_PATTERNS` (localhost, 127.x, 10.x, 172.16–31.x, ::1, etc.). Called from `POST /api/scans` before queueing. **DNS SSRF:** `ssrf.ts` — `assertPublicHostname()` resolves hostname and rejects private/reserved IPs; invoked inside `live-scan.ts` before Playwright navigation. **User copy:** blocked-URL explanations in `home-faqs.ts` and `URL_PUBLIC_HINT` in `product-copy.ts`. |
+| **How to use it** | Paste only public `http`/`https` URLs. Private/local addresses return **400** with a plain-language error — no scan is started. |
+
+---
+
+### MVP-4. Per-IP rate limiting — Done
+
+| | |
+|---|---|
+| **What it does** | Caps how many scan requests (and batch refresh starts) each client IP can make within a time window. Over limit → HTTP **429** with `Retry-After` header and seconds in the JSON body. |
+| **Why it exists** | Each live scan launches Chromium and loads a full page — expensive on CPU and RAM. Rate limits prevent abuse and keep the app responsive on shared or low-resource hosts. |
+| **How it is implemented** | **Core:** `rate-limit.ts` — in-memory fixed-window `Map` keyed by IP (or custom key). **Live scans:** `POST /api/scans` uses `checkRateLimit(ip)` — default **5 requests per 60 seconds** in production (`RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS`); higher in dev if unset. **Batch refresh:** separate bucket via `getBatchRefreshRateLimit()` in `batch-refresh-config.ts` — **5 per 10 min** when refresh enabled locally; **1 per hour** on production hosts. **IP extraction:** `getClientIp()` reads `x-forwarded-for` / `x-real-ip` behind proxies. |
+| **How to use it** | Normal use stays under limits. If throttled, wait for the retry period shown in the UI or API response. Self-hosted: tune env vars in `.env.local`. |
+
+---
+
+### MVP-5. Persistence (Postgres or PGlite) — Done
+
+| | |
+|---|---|
+| **What it does** | Stores every scan record and its issues in a relational database so results survive refresh, shareable URLs work, and JSON export reads historical data. |
+| **Why it exists** | In-memory storage would lose all scans on restart or deploy. Production needs durable storage; local dev should work with zero database setup. |
+| **How it is implemented** | **Schema:** `db.ts` — tables `scans` (id, url, status, timestamps, score, severity counts, error) and `issues` (rule, severity, selector, snippet, WCAG criteria JSON, optional AI fields). Index on `issues.scan_id`. **Backends:** PGlite (embedded Postgres) at `web/data/lumen-pg` when `DATABASE_URL` unset; real Postgres `Pool` when set. **Access layer:** async functions in `store.ts` — `saveScan`, `getScan`, `updateScan`, issue upserts on completion. **Health:** `GET /api/health` reports DB mode and connectivity. |
+| **How to use it** | Local: automatic PGlite — no install. Production: set `DATABASE_URL` (see `web/DEPLOY.md`). Scan URLs like `/` with active result use stored scan IDs internally. |
+
+---
+
+### MVP-6. JSON export — Done
+
+| | |
+|---|---|
+| **What it does** | Downloads a complete machine-readable report after a scan finishes: URL, timestamps, WCAG target level, score, severity counts, and full issue array (including optional AI fields). |
+| **Why it exists** | Developers attach reports to tickets, feed QA pipelines, or archive findings. JSON is the MVP export format before PDF. |
+| **How it is implemented** | **API:** `GET /api/scans/:id/export?format=json` in `export/route.ts`. Returns **409** if scan not `completed`; **400** if format ≠ json. **Payload fields:** `generator`, `disclaimer`, `scannedUrl`, `scannedAt`, `completedAt`, `wcagLevelTarget`, `score`, `summaryCounts`, `issues[]`. **Download:** `Content-Disposition: attachment; filename="lumen-scan-{id}.json"`. **UI:** Export button on results panel in `ScanExperience.tsx`. |
+| **How to use it** | Complete a scan → click **Export JSON** or call the API directly with the scan ID. |
+
+---
+
+### MVP-7. Optional AI enrichment — Done
+
+| | |
+|---|---|
+| **What it does** | After axe finds issues, sends the top N (by severity) to an OpenAI-compatible chat API for a plain-language explanation and suggested fix. Scoring and Pass/Fail are **not** changed by AI. |
+| **Why it exists** | Rule output is accurate but terse. AI helps junior developers understand impact and remediation without replacing axe as the source of truth. |
+| **How it is implemented** | **Module:** `ai-enrichment.ts` — batches top issues, calls Chat Completions with structured prompt, writes `aiExplanation`, `aiRemediation`, `aiConfidence` onto issue rows. **Pipeline slot:** `scan-runner.ts` sets status `ai_enrichment` before scoring. **Config:** `AI_API_KEY` or `OPENAI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` (default `gpt-4o-mini`), `AI_MAX_ISSUES` (default 5). **Failure handling:** API errors log and skip — scan still completes with axe-only data. **UI flag:** `GET /api/config` → `{ aiTipsEnabled: boolean }` — no secrets exposed to client. |
+| **How to use it** | Set API key in `.env.local`, restart server. AI sections appear on top issues in results. Without a key, axe results work unchanged. |
+
+---
+
+### MVP-8. Anonymous use (no login) — Done
+
+| | |
+|---|---|
+| **What it does** | Anyone can run scans and view results without creating an account, signing in, or managing sessions. Scans are identified by opaque IDs, not user profiles. |
+| **Why it exists** | MVP goal is frictionless “paste URL → get report” for portfolio demos, interviews, and quick checks. Auth adds scope (passwords, GDPR, scan history ownership) beyond v1. |
+| **How it is implemented** | **No auth middleware** — no NextAuth, cookies, or JWT checks on API routes. **Scan IDs:** `createScanId()` in `store.ts` — random UUID-style identifiers. **Abuse control:** rate limiting by IP instead of per-user quotas. **Data retention:** scans persist in DB/PGlite but are not tied to accounts; no “my scans” UI. **Privacy copy:** `home-faqs.ts` data FAQ explains what is stored locally vs on server. |
+| **How to use it** | Open the app and scan — no signup. Share results by keeping the browser session or exporting JSON (no account-linked history page yet). |
+
+---
+
+### MVP-9. Batch dashboard (28 sites) — Done
+
+| | |
+|---|---|
+| **What it does** | Shows a pre-computed Pass/Fail dashboard for 28 diverse public websites: summary tiles (tested, passed, failed, issue totals), sortable table (score, severities, date), Pass/Fail badges, and contextual notes for tricky sites. |
+| **Why it exists** | Proves Lumen on real-world pages instantly — media SPAs, e-commerce, docs, intentional bad demo (W3C) — without making every visitor wait for 28 live scans. |
+| **How it is implemented** | **Data:** `website-batch-results.ts` — 28 rows with id, name, url, score, severities, date, optional `note`. **Page:** `web/src/app/batch/page.tsx` — server-rendered summary + table. **Pass/Fail:** `website-pass-fail.ts`. **Guidance:** `website-batch-fail-guidance.ts` / pass guidance for tooltips. **Unified snapshot:** `batch-snapshot-store.ts` — prefers `data/batch-live-snapshot.json` after refresh, else committed TS. **Client-safe types:** `batch-snapshot-types.ts` (no Node `fs` in client bundle). **Read API:** `GET /api/batch/snapshot`. |
+| **How to use it** | Nav → **Batch results**. Review portfolio benchmark. Use **Run a live scan** to test your own URL. Snapshot date shown in header and home sidebar. |
+
+---
+
+### MVP-10. Refresh snapshot (background batch rescan) — Done
+
+| | |
+|---|---|
+| **What it does** | Rescans all 28 batch URLs live from the `/batch` page, saves updated scores to runtime JSON, and reloads the UI — without blocking other pages or holding one HTTP request open for the full run. |
+| **Why it exists** | Committed snapshot dates go stale. Developers and demo hosts need fresh data on demand without running CLI scripts or waiting 30+ minutes on a sequential blocking refresh. |
+| **How it is implemented** | **Start:** `POST /api/batch/refresh` → **202 Accepted** immediately. **Job state:** `batch-refresh-job.ts` — in-memory `running` / `done` / `failed` with progress `{ current, total, siteName }`. **Rescan engine:** `batch-live-rescan.ts` — `mapWithConcurrency()` (default 2 workers), `withTimeout()` 90s per site, failed sites keep prior row with note. **Poll:** `GET /api/batch/refresh`. **UI:** `BatchRefreshButton.tsx` polls every 2s, shows `Scanning {site} ({N}/28)…`. **Save:** `saveBatchSnapshot()` → `web/data/batch-live-snapshot.json`. **Enable:** dev by default; production requires `BATCH_REFRESH_ENABLED=1`. **Measured performance:** 28/28 in **~88 seconds** on local low-mem setup. |
+| **How to use it** | `/batch` → **Refresh snapshot**. App stays usable during rescan. Set env vars in `.env.local` for concurrency and rate limits. |
+
+---
+
+### MVP-11. Weekly CI batch rescan — Done
+
+| | |
+|---|---|
+| **What it does** | GitHub Actions automatically live-rescans all 28 sites, validates the snapshot, and commits updated `website-batch-results.ts` to `main` when scores change. |
+| **Why it exists** | Runtime JSON from Refresh snapshot does not survive Docker redeploys. Git-committed data keeps production `/batch` accurate after every deploy. |
+| **How it is implemented** | **Workflow:** `.github/workflows/batch-rescan.yml` — cron `0 4 * * 0` (Sunday 04:00 UTC) + `workflow_dispatch`. **Steps:** checkout → Node 22 → `npm ci` → Playwright Chromium → `npm run batch:sync` (`batch:rescan` → `batch:apply-rescan` → `validate:batch`) → commit/push if diff. **Scripts:** `scripts/batch-rescan.ts`, `apply-batch-rescan.ts`, `validate-batch-snapshot.ts`. **Concurrency group:** `batch-rescan` — no cancel-in-progress. **Timeout:** 120 minutes. |
+| **How to use it** | Automatic weekly. Manual: GitHub → Actions → **Batch rescan** → Run workflow. Local equivalent: `npm run batch:sync` then git commit. |
+
+---
+
+### MVP-12. Responsive layout + viewport CI — Done
+
+| | |
+|---|---|
+| **What it does** | Adapts layout from 320px phones to 1440px+ desktops: stacked home form on mobile, batch cards on tablet, full tables on laptop/desktop, 44px touch targets, tiered gutters. CI fails if pages overflow horizontally at key widths. |
+| **Why it exists** | Accessibility tools must be usable on the devices teams actually carry. Horizontal overflow is a common responsive bug that breaks mobile review workflows. |
+| **How it is implemented** | **CSS:** `globals.css` breakpoint tokens — `--bp-mobile` 480, `--bp-tablet` 768, `--bp-stack` 800, `--bp-laptop` 1024, `--bp-desktop` 1440. Batch table ↔ card swap, 2×2 summary grids on tablet. **Viewport meta:** `layout.tsx` — zoom allowed (accessibility requirement). **Test script:** `scripts/responsive-viewport-check.ts` — Playwright measures `scrollWidth` vs viewport at 320, 390, 768, 1024, 1280, 1440 on `/`, `/batch`, `/fixtures/results`. **CI:** `responsive-viewport` job in `ci.yml`. |
+| **How to use it** | Resize browser or DevTools device toolbar. Run `npm run test:responsive` locally (requires `npm run start` in another terminal). |
+
+---
+
+### MVP-13. SEO (sitemap, OG, JSON-LD) — Done
+
+| | |
+|---|---|
+| **What it does** | Exposes search-engine metadata: page titles/descriptions, canonical URLs, Open Graph/Twitter cards, `robots.txt`, dynamic `sitemap.xml`, favicon, and JSON-LD structured data for the public site. |
+| **Why it exists** | When deployed, Lumen should be discoverable and preview correctly on LinkedIn/GitHub links — important for portfolio visibility. |
+| **How it is implemented** | **Metadata:** `seo.ts` + `layout.tsx` — `SITE_TITLE`, `SITE_DESCRIPTION`, keywords, OG image `/og.png`. **URLs:** `site-url.ts` — `getSiteUrl()` from `NEXT_PUBLIC_SITE_URL`. **Routes:** `app/sitemap.ts`, `app/robots.ts`, `app/icon.svg`. **JSON-LD:** WebApplication schema in layout. Production requires `NEXT_PUBLIC_SITE_URL` for correct absolute links. |
+| **How to use it** | Set `NEXT_PUBLIC_SITE_URL=https://your-domain` on deploy. Submit `https://your-domain/sitemap.xml` in Google Search Console. |
+
+---
+
+### MVP-14. Docker + CD workflow — Done
+
+| | |
+|---|---|
+| **What it does** | Builds a production container with Next.js standalone output, bundled Chromium for Playwright, and pushes to GitHub Container Registry after CI passes on `main`. Optional Render deploy hook triggers hosting. |
+| **Why it exists** | Live scanning requires Chrome on the server — Docker standardizes that environment. CD automates repeatable deploys for portfolio/production hosting. |
+| **How it is implemented** | **Dockerfile:** multi-stage — deps → `npm run build` → runner with `output: standalone`, `PLAYWRIGHT_CHROMIUM=1`, `npx playwright install chromium --with-deps`, port **4376**. **CD:** `.github/workflows/cd.yml` — triggers after CI green on `main`, builds/pushes `ghcr.io/<owner>/lumen-web`. **Secrets:** `RENDER_DEPLOY_HOOK` optional. **Docs:** `web/DEPLOY.md` — env vars, Postgres, SEO URL. |
+| **How to use it** | `docker build -f web/Dockerfile web`. Or rely on GHCR image from CD pipeline. Configure host with `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL`, optional AI keys. |
+
+---
+
+### MVP-15. Deferred: PDF export, accounts, multi-page crawl — Not yet
+
+| | |
+|---|---|
+| **What they would do** | **PDF export:** downloadable formatted report (like JSON but for stakeholders). **Accounts:** sign-in, saved scan history, per-user quotas. **Multi-page crawl:** start at one URL and automatically follow same-domain links to scan many pages in one job. |
+| **Why deferred** | MVP prioritizes **fast single-URL reports** and a **28-site portfolio benchmark**. PDF adds layout work; accounts add auth, privacy, and retention policy; crawl adds queues, deduplication, timeouts, and bot-wall handling — each is a major feature beyond v1 scope. |
+| **What exists today instead** | **JSON export** covers developer handoff. **Anonymous + rate limit** covers access control lightly. **Single URL + batch list** covers demo and regression without whole-site spidering. |
+| **Likely implementation path (future)** | PDF: server-side template from scan JSON (Playwright PDF or react-pdf). Accounts: NextAuth + user_id on scans table. Crawl: bounded BFS worker with max depth/pages, same-domain filter, shared scan queue — after public deploy proves demand. |
+
+---
+
+## Scoring formula (used across live scans and batch)
+
+| Severity | Score penalty |
+|----------|--------------:|
+| Critical | −25 each |
+| Serious | −15 each |
+| Moderate | −7 each |
+| Minor | −3 each |
+
+**Formula:** start at 100, subtract penalties, clamp 0–100. Zero issues = **100**.  
+**Pass (batch):** score ≥ 85 **and** critical = 0.  
+**Labels:** Strong (≥85), Fair (60–84), Needs work (&lt;60).  
+**Source:** `store.ts` (`WEIGHTS`, `scoreFromIssues`) and `product-copy.ts` (`SCORE_FORMULA`).
+
+---
+
+## API reference (MVP)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/scans` | Start scan `{ "url": "https://..." }` → `{ scanId }` |
+| GET | `/api/scans/:id` | Status, score, summary counts |
+| GET | `/api/scans/:id/issues` | Paginated/filtered issue list |
+| GET | `/api/scans/:id/export?format=json` | Download JSON report |
+| GET | `/api/batch/snapshot` | Batch date, meta, summary (no rescan) |
+| POST | `/api/batch/refresh` | Start background 28-site rescan (202) |
+| GET | `/api/batch/refresh` | Poll refresh job progress |
+| GET | `/api/config` | `{ aiTipsEnabled }` |
+| GET | `/api/health` | Service + database mode |
+
+---
+
+## Software testing approach
+
+**Software testing** is the process of checking that software behaves as intended, finding defects before users do, and recording evidence that requirements are met. You run planned checks, compare actual results to expected outcomes, and log pass/fail.
+
+Lumen uses testing at **two levels** — the **tool** (does Lumen work?) and the **28 websites** (what do automated axe findings show for each site?).
+
+### Level 1 — Testing Lumen (the tool)
+
+| Type | What we did | Where |
+|------|-------------|-------|
+| **Manual functional testing** | Homepage, scan flow, results, export, errors for bad URLs | `TEST_PLAN.md` (UI-*, SEC-*, API-*) |
+| **Manual security testing** | Block invalid URLs, localhost, private IPs; rate-limit abuse | `TEST_PLAN.md` SEC-01–SEC-04 |
+| **Automated CI** | Lint, typecheck, build, batch validation, responsive viewport | `.github/workflows/ci.yml` — `npm run ci` |
+| **Regression testing** | Re-run scans and batch sync after code changes | `TEST_PLAN.md` REG-01; `npm run batch:sync` |
+
+**Purpose:** Confirm Lumen can scan, score, persist, export, and protect itself before trusting batch results.
+
+### Level 2 — Testing the 28 websites (scan targets)
+
+| Type | What we did | Where |
+|------|-------------|-------|
+| **Live multi-site scans** | Playwright + axe on all 28 public URLs | `npm run batch:sync`, **Refresh snapshot**, weekly CI |
+| **Pass/Fail acceptance rule** | Pass = score ≥ 85 and critical = 0; Fail otherwise | `website-pass-fail.ts`, `TEST_RESULTS.md` |
+| **Results logging** | Scores, severities, notes, recommended actions per site | `TEST_RESULTS.md`, `website-batch-results.ts` |
+| **Snapshot validation** | Totals match rows; Pass/Fail consistent with score formula | `npm run validate:batch` |
+| **Scheduled re-test** | Weekly rescan; commit if scores change | `.github/workflows/batch-rescan.yml` |
+
+**Purpose:** Build a reproducible portfolio benchmark — diverse real sites (SPAs, media, e-commerce, docs, intentional bad demo) — not a legal WCAG audit.
+
+### 28-site test flow
+
+1. **Select** 28 public URLs (Google UK, BBC, Netflix, W3Schools, W3C bad demo, etc.).
+2. **Scan** each URL — Chrome renders page → axe runs WCAG A/AA tagged rules.
+3. **Score** — start at 100; subtract per issue (critical −25, serious −15, moderate −7, minor −3).
+4. **Classify** — apply Pass/Fail rule; record in batch table.
+5. **Validate** — `validate:batch` checks internal consistency.
+6. **Re-run** — manual refresh, CLI sync, or weekly CI to catch site changes.
+
+**Latest full refresh:** 28/28 OK in ~88 seconds (Aug 2026 background rescan). Example outcome: **8 Pass / 20 Fail** (varies by resync date).
+
+### Testing types used (summary)
+
+| Testing type | In Lumen |
+|--------------|----------|
+| **Functional** | Scan returns score + issues; batch table renders |
+| **Integration** | Playwright + axe + DB + API pipeline end-to-end |
+| **Regression** | Re-scan 28 sites after changes; CI on every push |
+| **Security** | SSRF blocks, rate limits (TEST_PLAN SEC-*) |
+| **Acceptance / MVP** | 28 sites logged; batch dashboard + export working |
+| **Automated** | `batch:sync`, `validate:batch`, GitHub Actions |
+| **Manual** | TEST_PLAN UI checks; reviewer notes on failed sites |
+
+### Important distinction
+
+Testing the **28 websites** means: *we ran Lumen’s automated axe rules on each URL and recorded Pass/Fail by our score rule.* It does **not** mean those sites are legally WCAG compliant or fully accessible — automated rules catch many but not all barriers (manual assistive-technology testing is still required for conformance claims).
+
+**Related docs:** `TEST_PLAN.md` (tool tests) · `TEST_RESULTS.md` (website Pass/Fail log) · `/batch` (live dashboard)
 
 ---
 
