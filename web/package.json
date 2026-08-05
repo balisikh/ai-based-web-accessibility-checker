@@ -2,6 +2,9 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev -p 4376 --webpack",
     "dev:low-mem": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev -p 4376 --webpack",

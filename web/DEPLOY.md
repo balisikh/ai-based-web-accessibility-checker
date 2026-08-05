@@ -72,6 +72,37 @@ docker push ghcr.io/<owner>/lumen-web:latest
 
 Then redeploy your service to pull the new tag.
 
+## Vercel: fix `404 NOT_FOUND` on every route
+
+If you see Vercel’s plain **`404: NOT_FOUND`** page (with `Code: NOT_FOUND` and an ID like `lhr1::…`) on **all** URLs, the project is not building the Next.js app in **`web/`**.
+
+### Required project settings
+
+In **Vercel → Project → Settings → Build and Deployment**:
+
+| Setting | Must be |
+|---------|---------|
+| **Root Directory** | **`web`** (not `./` or empty repo root) |
+| **Framework Preset** | **Next.js** (not **Other**) |
+| **Output Directory** | **empty** (default — do not set `.next` manually) |
+| **Build Command** | `npm run build` (default, or from [`vercel.json`](./vercel.json)) |
+
+Then **Deployments → Redeploy → Clear build cache**.
+
+### Confirm the build worked
+
+Build logs must include **`Detected Next.js`**, **`Running "npm run build"`**, and a **route list** (`/`, `/batch`, `/api/health`, …). A build that finishes in under a second means the wrong folder is still selected.
+
+### Still broken?
+
+1. Delete the Vercel project and re-import from GitHub.
+2. On import, set **Root Directory = `web`** before the first deploy.
+3. After the home page loads, add env vars for [hybrid scans](#vercel-ui--docker-scan-worker-hybrid) and redeploy.
+
+The repo includes [`web/vercel.json`](./vercel.json) so Vercel treats this folder as Next.js. That file is **ignored** if Root Directory points at the repo root instead of `web/`.
+
+---
+
 ## Vercel UI + Docker scan worker (hybrid)
 
 Use this when the **public site** is on [Vercel](https://vercel.com) but **real scans** need Playwright in a container (Render, Railway, Fly, etc.). The Vercel app serves pages and API routes that read/write **shared Postgres**; live browser work runs on the worker.
