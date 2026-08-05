@@ -105,7 +105,7 @@ export const HOME_FAQS: HomeFaq[] = [
     id: "who-built",
     summary: "Who built this?",
     paragraphs: [
-      "Lumen is an AI-based web accessibility checker built as a portfolio project by Baljinder Sikh (GitHub: balisikh).",
+      "Lumen scans public pages for WCAG accessibility issues, with optional AI fix guidance — built as a portfolio project by Baljinder Sikh (GitHub: balisikh).",
       "Stack: Next.js, Playwright, axe-core, optional OpenAI-compatible AI tips, and a 28-site batch evaluation snapshot documented in TEST_RESULTS.md.",
       "Source, docs, and issues: https://github.com/balisikh/ai-based-web-accessibility-checker",
     ],

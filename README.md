@@ -1,8 +1,8 @@
-# Lumen — AI-Based Web Accessibility Checker
+# Lumen — Scan any public page for WCAG accessibility issues, with optional AI fix guidance
 
 [![CI status](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
 
-Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and (optionally) AI-guided fix tips.
+Built with Playwright + axe-core · JSON & PDF export · Batch dashboard
 
 **Live product UI brand:** Lumen  
 **App code:** [`web/`](./web)  

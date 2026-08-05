@@ -3,10 +3,10 @@ import { PRODUCT_NAME } from "./product-copy";
 import { absoluteUrl, getSiteUrl } from "./site-url";
 
 export const SITE_TITLE =
-  "WCAG Accessibility Checker — Scan Public URLs for axe Issues";
+  "Lumen — WCAG accessibility scanner with optional AI guidance";
 
 export const SITE_DESCRIPTION =
-  "Lumen scans any public URL with Playwright and axe-core for WCAG A/AA-oriented accessibility issues. Get a 0–100 score, severity breakdown, JSON export, and optional AI fix tips.";
+  "Scan any public page for WCAG accessibility issues, with optional AI fix guidance. Playwright + axe-core, scored reports, JSON and PDF export.";
 
 export const SITE_KEYWORDS = [
   "accessibility checker",

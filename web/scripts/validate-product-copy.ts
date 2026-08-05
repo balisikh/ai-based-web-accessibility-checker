@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { HOW_TO_USE_STEPS } from "../src/lib/how-to-use";
 import { HOME_FAQS } from "../src/lib/home-faqs";
+import { PRODUCT_TAGLINE } from "../src/lib/product-copy";
 
 function fail(message: string): never {
   console.error("validate:copy FAIL:", message);
@@ -58,6 +59,12 @@ for (const faq of HOME_FAQS) {
 
 if (!readme.includes("product-copy.ts")) {
   fail("README must reference web/src/lib/product-copy.ts as shared UI copy source");
+}
+
+if (!readme.includes(PRODUCT_TAGLINE)) {
+  fail(
+    "README title/tagline must match PRODUCT_TAGLINE in web/src/lib/product-copy.ts",
+  );
 }
 
 console.log(

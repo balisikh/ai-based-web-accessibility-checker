@@ -1,6 +1,6 @@
 # Lumen — Portfolio Documentation
 
-AI-Based Web Accessibility Checker
+Scan any public page for WCAG accessibility issues, with optional AI fix guidance
 
 Repository: https://github.com/balisikh/ai-based-web-accessibility-checker  
 Local app: http://localhost:4376  

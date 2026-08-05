@@ -5,6 +5,14 @@
 
 export const PRODUCT_NAME = "Lumen";
 
+/** Primary one-line product description (README, About, FAQs). */
+export const PRODUCT_TAGLINE =
+  "Scan any public page for WCAG accessibility issues, with optional AI fix guidance";
+
+/** Secondary line for GitHub / docs — stack and headline features. */
+export const PRODUCT_TECH_SUBLINE =
+  "Built with Playwright + axe-core · JSON & PDF export · Batch dashboard";
+
 export const DISCLAIMER_ASSISTIVE =
   "Automated axe results help you improve pages — not a legal WCAG certificate or full manual audit.";
 
