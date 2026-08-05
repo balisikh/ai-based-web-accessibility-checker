@@ -130,6 +130,8 @@ Copy `.env.example` to `.env.local` and adjust:
 | `AI_MODEL` | Model name (default `gpt-4o-mini`) |
 | `AI_MAX_ISSUES` | Top issues to enrich (default `5`) |
 | `USE_DEMO_SCAN=1` | Sample findings instead of Playwright/axe |
+| `SCAN_WORKER_URL` | Vercel UI: origin of Docker scan worker (hybrid deploy — see [DEPLOY.md](./DEPLOY.md#vercel-ui--docker-scan-worker-hybrid)) |
+| `SCAN_WORKER_SECRET` | Shared Bearer secret between Vercel and worker |
 | `BATCH_REFRESH_ENABLED=1` | Enable **Refresh snapshot** on `/batch` in production (`POST /api/batch/refresh`) |
 
 ### Examples

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { isScanWorkerProxyEnabled } from "@/lib/scan-worker-config";
+import { fetchScanPdfFromWorker } from "@/lib/scan-worker-client";
 import { renderScanReportPdf } from "@/lib/scan-report-pdf";
 import { getScan } from "@/lib/store";
 
@@ -26,6 +28,24 @@ export async function GET(request: Request, { params }: Params) {
 
   if (format === "pdf") {
     try {
+      if (isScanWorkerProxyEnabled()) {
+        const workerRes = await fetchScanPdfFromWorker(scan.id);
+        if (!workerRes.ok) {
+          const detail = (await workerRes.text().catch(() => "")).slice(0, 240);
+          throw new Error(
+            detail || `Worker PDF export returned ${workerRes.status}.`,
+          );
+        }
+        const pdf = await workerRes.arrayBuffer();
+        return new NextResponse(pdf, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="lumen-scan-${scan.id}.pdf"`,
+          },
+        });
+      }
+
       const pdf = await renderScanReportPdf(scan);
       return new NextResponse(new Uint8Array(pdf), {
         status: 200,

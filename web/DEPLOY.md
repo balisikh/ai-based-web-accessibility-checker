@@ -71,3 +71,80 @@ docker push ghcr.io/<owner>/lumen-web:latest
 ```
 
 Then redeploy your service to pull the new tag.
+
+## Vercel UI + Docker scan worker (hybrid)
+
+Use this when the **public site** is on [Vercel](https://vercel.com) but **real scans** need Playwright in a container (Render, Railway, Fly, etc.). The Vercel app serves pages and API routes that read/write **shared Postgres**; live browser work runs on the worker.
+
+```
+Visitor → your-project.vercel.app
+            POST /api/scans → saves scan (queued) in Neon
+                         → POST worker /api/worker/scans/:id/run (secret)
+            GET  /api/scans/:id  → polls Neon until completed
+
+Worker  → lumen-worker.onrender.com (Docker)
+            runLiveScan() with Playwright + axe-core
+            writes results to same Neon DATABASE_URL
+```
+
+### 1. Postgres (required for hybrid)
+
+Create a database ([Neon](https://neon.tech), Vercel Postgres, Supabase, etc.) and copy **`DATABASE_URL`**. Use the **same** URL on Vercel and on the worker.
+
+PGlite does not persist on Vercel — do not rely on it for hybrid deploys.
+
+### 2. Scan worker (Docker / Render)
+
+Deploy the same repo with [`web/Dockerfile`](./Dockerfile) (see [Render](#render-optional) above).
+
+| Variable | Worker value |
+|----------|----------------|
+| `DATABASE_URL` | Shared Postgres URL |
+| `PLAYWRIGHT_CHROMIUM` | `1` (set in Dockerfile) |
+| `SCAN_WORKER_SECRET` | Long random string — **same value on Vercel** |
+| `OPENAI_API_KEY` / `AI_API_KEY` | Optional — AI runs on worker during scan |
+| `SCAN_WORKER_URL` | **Leave unset** on the worker |
+
+Note the worker’s public URL, e.g. `https://lumen-worker.onrender.com`.
+
+### 3. Vercel project
+
+1. **Add New Project** → import repo → **Root Directory:** `web`.
+2. **Environment variables** (Production + Preview):
+
+| Variable | Vercel value |
+|----------|----------------|
+| `DATABASE_URL` | Same Postgres URL as worker |
+| `SCAN_WORKER_URL` | Worker origin, no trailing slash |
+| `SCAN_WORKER_SECRET` | Same secret as worker |
+| `NEXT_PUBLIC_SITE_URL` | `https://your-project.vercel.app` (or custom domain later) |
+| `RATE_LIMIT_MAX` | e.g. `5` |
+
+**Do not set** `SCAN_WORKER_URL` on Vercel to itself. **Do not enable** `BATCH_REFRESH_ENABLED` on Vercel (batch refresh needs long Playwright jobs on the worker host).
+
+3. Deploy. Use the `*.vercel.app` URL first — **do not move DNS** from an existing production host until scans are verified.
+
+### 4. Verify
+
+| Check | Expected |
+|-------|----------|
+| `GET /api/health` on Vercel | `"scanExecution": "worker_proxy"`, `"db": "postgres"` |
+| `GET /api/health` on worker | `"scanExecution": "local"`, `"db": "postgres"` |
+| Home → scan `https://example.com` | Completes with real score |
+| Export JSON | Works from Vercel (reads Neon) |
+| Export PDF | Proxied to worker Playwright |
+
+### 5. Safe rollout (no impact on existing site)
+
+- Keep Render/CD and any current production URL unchanged.
+- Vercel gets a **separate** `*.vercel.app` URL until you choose to switch DNS.
+- Only point a custom domain at Vercel after hybrid scans pass on the preview URL.
+
+### How it works in code
+
+- When `SCAN_WORKER_URL` and `SCAN_WORKER_SECRET` are set, `POST /api/scans` calls [`triggerScanOnWorker`](./src/lib/scan-worker-client.ts) instead of local Playwright.
+- The worker exposes `POST /api/worker/scans/:id/run` (Bearer auth) and runs [`runLiveScan`](./src/lib/scan-runner.ts).
+- PDF export on Vercel proxies to the worker’s `GET /api/scans/:id/export?format=pdf`.
+
+Single-host Docker deploy (no Vercel) is unchanged — leave `SCAN_WORKER_URL` unset and scans run locally.
+

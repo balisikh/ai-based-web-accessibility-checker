@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createQueuedScan, runLiveScan } from "@/lib/scan-runner";
 import { runDemoScan } from "@/lib/demo-scan";
-import { toSummary } from "@/lib/store";
+import {
+  isScanWorkerProxyEnabled,
+} from "@/lib/scan-worker-config";
+import { triggerScanOnWorker } from "@/lib/scan-worker-client";
+import { toSummary, updateScan } from "@/lib/store";
 import { validateScanUrl } from "@/lib/validate-url";
 import {
   checkRateLimit,
@@ -55,6 +59,25 @@ export async function POST(request: Request) {
 
   if (process.env.USE_DEMO_SCAN === "1") {
     void runDemoScan(scan.id);
+  } else if (isScanWorkerProxyEnabled()) {
+    try {
+      await triggerScanOnWorker(scan.id);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Scan worker unavailable.";
+      await updateScan(scan.id, {
+        status: "failed",
+        completedAt: new Date().toISOString(),
+        errorMessage: `Could not start scan on worker. ${message}`,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "Scan service is temporarily unavailable. Please try again shortly.",
+        },
+        { status: 503, headers: rateLimitHeaders(rate) },
+      );
+    }
   } else {
     void runLiveScan(scan.id);
   }

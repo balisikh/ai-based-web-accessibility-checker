@@ -140,6 +140,8 @@ Copy [`web/.env.example`](./web/.env.example) to `web/.env.local`:
 | `AI_MODEL` | Model name (default `gpt-4o-mini`) |
 | `AI_MAX_ISSUES` | How many top issues to enrich (default `5`) |
 | `USE_DEMO_SCAN=1` | Sample findings instead of live Playwright/axe |
+| `SCAN_WORKER_URL` | **Vercel UI host:** origin of Docker scan worker (see [`web/DEPLOY.md`](./web/DEPLOY.md#vercel-ui--docker-scan-worker-hybrid)) |
+| `SCAN_WORKER_SECRET` | Shared secret between Vercel and worker (`Authorization: Bearer …`) |
 | `NEXT_PUBLIC_SITE_URL` | Public deploy URL for SEO (canonical, sitemap, Open Graph) |
 
 Full details: [`web/README.md`](./web/README.md) · SEO: [`web/DEPLOY.md`](./web/DEPLOY.md#seo-search-visibility)
