@@ -1,5 +1,7 @@
 # Lumen (web app)
 
+[![CI status](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
+
 Next.js application for the AI-Based Web Accessibility Checker.
 
 For the project overview and quick start, see the [root README](../README.md).

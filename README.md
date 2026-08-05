@@ -1,6 +1,6 @@
 # Lumen — AI-Based Web Accessibility Checker
 
-[![CI](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
+[![CI status](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
 
 Scan a public URL for WCAG-oriented accessibility issues, get a clear score, and (optionally) AI-guided fix tips.
 
@@ -147,6 +147,8 @@ Full details: [`web/README.md`](./web/README.md) · SEO: [`web/DEPLOY.md`](./web
 ---
 
 ## Continuous integration (GitHub Actions)
+
+[![CI status](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/balisikh/ai-based-web-accessibility-checker/actions/workflows/ci.yml)
 
 On every push and pull request to **`main`**, [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) runs:
 
