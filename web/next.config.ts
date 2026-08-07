@@ -5,10 +5,12 @@ const isVercel = Boolean(process.env.VERCEL);
 
 const nextConfig: NextConfig = {
   ...(isVercel ? {} : { output: "standalone" }),
-  // Low-RAM machines: use 1 worker for static generation (avoids build OOM).
-  experimental: {
-    cpus: 1,
-  },
+  ...(isVercel
+    ? {}
+    : {
+        // Low-RAM machines: use 1 worker for static generation (avoids build OOM).
+        experimental: { cpus: 1 },
+      }),
   serverExternalPackages: [
     "playwright",
     "playwright-core",

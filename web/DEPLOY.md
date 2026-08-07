@@ -76,18 +76,32 @@ Then redeploy your service to pull the new tag.
 
 If you see Vercel’s plain **`404: NOT_FOUND`** page (with `Code: NOT_FOUND` and an ID like `lhr1::…`) on **all** URLs, the project is not building the Next.js app in **`web/`**.
 
+**This is a Next.js App Router app — not a Vite/CRA SPA.** There is no `index.html` and you must **not** add SPA rewrites to `index.html`. Vercel runs `next build` and serves routes from `.next/` (e.g. `/` → `src/app/page.tsx`).
+
+### Choose ONE root-directory setup (do not mix)
+
+| Root Directory in Vercel | Config file used |
+|--------------------------|------------------|
+| **`web`** (recommended) | [`web/vercel.json`](./vercel.json) |
+| **`.`** (repo root) | [`../vercel.json`](../vercel.json) (builds `web/package.json` with `@vercel/next`) |
+
 ### Required project settings
 
 In **Vercel → Project → Settings → Build and Deployment**:
 
 | Setting | Must be |
 |---------|---------|
-| **Root Directory** | **`web`** (not `./` or empty repo root) |
+| **Root Directory** | **`web`** *or* **`.`** — match the table above |
 | **Framework Preset** | **Next.js** (not **Other**) |
-| **Output Directory** | **empty** (default — do not set `.next` manually) |
-| **Build Command** | `npm run build` (default, or from [`vercel.json`](./vercel.json)) |
+| **Output Directory** | **empty** — never `dist`, `build`, `out`, or `.next` |
+| **Build Command** | `npm run build` (default, or from `vercel.json`) |
 
 Then **Deployments → Redeploy → Clear build cache**.
+
+Also:
+
+- **Delete** duplicate project `ai-based-web-accessibility-checker-jjq5` (failed twin deploys).
+- **Settings → Deployment Protection** → **Off** for Production (otherwise login/404 for visitors).
 
 ### Confirm the build worked
 
@@ -99,7 +113,7 @@ Build logs must include **`Detected Next.js`**, **`Running "npm run build"`**, a
 2. On import, set **Root Directory = `web`** before the first deploy.
 3. After the home page loads, add env vars for [hybrid scans](#vercel-ui--docker-scan-worker-hybrid) and redeploy.
 
-The repo includes [`web/vercel.json`](./vercel.json) so Vercel treats this folder as Next.js. That file is **ignored** if Root Directory points at the repo root instead of `web/`.
+The repo includes [`web/vercel.json`](./vercel.json) so Vercel treats this folder as Next.js. That file is **ignored** if Root Directory points at the repo root — use root [`vercel.json`](../vercel.json) instead.
 
 ---
 
