@@ -80,10 +80,11 @@ If you see Vercel’s plain **`404: NOT_FOUND`** page (with `Code: NOT_FOUND` an
 
 ### Choose ONE root-directory setup (do not mix)
 
-| Root Directory in Vercel | Config file used |
-|--------------------------|------------------|
-| **`web`** (recommended) | [`web/vercel.json`](./vercel.json) |
-| **`.`** (repo root) | [`../vercel.json`](../vercel.json) (builds `web/package.json` with `@vercel/next`) |
+| Root Directory in Vercel | Notes |
+|--------------------------|--------|
+| **`web`** (recommended) | Uses [`web/vercel.json`](./vercel.json). The repo root has no `package.json`. |
+
+Do **not** set Root Directory to `.` (repo root) — there is no Next.js app there.
 
 ### Required project settings
 
@@ -113,7 +114,7 @@ Build logs must include **`Detected Next.js`**, **`Running "npm run build"`**, a
 2. On import, set **Root Directory = `web`** before the first deploy.
 3. After the home page loads, add env vars for [hybrid scans](#vercel-ui--docker-scan-worker-hybrid) and redeploy.
 
-The repo includes [`web/vercel.json`](./vercel.json) so Vercel treats this folder as Next.js. That file is **ignored** if Root Directory points at the repo root — use root [`vercel.json`](../vercel.json) instead.
+The repo includes [`web/vercel.json`](./vercel.json) so Vercel treats this folder as Next.js. Root Directory **must** be `web`.
 
 ---
 
