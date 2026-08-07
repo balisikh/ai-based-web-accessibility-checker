@@ -155,6 +155,8 @@ Note the worker’s public URL, e.g. `https://lumen-worker.onrender.com`.
 
 3. Deploy. Use the `*.vercel.app` URL first — **do not move DNS** from an existing production host until scans are verified.
 
+**If the site loads only for you (SSO login) or fails in embedded browsers:** Vercel → **Settings → Deployment Protection** → set Production to **Standard Protection** off, or enable **Public** access for the production domain so visitors are not redirected to Vercel SSO.
+
 ### 4. Verify
 
 | Check | Expected |
